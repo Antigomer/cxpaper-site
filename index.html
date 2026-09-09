@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Construction Paper — field photo tools for pipeline inspection</title>
+<meta name="description" content="Construction Paper is a Windows tool for pipeline environmental inspectors: rename field photos by station, stamp them with GPS, and export Google Earth KMZs.">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<meta property="og:title" content="Construction Paper">
+<meta property="og:description" content="Field photo tools for pipeline inspection. Rename by station, stamp with GPS, export to Google Earth.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://cxpaper.com/">
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <img class="mark" src="assets/mark.svg" alt="">
+    <a class="name" href="/">Construction Paper</a>
+    <nav class="site-nav">
+      <a href="/">Overview</a>
+      <a href="/download/">Download</a>
+      <a href="/license/">License</a>
+    </nav>
+  </div>
+</header>
+<div class="ream" role="presentation"></div>
+
+<main>
+  <div class="wrap">
+
+    <p class="label">Windows · pipeline environmental inspection</p>
+    <h1>The photos come off the camera already named.</h1>
+    <p class="lede">
+      Construction Paper takes a day's field photos, matches each one to the
+      nearest station on your alignment, and renames it accordingly — then
+      stamps what you need on the face of it and hands you a KMZ you can open
+      in Google Earth. Built on a pipeline right-of-way, by someone walking one.
+    </p>
+
+    <div class="btn-row">
+      <a class="btn" href="/download/">Download</a>
+      <a class="btn ghost" href="/license/">License status</a>
+    </div>
+    <p class="data" style="color:var(--muted)">
+      Current build <span data-release="version">…</span> · <span data-release="date">…</span>
+    </p>
+
+    <h2>What it does</h2>
+
+    <div class="grid">
+      <div>
+        <h3>Rename by station</h3>
+        <p>Reads the GPS out of each photo, finds the nearest station point in
+        your KMZ, and writes a name you can sort — station, project, original
+        filename. Videos too.</p>
+      </div>
+      <div>
+        <h3>Marco Polocator</h3>
+        <p>Burns location, bearing, date and a caption onto the image itself, so
+        the photo still says where it was taken after it has been mailed,
+        pasted into a report and printed.</p>
+      </div>
+      <div>
+        <h3>Google Earth KMZ</h3>
+        <p>Exports the whole day as a KMZ — thumbnails on the alignment, a
+        ribbon of the route, a minimap and a compass on each photo. Send it and
+        the other person sees what you saw.</p>
+      </div>
+      <div>
+        <h3>GIS tools</h3>
+        <p>Pull features, clip to a station range, build layers, and put NAIP
+        imagery underneath it. Georeferenced output that other software will
+        actually read.</p>
+      </div>
+      <div>
+        <h3>Stale GPS caught</h3>
+        <p>A plausibility check flags photos whose coordinates could not be
+        right — a camera holding the last fix through a treeline is the usual
+        culprit — instead of quietly filing them at the wrong station.</p>
+      </div>
+      <div>
+        <h3>Portable</h3>
+        <p>One executable. Settings, layers, profiles and tile cache live beside
+        it, so it runs from a truck laptop or a thumb drive with nothing
+        installed and nothing left behind.</p>
+      </div>
+    </div>
+
+    <h2>Who it is for</h2>
+    <p>
+      Environmental and utility inspectors who take a few hundred photos a day
+      along a linear project and have to file every one of them against a
+      station. If you have ever renamed photos by hand at nine at night against
+      a scatter sheet, this was written for you.
+    </p>
+
+    <div class="panel">
+      <p class="label">Availability</p>
+      <p style="margin:0">
+        Construction Paper is in an invitation-only rollout. The download is
+        open, but the program will not run without a license key — if you would
+        like one, get in touch and say what you are working on.
+      </p>
+    </div>
+
+    <div class="btn-row">
+      <a class="btn" href="/download/">Get the current build</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>Construction Paper</span>
+    <span>© <span data-year>2026</span> Chris Putnam</span>
+    <span class="spacer"><a href="mailto:chris@chrisputnam.me">chris@chrisputnam.me</a></span>
+  </div>
+</footer>
+
+<script src="assets/site.js"></script>
+</body>
+</html>
