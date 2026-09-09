@@ -10,6 +10,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
+<style>
+/* The hero's release line appears only once the Releases API actually returns a
+   release; site.js flips data-release-state to "ready". Until a build is
+   published there is nothing true to put here, so the line stays out of the
+   page rather than reading "unavailable". Both [data-release] spans stay in the
+   DOM so fillRelease() still has something to fill. Scoped to p.data so the
+   download page's table, which carries the same attribute, is unaffected. */
+p.data[data-release-state] { display: none; }
+p.data[data-release-state="ready"] { display: block; }
+</style>
 <meta property="og:title" content="Construction Paper">
 <meta property="og:description" content="Field photo tools for pipeline inspection. Rename by station, stamp with GPS, export to Google Earth.">
 <meta property="og:type" content="website">
@@ -34,23 +44,494 @@
   <div class="wrap">
 
     <p class="label">Windows · pipeline environmental inspection</p>
-    <h1>A picture is worth a thousand words&hellip; unless you can&rsquo;t
-    remember where you were when you took it.</h1>
+    <h1>Nobody types a station number into a filename.</h1>
     <p class="lede">
-      Construction Paper reads the GPS out of every photo you shot, matches each
-      one to the nearest station on your alignment, and renames it accordingly —
-      then stamps what you need on the face of it and hands you a KMZ you can
-      open in Google Earth. Built on a pipeline right-of-way, by someone walking
-      one.
+      Construction Paper gets it from the photo itself: the GPS in the file,
+      the nearest station point in your KMZ, and the station in front with the
+      camera's original name still in it. It will also burn location, bearing,
+      date and a caption onto the face of the photo, and hand you the day as a
+      KMZ for Google Earth. Built for the ROW, by the ROW.
     </p>
 
     <div class="btn-row">
       <a class="btn" href="/download/">Download</a>
       <a class="btn ghost" href="/license/">License status</a>
     </div>
-    <p class="data" style="color:var(--muted)">
-      Current build <span data-release="version">…</span> · <span data-release="date">…</span>
+    <p class="data" data-release-state="loading" style="color:var(--muted)">
+      Latest published release <span data-release="version">…</span> · <span data-release="date">…</span>
     </p>
+
+    <h2>One pass over the day</h2>
+    <p>Your camera numbers the photos. Construction Paper names them.</p>
+
+    <section class="cpa-scope" aria-label="How Construction Paper renames a day of photos">
+    <style>
+    .cpa-scope{
+      --cpa-ink:#161311;
+      --cpa-lid:#242020;
+      --cpa-paper:#F2ECDF;
+      --cpa-amber:#F0A53A;
+      --cpa-corn:#5083E2;
+      --cpa-corn-t:#2757B6;
+      --cpa-green:#637F08;
+      --cpa-green-t:#495F03;
+      --cpa-hair:rgba(22,19,17,.16);
+      --cpa-sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+      --cpa-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+      --cpa-dur:18s;
+      --cpa-ease:cubic-bezier(.4,0,.2,1);
+      font-family:var(--cpa-sans);
+      color:var(--cpa-ink);
+      display:block;
+      margin:0;
+      padding:2.5rem 0;
+      -webkit-font-smoothing:antialiased;
+    }
+    .cpa-scope *{box-sizing:border-box;}
+
+    /* ---------- heading ---------- */
+    .cpa-eyebrow{
+      font-family:var(--cpa-mono);
+      font-size:11px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:rgba(22,19,17,.55);
+      margin:0 0 .75rem;
+    }
+    .cpa-h{
+      font-family:var(--cpa-sans);
+      font-size:clamp(1.05rem,2.4vw,1.45rem);
+      line-height:1.35;
+      font-weight:500;
+      letter-spacing:-.005em;
+      margin:0 0 1.5rem;
+      max-width:34rem;
+    }
+    .cpa-h b{font-weight:600;}
+
+    /* ---------- stage ---------- */
+    .cpa-stage{
+      background:var(--cpa-paper);
+      border:1px solid var(--cpa-hair);
+      border-radius:2px;
+      padding:1.5rem 1.25rem 1.375rem;
+    }
+    .cpa-track{
+      display:grid;
+      grid-template-columns:1fr;
+      align-items:start;
+    }
+
+    /* ---------- a beat ---------- */
+    .cpa-beat{
+      min-width:0;
+      opacity:1;
+      animation-duration:var(--cpa-dur);
+      animation-iteration-count:infinite;
+      animation-timing-function:var(--cpa-ease);
+      animation-fill-mode:both;
+    }
+    .cpa-b1{animation-name:cpa-lit1;}
+    .cpa-b2{animation-name:cpa-lit2;}
+    .cpa-b3{animation-name:cpa-lit3;}
+    .cpa-b4{animation-name:cpa-lit4;}
+
+    .cpa-rule{height:1px;background:var(--cpa-ink);}
+    .cpa-lab{
+      font-family:var(--cpa-mono);
+      font-size:11px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:var(--cpa-ink);
+      margin:.5rem 0 .3rem;
+      white-space:nowrap;
+    }
+    .cpa-cap{
+      font-size:11.5px;
+      line-height:1.45;
+      color:rgba(22,19,17,.62);
+      margin:0 0 .8rem;
+    }
+    .cpa-body{min-height:6.75rem;}
+
+    /* ---------- shared type ---------- */
+    .cpa-f{
+      font-family:var(--cpa-mono);
+      font-size:11px;
+      line-height:1.55;
+      white-space:nowrap;
+      color:var(--cpa-ink);
+    }
+    .cpa-sc{
+      font-family:var(--cpa-mono);
+      font-size:10px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:rgba(22,19,17,.5);
+      white-space:nowrap;
+    }
+
+    /* ---------- connectors: the one moving thing ---------- */
+    .cpa-link{
+      position:relative;
+      background:rgba(22,19,17,.16);
+      width:1px;
+      height:1.75rem;
+      margin:.35rem 0 .35rem 0;
+    }
+    .cpa-fill{
+      position:absolute;
+      left:0;top:0;width:100%;height:100%;
+      background:var(--cpa-ink);
+      animation-duration:var(--cpa-dur);
+      animation-iteration-count:infinite;
+      animation-timing-function:linear;
+      animation-fill-mode:both;
+    }
+    .cpa-l1 .cpa-fill{animation-name:cpa-draw1v;}
+    .cpa-l2 .cpa-fill{animation-name:cpa-draw2v;}
+    .cpa-l3 .cpa-fill{animation-name:cpa-draw3v;}
+    .cpa-tip{
+      position:absolute;
+      left:50%;bottom:-2px;
+      width:5px;height:5px;margin-left:-2.5px;
+      background:var(--cpa-ink);
+      opacity:0;
+      animation-duration:var(--cpa-dur);
+      animation-iteration-count:infinite;
+      animation-timing-function:linear;
+      animation-fill-mode:both;
+    }
+    .cpa-l1 .cpa-tip{animation-name:cpa-tip1;}
+    .cpa-l2 .cpa-tip{animation-name:cpa-tip2;}
+    .cpa-l3 .cpa-tip{animation-name:cpa-tip3;}
+
+    /* ---------- beat 1 : day folder ---------- */
+    .cpa-list>*{
+      opacity:1;
+      animation:cpa-in1 var(--cpa-dur) var(--cpa-ease) infinite both;
+    }
+    .cpa-list>*:nth-child(2){animation-delay:.15s;}
+    .cpa-list>*:nth-child(3){animation-delay:.3s;}
+    .cpa-list>*:nth-child(4){animation-delay:.45s;}
+    .cpa-list>*:nth-child(5){animation-delay:.65s;}
+    .cpa-more{margin-top:.45rem;}
+
+    /* ---------- beat 2 : read ---------- */
+    .cpa-read>*{
+      opacity:1;
+      animation:cpa-in2 var(--cpa-dur) var(--cpa-ease) infinite both;
+    }
+    .cpa-read>*:nth-child(2){animation-delay:.22s;}
+    .cpa-read>*:nth-child(3){animation-delay:.44s;}
+    .cpa-read>*:nth-child(4){animation-delay:.66s;}
+    .cpa-read>*:nth-child(5){animation-delay:.88s;}
+    .cpa-pair{margin-bottom:.5rem;}
+    .cpa-coord{
+      font-family:var(--cpa-mono);
+      font-size:11px;
+      line-height:1.55;
+      color:var(--cpa-corn-t);
+      white-space:nowrap;
+      position:relative;
+      padding-left:14px;
+      margin-top:1px;
+    }
+    .cpa-coord::before{
+      content:"";
+      position:absolute;
+      left:2px;top:-3px;bottom:50%;
+      width:7px;
+      border-left:1px solid rgba(80,131,226,.55);
+      border-bottom:1px solid rgba(80,131,226,.55);
+    }
+    .cpa-readlab{margin-bottom:.5rem;}
+
+    /* ---------- beat 3 : match ---------- */
+    .cpa-rail{position:relative;height:74px;margin-top:.15rem;}
+    .cpa-railline{
+      position:absolute;left:28px;top:2px;bottom:2px;
+      width:1px;background:rgba(22,19,17,.3);
+      animation:cpa-in3 var(--cpa-dur) var(--cpa-ease) infinite both;
+    }
+    .cpa-st{
+      position:absolute;left:28px;height:14px;
+      display:flex;align-items:center;gap:8px;
+      color:var(--cpa-ink);
+      animation:cpa-in3 var(--cpa-dur) var(--cpa-ease) infinite both;
+    }
+    .cpa-st i{display:block;width:8px;height:1px;background:currentColor;flex:none;}
+    .cpa-st span{
+      font-family:var(--cpa-mono);
+      font-size:11px;line-height:14px;
+      color:currentColor;white-space:nowrap;
+    }
+    .cpa-s1{top:5px;animation-delay:.08s;}
+    .cpa-s2{
+      top:29px;color:var(--cpa-green-t);
+      animation:cpa-in3 var(--cpa-dur) var(--cpa-ease) infinite both,
+                cpa-hit var(--cpa-dur) steps(1,end) infinite both;
+      animation-delay:.16s,0s;
+    }
+    .cpa-s3{top:53px;animation-delay:.24s;}
+    .cpa-fix{
+      position:absolute;left:28px;top:36px;
+      width:9px;height:9px;margin:-4.5px 0 0 -4.5px;
+      border-radius:50%;
+      background:var(--cpa-green);
+      opacity:1;
+      animation:cpa-fix var(--cpa-dur) var(--cpa-ease) infinite both;
+    }
+    .cpa-raillab{
+      margin-bottom:.35rem;
+      animation:cpa-in3 var(--cpa-dur) var(--cpa-ease) infinite both;
+    }
+
+    /* ---------- beat 4 : write ---------- */
+    .cpa-outlist>*{
+      opacity:1;
+      animation:cpa-in4 var(--cpa-dur) var(--cpa-ease) infinite both;
+    }
+    .cpa-outlist>*:nth-child(2){animation-delay:.12s;}
+    .cpa-outlist>*:nth-child(3){animation-delay:.24s;}
+    .cpa-outlist>*:nth-child(4){animation-delay:.36s;}
+    .cpa-pre{
+      display:inline-block;
+      overflow:hidden;
+      white-space:nowrap;
+      vertical-align:bottom;
+      max-width:18ch;
+      color:var(--cpa-green-t);
+      font-weight:500;
+      /* a caret sits at the writing edge so a half-typed prefix reads as an
+         insertion point, not as a malformed filename */
+      border-right:1px solid transparent;
+      /* stepped one character at a time: no frame ever shows a half-cut name */
+      animation:cpa-wipe var(--cpa-dur) steps(18,end) infinite both,
+                cpa-caret var(--cpa-dur) steps(1,end) infinite both;
+    }
+    .cpa-outlist>*:nth-child(2) .cpa-pre{animation-delay:.14s;}
+    .cpa-outlist>*:nth-child(3) .cpa-pre{animation-delay:.28s;}
+    .cpa-old{color:rgba(22,19,17,.72);}
+    .cpa-extra{
+      margin-top:.7rem;padding-top:.6rem;
+      border-top:1px solid var(--cpa-hair);
+      animation:cpa-in4b var(--cpa-dur) var(--cpa-ease) infinite both;
+    }
+    .cpa-extra .cpa-f{margin-top:.15rem;}
+    .cpa-held{
+      margin-top:.55rem;
+      display:flex;align-items:center;gap:6px;
+      animation:cpa-in4b var(--cpa-dur) var(--cpa-ease) infinite both;
+      animation-delay:.4s;
+    }
+    .cpa-held i{display:block;width:7px;height:7px;background:var(--cpa-amber);flex:none;}
+    .cpa-held span{
+      font-family:var(--cpa-mono);
+      font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+      color:rgba(22,19,17,.72);white-space:nowrap;
+    }
+
+    /* ---------- footnote ---------- */
+    .cpa-foot{
+      font-size:11.5px;line-height:1.5;
+      color:rgba(22,19,17,.55);
+      margin:.9rem 0 0;
+      max-width:44rem;
+    }
+
+    /* ---------- wide: four across, one continuous rule ---------- */
+    @media (min-width:960px){
+      .cpa-track{
+        grid-template-columns:1fr 2.5rem 1fr 2.5rem 1fr 2.5rem 1fr;
+      }
+      .cpa-link{
+        align-self:start;
+        width:100%;height:1px;
+        margin:0;
+      }
+      .cpa-l1 .cpa-fill{animation-name:cpa-draw1h;}
+      .cpa-l2 .cpa-fill{animation-name:cpa-draw2h;}
+      .cpa-l3 .cpa-fill{animation-name:cpa-draw3h;}
+      .cpa-tip{
+        left:auto;right:-2px;bottom:auto;top:50%;
+        margin-left:0;margin-top:-2.5px;
+      }
+      .cpa-f,.cpa-coord,.cpa-st span{font-size:10px;}
+      .cpa-body{min-height:7.25rem;}
+    }
+    @media (max-width:959.98px){
+      .cpa-track{max-width:34rem;}
+      .cpa-body{min-height:0;}
+    }
+
+    /* ================= keyframes ================= */
+    /* beat illumination */
+    @keyframes cpa-lit1{0%{opacity:.5}2.2%,94.4%{opacity:1}97.8%,100%{opacity:.5}}
+    @keyframes cpa-lit2{0%,18.9%{opacity:.5}21.1%,94.4%{opacity:1}97.8%,100%{opacity:.5}}
+    @keyframes cpa-lit3{0%,38.9%{opacity:.5}41.1%,94.4%{opacity:1}97.8%,100%{opacity:.5}}
+    @keyframes cpa-lit4{0%,58.9%{opacity:.5}61.1%,94.4%{opacity:1}97.8%,100%{opacity:.5}}
+
+    /* connector draw — horizontal */
+    @keyframes cpa-draw1h{0%,16.7%{width:0}20%,94.4%{width:100%}97.2%,100%{width:0}}
+    @keyframes cpa-draw2h{0%,36.7%{width:0}40%,94.4%{width:100%}97.2%,100%{width:0}}
+    @keyframes cpa-draw3h{0%,56.7%{width:0}60%,94.4%{width:100%}97.2%,100%{width:0}}
+    /* connector draw — vertical */
+    @keyframes cpa-draw1v{0%,16.7%{height:0}20%,94.4%{height:100%}97.2%,100%{height:0}}
+    @keyframes cpa-draw2v{0%,36.7%{height:0}40%,94.4%{height:100%}97.2%,100%{height:0}}
+    @keyframes cpa-draw3v{0%,56.7%{height:0}60%,94.4%{height:100%}97.2%,100%{height:0}}
+    /* the travelling tip */
+    @keyframes cpa-tip1{0%,16.4%{opacity:0}16.7%,20%{opacity:1}21.7%,100%{opacity:0}}
+    @keyframes cpa-tip2{0%,36.4%{opacity:0}36.7%,40%{opacity:1}41.7%,100%{opacity:0}}
+    @keyframes cpa-tip3{0%,56.4%{opacity:0}56.7%,60%{opacity:1}61.7%,100%{opacity:0}}
+
+    /* content reveals */
+    @keyframes cpa-in1{
+      0%,1.7%{opacity:0;transform:translateY(4px)}
+      4.4%,94.4%{opacity:1;transform:none}
+      97.2%,100%{opacity:0;transform:translateY(4px)}
+    }
+    @keyframes cpa-in2{
+      0%,20.6%{opacity:0;transform:translateY(4px)}
+      23.3%,94.4%{opacity:1;transform:none}
+      97.2%,100%{opacity:0;transform:translateY(4px)}
+    }
+    @keyframes cpa-in3{
+      0%,40.6%{opacity:0;transform:translateY(4px)}
+      43.3%,94.4%{opacity:1;transform:none}
+      97.2%,100%{opacity:0;transform:translateY(4px)}
+    }
+    @keyframes cpa-in4{
+      0%,61.1%{opacity:0;transform:translateY(4px)}
+      63.9%,94.4%{opacity:1;transform:none}
+      97.2%,100%{opacity:0;transform:translateY(4px)}
+    }
+    @keyframes cpa-in4b{
+      0%,72.2%{opacity:0;transform:translateY(4px)}
+      74.4%,94.4%{opacity:1;transform:none}
+      97.2%,100%{opacity:0;transform:translateY(4px)}
+    }
+    /* the fix arrives off-station, then snaps to the nearest one */
+    @keyframes cpa-fix{
+      0%,46.1%{opacity:0;top:46px;transform:translateX(-24px);background:var(--cpa-corn)}
+      48.3%{opacity:1;top:46px;transform:translateX(-24px);background:var(--cpa-corn)}
+      50.6%,52.8%{opacity:1;top:46px;transform:translateX(0);background:var(--cpa-corn)}
+      54.4%,94.4%{opacity:1;top:36px;transform:translateX(0);background:var(--cpa-green)}
+      97.2%,100%{opacity:0;top:36px;transform:translateX(0);background:var(--cpa-green)}
+    }
+    @keyframes cpa-hit{
+      0%,53.9%{color:var(--cpa-ink)}
+      54.4%,100%{color:var(--cpa-green-t)}
+    }
+    /* the software writes the name in front of the camera's */
+    @keyframes cpa-caret{
+      0%,66%{border-right-color:transparent}
+      66.1%,70.5%{border-right-color:var(--cpa-green-t)}
+      70.6%,100%{border-right-color:transparent}
+    }
+    @keyframes cpa-wipe{
+      0%,66.1%{max-width:0}
+      70.6%,100%{max-width:18ch}
+    }
+
+    /* ---------- reduced motion: hold the finished state ---------- */
+    @media (prefers-reduced-motion:reduce){
+      .cpa-scope *,
+      .cpa-scope *::before,
+      .cpa-scope *::after{
+        animation:none !important;
+        transition:none !important;
+      }
+    }
+    </style>
+
+      <div class="cpa-stage">
+        <div class="cpa-track">
+
+          <!-- 01 -->
+          <div class="cpa-beat cpa-b1">
+            <div class="cpa-rule"></div>
+            <div class="cpa-lab">01 &middot; Day folder</div>
+            <p class="cpa-cap">As the camera left them.</p>
+            <div class="cpa-body">
+              <div class="cpa-list">
+                <div class="cpa-f">IMG_4487.JPG</div>
+                <div class="cpa-f">IMG_4488.JPG</div>
+                <div class="cpa-f">IMG_4489.JPG</div>
+                <div class="cpa-f">IMG_4490.JPG</div>
+                <div class="cpa-sc cpa-more">+ 214 more</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cpa-link cpa-l1" aria-hidden="true"><span class="cpa-fill"><span class="cpa-tip"></span></span></div>
+
+          <!-- 02 -->
+          <div class="cpa-beat cpa-b2">
+            <div class="cpa-rule"></div>
+            <div class="cpa-lab">02 &middot; Read</div>
+            <p class="cpa-cap">GPS out of every file.</p>
+            <div class="cpa-body">
+              <div class="cpa-read">
+                <div class="cpa-sc cpa-readlab">EXIF &middot; GPS</div>
+                <div class="cpa-pair">
+                  <div class="cpa-f">IMG_4487.JPG</div>
+                  <div class="cpa-coord">41.83019, -79.65412</div>
+                </div>
+                <div class="cpa-pair">
+                  <div class="cpa-f">IMG_4488.JPG</div>
+                  <div class="cpa-coord">41.83007, -79.65402</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cpa-link cpa-l2" aria-hidden="true"><span class="cpa-fill"><span class="cpa-tip"></span></span></div>
+
+          <!-- 03 -->
+          <div class="cpa-beat cpa-b3">
+            <div class="cpa-rule"></div>
+            <div class="cpa-lab">03 &middot; Match</div>
+            <p class="cpa-cap">Nearest station on the alignment.</p>
+            <div class="cpa-body">
+              <div class="cpa-sc cpa-raillab">Alignment &middot; KMZ</div>
+              <div class="cpa-rail">
+                <div class="cpa-railline"></div>
+                <div class="cpa-st cpa-s1"><i></i><span>1043+00</span></div>
+                <div class="cpa-st cpa-s2"><i></i><span>1043+50</span></div>
+                <div class="cpa-st cpa-s3"><i></i><span>1044+00</span></div>
+                <div class="cpa-fix"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cpa-link cpa-l3" aria-hidden="true"><span class="cpa-fill"><span class="cpa-tip"></span></span></div>
+
+          <!-- 04 -->
+          <div class="cpa-beat cpa-b4">
+            <div class="cpa-rule"></div>
+            <div class="cpa-lab">04 &middot; Write</div>
+            <p class="cpa-cap">Renamed, stamped, exported.</p>
+            <div class="cpa-body">
+              <div class="cpa-outlist">
+                <div class="cpa-f"><span class="cpa-pre">1043+50_SireWest_</span><span class="cpa-old">IMG_4487.JPG</span></div>
+                <div class="cpa-f"><span class="cpa-pre">1044+00_SireWest_</span><span class="cpa-old">IMG_4488.JPG</span></div>
+                <div class="cpa-f"><span class="cpa-pre">1044+50_SireWest_</span><span class="cpa-old">IMG_4489.JPG</span></div>
+                <div class="cpa-sc cpa-more">+ 214 more</div>
+              </div>
+              <div class="cpa-extra">
+                <div class="cpa-sc">Google Earth export</div>
+                <div class="cpa-f">SireWest_2026-09-09.kmz</div>
+              </div>
+              <div class="cpa-held"><i></i><span>1 held &middot; stale GPS</span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <p class="cpa-foot">Station, project, original filename &mdash; nothing thrown away, nothing filed at the wrong station.</p>
+    </section>
 
     <h2>What it does</h2>
 
@@ -59,7 +540,7 @@
         <h3>Rename by station</h3>
         <p>Reads the GPS out of each photo, finds the nearest station point in
         your KMZ, and writes a name you can sort — station, project, original
-        filename. Videos too.</p>
+        filename. Videos too, on a machine that has ffmpeg installed.</p>
       </div>
       <div>
         <h3>Marco Polocator</h3>
@@ -69,45 +550,45 @@
       </div>
       <div>
         <h3>Google Earth KMZ</h3>
-        <p>Exports the whole day as a KMZ — thumbnails on the alignment, a
-        ribbon of the route, a minimap and a compass on each photo. Send it and
-        the other person sees what you saw.</p>
+        <p>Exports the day as a KMZ, one file for each date folder. Every photo
+        becomes a camera pin with a field of view showing which way the camera
+        was pointed, and a plain camera where the phone recorded no heading.
+        Click a pin and the photo opens in the balloon. Send it and the other
+        person sees what you saw.</p>
       </div>
       <div>
         <h3>Stale GPS caught</h3>
-        <p>A plausibility check flags photos whose coordinates could not be
-        right — a camera still holding the last fix under a treeline is the
-        usual culprit — instead of quietly filing them at the wrong station. It
-        shows them in red before it renames anything, and offers you a position
-        worked out from the photos either side of it.</p>
+        <p>A plausibility check catches coordinates that could not be right
+        — usually a hot phone that stopped reacquiring GPS and stamped the photo
+        with its last known fix. The suspect photos turn red in the preview,
+        with the reason, before anything is renamed.</p>
       </div>
       <div>
         <h3>Portable</h3>
-        <p>One executable. Settings, layers, profiles and tile cache live beside
-        it, so it runs from a truck laptop or a thumb drive with nothing
-        installed and nothing left behind.</p>
+        <p>One executable and no installer. Settings, layers, profiles and tile
+        cache live beside it, so it runs from a truck laptop and leaves the rest
+        of the machine alone. The key binds to the first computer it opens on.</p>
       </div>
     </div>
 
     <h2>Who it is for</h2>
     <p>
-      Environmental and utility inspectors who take a few hundred photos a day
-      along a linear project and have to file every one of them against a
-      station. If you have ever renamed photos by hand at nine at night against
-      a scatter sheet, this was written for you.
+      Environmental and utility inspectors who photograph a linear project all
+      day and have to file every photo against a station.
     </p>
 
     <div class="panel">
       <p class="label">Availability</p>
       <p style="margin:0">
-        Construction Paper is in an invitation-only rollout. The download is
-        open, but the program will not run without a license key — if you would
-        like one, get in touch and say what you are working on.
+        Construction Paper is invitation-only right now. Every copy needs its
+        own license key and will not open without one. Email
+        <a href="mailto:chris@chrisputnam.me">chris@chrisputnam.me</a> and
+        include the project you are on.
       </p>
     </div>
 
     <div class="btn-row">
-      <a class="btn" href="/download/">Get the current build</a>
+      <a class="btn" href="/download/">How to get a copy</a>
     </div>
 
   </div>
