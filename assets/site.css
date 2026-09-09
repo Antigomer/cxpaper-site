@@ -1,0 +1,222 @@
+/* Construction Paper — cxpaper.com
+   Identity v2 tokens. Do not invent colours; these are the seven inks. */
+
+:root {
+  --ink:        #161311;
+  --lid:        #242020;
+  --paper:      #F2ECDF;
+  --ground:     #F5F1E8;
+  --amber:      #F0A53A;
+  --cornflower: #5083E2;
+  --green:      #637F08;
+  --red:        #BB0A10;
+
+  /* text-safe drops — the sheet inks are tuned for a 200-sheet edge,
+     not for 14px type */
+  --cornflower-text: #2757B6;
+  --green-text:      #495F03;
+  --red-text:        #AC040C;
+
+  --rule: rgba(22, 19, 17, 0.14);
+  --muted: rgba(22, 19, 17, 0.62);
+
+  --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --measure: 65ch;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.65;
+  font-weight: 400;
+}
+
+a { color: var(--cornflower-text); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+
+.wrap { max-width: 62rem; margin: 0 auto; padding: 0 1.5rem; }
+
+/* ---- header + ream edge ------------------------------------------------ */
+
+.site-head {
+  background: var(--ground);
+  border-bottom: 1px solid var(--rule);
+}
+
+.site-head .wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding-top: 1.15rem;
+  padding-bottom: 1.15rem;
+  flex-wrap: wrap;
+}
+
+.site-head img.mark { width: 40px; height: 40px; display: block; flex: none; }
+
+.site-head .name {
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: -0.025em;
+  margin-right: auto;
+  text-decoration: none;
+  color: var(--ink);
+}
+.site-head .name:hover { text-decoration: none; }
+
+.site-nav { display: flex; gap: 1.4rem; }
+.site-nav a {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--muted);
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+}
+.site-nav a:hover { color: var(--ink); border-bottom-color: var(--rule); }
+.site-nav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--cornflower); }
+
+/* The ream edge — one 200-stop sequence read off the mark's own side face,
+   laid flat. Derived from the mark, not a second variant of it.
+   Delete this rule and the <div class="ream"> to remove the motif. */
+.ream {
+  height: 5px;
+  background: linear-gradient(90deg,
+    var(--green) 0 3%,  var(--amber) 3% 5%,   var(--green) 5% 8%,
+    var(--ink) 8% 13%,  var(--cornflower) 13% 15%, var(--red) 15% 17%,
+    var(--ink) 17% 28%, var(--green) 28% 33%, var(--red) 33% 35%,
+    var(--green) 35% 41%, var(--cornflower) 41% 43%, var(--ink) 43% 48%,
+    var(--cornflower) 48% 50%, var(--ink) 50% 58%, var(--amber) 58% 60%,
+    var(--ink) 60% 66%, var(--green) 66% 69%, var(--ink) 69% 77%,
+    var(--red) 77% 79%, var(--ink) 79% 86%, var(--cornflower) 86% 88%,
+    var(--green) 88% 91%, var(--ink) 91% 100%);
+}
+
+/* ---- type -------------------------------------------------------------- */
+
+h1 { font-size: 2.75rem; line-height: 1.12; font-weight: 600; letter-spacing: -0.025em; margin: 0 0 1rem; }
+h2 { font-size: 1.75rem; line-height: 1.2; font-weight: 500; letter-spacing: -0.02em; margin: 2.75rem 0 0.75rem; }
+h3 { font-size: 1.125rem; font-weight: 600; margin: 1.75rem 0 0.4rem; }
+
+.lede { font-size: 1.2rem; line-height: 1.55; color: var(--muted); max-width: var(--measure); margin: 0 0 2rem; }
+
+p, ul, ol { max-width: var(--measure); }
+
+.label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.5rem;
+}
+
+.data { font-family: var(--mono); font-size: 14px; }
+
+main { padding: 3.5rem 0 5rem; }
+
+/* ---- panels + buttons -------------------------------------------------- */
+
+.panel {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1.5rem 1.75rem;
+  margin: 1.5rem 0;
+  max-width: var(--measure);
+}
+
+.btn {
+  display: inline-block;
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.8rem 1.6rem;
+  border-radius: 3px;
+  text-decoration: none;
+  border: 1px solid var(--ink);
+}
+.btn:hover { background: var(--lid); color: var(--paper); text-decoration: none; }
+.btn.ghost { background: transparent; color: var(--ink); }
+.btn.ghost:hover { background: rgba(22,19,17,0.06); color: var(--ink); }
+
+.btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin: 2rem 0 0.75rem; }
+
+/* ---- feature grid ------------------------------------------------------ */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.75rem 2.25rem;
+  margin: 2rem 0;
+  max-width: none;
+}
+.grid > div { max-width: 30rem; }
+.grid h3 { margin-top: 0; }
+.grid p { margin: 0; font-size: 0.95rem; color: var(--muted); }
+
+/* ---- key/value table --------------------------------------------------- */
+
+.kv { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 14px; }
+.kv th, .kv td { text-align: left; padding: 0.55rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.kv th { font-weight: 400; color: var(--muted); width: 11rem; letter-spacing: 0.04em; }
+.kv tr:last-child th, .kv tr:last-child td { border-bottom: 0; }
+.kv td.wrapish { word-break: break-all; }
+
+/* ---- status chips ------------------------------------------------------ */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 2px;
+  border: 1px solid currentColor;
+}
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip.ok    { color: var(--green-text); }
+.chip.look  { color: #8a5a12; }
+.chip.fail  { color: var(--red-text); }
+
+code, kbd { font-family: var(--mono); font-size: 0.9em; background: rgba(22,19,17,0.06); padding: 0.1em 0.35em; border-radius: 2px; }
+pre { font-family: var(--mono); font-size: 13px; background: var(--paper); border: 1px solid var(--rule); border-radius: 3px; padding: 1rem 1.15rem; overflow-x: auto; max-width: var(--measure); }
+pre code { background: none; padding: 0; }
+
+hr { border: 0; border-top: 1px solid var(--rule); margin: 3rem 0; }
+
+/* ---- footer ------------------------------------------------------------ */
+
+.site-foot {
+  border-top: 1px solid var(--rule);
+  padding: 2rem 0 3rem;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+.site-foot .wrap { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: baseline; }
+.site-foot a { color: var(--muted); }
+.site-foot .spacer { margin-left: auto; }
+
+@media (max-width: 40rem) {
+  h1 { font-size: 2.1rem; }
+  h2 { font-size: 1.45rem; }
+  .lede { font-size: 1.08rem; }
+  .kv th { width: auto; display: block; padding-bottom: 0; border-bottom: 0; }
+  .kv td { display: block; padding-top: 0.15rem; }
+}
