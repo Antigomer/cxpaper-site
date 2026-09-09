@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>License — Construction Paper</title>
+<meta name="description" content="How Construction Paper licensing works, and the current signed status file.">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <img class="mark" src="../assets/mark.svg" alt="">
+    <a class="name" href="/">Construction Paper</a>
+    <nav class="site-nav">
+      <a href="/">Overview</a>
+      <a href="/download/">Download</a>
+      <a href="/license/">License</a>
+    </nav>
+  </div>
+</header>
+<div class="ream" role="presentation"></div>
+
+<main>
+  <div class="wrap">
+
+    <p class="label">Status host</p>
+    <h1>License</h1>
+    <p class="lede">
+      Every copy of Construction Paper checks a signed status file published at
+      this address. This page shows what that file currently says.
+    </p>
+
+    <div class="panel" data-status>
+      <p class="label">Current status file</p>
+      <p style="margin:0 0 1rem"><span class="chip ok" data-status="chip">loading…</span></p>
+      <table class="kv">
+        <tr><th>Endpoint</th><td class="wrapish"><a href="status.json">https://cxpaper.com/license/status.json</a></td></tr>
+        <tr><th>Format</th><td data-status="format">…</td></tr>
+        <tr><th>Updated</th><td data-status="updated">…</td></tr>
+        <tr><th>Revoked keys</th><td data-status="count">…</td></tr>
+      </table>
+    </div>
+
+    <h2>How it works</h2>
+    <p>
+      A license is a small signed file. It carries an id, an expiry, and either a
+      machine fingerprint or nothing at all — and the program verifies that
+      signature before it opens. There are three kinds:
+    </p>
+    <table class="kv">
+      <tr><th>Redeemable</th><td>Binds to the first computer that runs it, and is refused on a second.</td></tr>
+      <tr><th>Locked</th><td>Issued for one specific machine and runs only there.</td></tr>
+      <tr><th>Master</th><td>Runs anywhere. Held by the author.</td></tr>
+    </table>
+
+    <h2>The status file</h2>
+    <p>
+      <code>status.json</code> is the revocation list. It is signed with the same
+      key as the licenses themselves, which means this host does not have to be
+      trusted — it can refuse to answer, but it cannot forge a status. A tampered
+      file is rejected by every copy of the program.
+    </p>
+    <p>
+      Because it is signed rather than trusted, an unreachable host is not a
+      failure: a normal license keeps working while this site is down. Only the
+      strict check-in keys, which are issued deliberately, care.
+    </p>
+
+    <h2>What is stored on your machine</h2>
+    <p>
+      The license gate reads <code>license.igl</code> and writes only its own
+      files beside the executable — the binding record, the cached status, and a
+      machine fingerprint. It never touches your photos, layers, profiles or
+      output. That is a hard rule, not a current behaviour.
+    </p>
+    <p class="data" style="color:var(--muted)">
+      The fingerprint is a hash of two values Windows already exposes about the
+      computer. It is not derived from anything about you.
+    </p>
+
+    <h2>Getting a license</h2>
+    <p>
+      Construction Paper is in an invitation-only rollout. Email
+      <a href="mailto:chris@chrisputnam.me">chris@chrisputnam.me</a> with the
+      project you are working on. If a key ever needs to be withdrawn, it is
+      added to the revocation list above and stops working at the next check-in.
+    </p>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>Construction Paper</span>
+    <span>© <span data-year>2026</span> Chris Putnam</span>
+    <span class="spacer"><a href="mailto:chris@chrisputnam.me">chris@chrisputnam.me</a></span>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>
