@@ -1,0 +1,12 @@
+# The signing seed must NEVER enter this repository.
+*.igk
+*.igl
+ig_admin_key*
+issued_licenses.json
+
+# Build/OS noise
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+*.tmp
