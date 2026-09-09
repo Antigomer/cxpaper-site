@@ -32,64 +32,85 @@
     <p class="label">Status host</p>
     <h1>License</h1>
     <p class="lede">
-      Every copy of Construction Paper checks a signed status file published at
-      this address. This page shows what that file currently says.
+      Construction Paper reads a signed status file — the revocation list — to
+      decide whether a key is still good. That file is published at this
+      address, and this page shows what it currently says. Copies already in
+      the field were built against an earlier address and do not read this one
+      yet.
     </p>
 
     <div class="panel" data-status>
       <p class="label">Current status file</p>
-      <p style="margin:0 0 1rem"><span class="chip ok" data-status="chip">loading…</span></p>
+      <p style="margin:0 0 1rem"><span class="chip" data-status="chip">loading…</span></p>
       <table class="kv">
         <tr><th>Endpoint</th><td class="wrapish"><a href="status.json">https://cxpaper.com/license/status.json</a></td></tr>
         <tr><th>Format</th><td data-status="format">…</td></tr>
         <tr><th>Updated</th><td data-status="updated">…</td></tr>
         <tr><th>Revoked keys</th><td data-status="count">…</td></tr>
       </table>
+      <noscript>
+        <p style="margin:1rem 0 0">Those rows are read from
+        <code>status.json</code> by JavaScript. With it turned off they stay as
+        dots; the file itself is linked above and can be read directly.</p>
+      </noscript>
     </div>
 
     <h2>How it works</h2>
     <p>
-      A license is a small signed file. It carries an id, an expiry, and either a
-      machine fingerprint or nothing at all — and the program verifies that
-      signature before it opens. There are three kinds:
+      A license is a small signed file. It carries an id, an expiry, whether the
+      copy has to check in, and a machine field that is blank, one specific
+      fingerprint, or a wildcard. The program verifies that signature before it
+      opens. Those three machine values are the three kinds:
     </p>
     <table class="kv">
-      <tr><th>Redeemable</th><td>Binds to the first computer that runs it, and is refused on a second.</td></tr>
-      <tr><th>Locked</th><td>Issued for one specific machine and runs only there.</td></tr>
-      <tr><th>Master</th><td>Runs anywhere. Held by the author.</td></tr>
+      <tr><th>Redeemable</th><td>Blank. Binds to the first computer that runs it. The binding is recorded beside the program, not counted on a server.</td></tr>
+      <tr><th>Locked</th><td>One fingerprint. Issued for one specific machine and runs only there.</td></tr>
+      <tr><th>Master</th><td>Wildcard. Runs on any number of computers, never binds, and never runs the check-in clock. Revocable by id like any other key.</td></tr>
     </table>
 
     <h2>The status file</h2>
     <p>
       <code>status.json</code> is the revocation list. It is signed with the same
-      key as the licenses themselves, which means this host does not have to be
-      trusted — it can refuse to answer, but it cannot forge a status. A tampered
-      file is rejected by every copy of the program.
+      key as the licenses themselves, so a tampered or invented file is rejected
+      by every copy of the program. What a signature cannot do is force an
+      answer, or prove on its own that the copy that arrived is the newest one.
+      A host that cannot be reached leaves a withdrawn key looking good.
+      Revocation depends on a copy reaching this address.
     </p>
     <p>
-      Because it is signed rather than trusted, an unreachable host is not a
-      failure: a normal license keeps working while this site is down. Only the
-      strict check-in keys, which are issued deliberately, care.
+      What happens when that answer does not arrive depends on the key. A
+      license that has never reached this host is never blocked for it; one that
+      has keeps working for thirty days past its last successful check, and is
+      then blocked. A strict
+      check-in key, which is issued deliberately, starts that clock on the day it
+      is issued instead of at its first successful check. A master license
+      ignores the clock entirely.
     </p>
 
     <h2>What is stored on your machine</h2>
     <p>
-      The license gate reads <code>license.igl</code> and writes only its own
-      files beside the executable — the binding record, the cached status, and a
-      machine fingerprint. It never touches your photos, layers, profiles or
-      output. That is a hard rule, not a current behaviour.
+      The license gate touches only its own files, and only beside the
+      executable: the license itself (<code>license.igl</code>, which it writes
+      when a key is imported or pasted), the binding record, the cached status,
+      and the machine fingerprint. On the author's own copy it also appends the
+      ledger of keys it has issued. It never touches your photos, layers,
+      profiles or output. That is a hard rule, not a current behavior.
     </p>
     <p class="data" style="color:var(--muted)">
-      The fingerprint is a hash of two values Windows already exposes about the
-      computer. It is not derived from anything about you.
+      The fingerprint is a SHA-256 of two values Windows already exposes about
+      the computer: its machine GUID and its computer name. It stays on the
+      machine. The status check is a plain download of the file above, and there
+      is nothing on this host that could receive anything back.
     </p>
 
     <h2>Getting a license</h2>
     <p>
-      Construction Paper is in an invitation-only rollout. Email
-      <a href="mailto:chris@chrisputnam.me">chris@chrisputnam.me</a> with the
-      project you are working on. If a key ever needs to be withdrawn, it is
-      added to the revocation list above and stops working at the next check-in.
+      Construction Paper is invitation-only right now. Email
+      <a href="mailto:chris@chrisputnam.me">chris@chrisputnam.me</a> and include
+      the project you are on. If a key has to be withdrawn it goes on the
+      revocation list above. A copy issued with a strict check-in stops at its
+      next check; any other copy stops the next time it reaches this host
+      successfully.
     </p>
 
   </div>
