@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableDelayedExpansion
 REM ============================================================================
-REM  release.bat -- publish dist\ConstructionPaper.exe to GitHub Releases
+REM  release.bat -- publish the RELEASE edition to GitHub Releases
 REM
 REM    tools\release.bat 1.0.0
 REM    tools\release.bat 1.0.0 "Build 4 -- scatter sheet rewrite"
@@ -15,7 +15,16 @@ REM  The hash is parsed out of the notes -- keep the "SHA-256: <hash>" line.
 REM ============================================================================
 
 set "REPO=antigomer/cxpaper-releases"
-set "EXE=%~dp0..\..\dist\ConstructionPaper.exe"
+REM  Which exe to publish. The build agent sets CP_RELEASE_EXE to the RELEASE
+REM  edition (dist_release\), which is what customers get. Falling back to
+REM  dist\ would publish the BETA build, GIS Tools and all, so the fallback
+REM  exists only for a hand-run on a pre-build-11 tree.
+if defined CP_RELEASE_EXE (
+  set "EXE=%CP_RELEASE_EXE%"
+) else (
+  set "EXE=%~dp0..\..\dist_release\ConstructionPaper.exe"
+  if not exist "!EXE!" set "EXE=%~dp0..\..\dist\ConstructionPaper.exe"
+)
 
 if "%~1"=="" (
   echo Usage: tools\release.bat ^<version^> ["release title"]
@@ -69,7 +78,7 @@ set "NOTES=%TEMP%\cp_release_notes_%VER%.md"
 >> "!NOTES!" echo.
 >> "!NOTES!" echo     Get-FileHash .\ConstructionPaper.exe -Algorithm SHA256
 >> "!NOTES!" echo.
->> "!NOTES!" echo A licence key is required. cxpaper.com/license/
+>> "!NOTES!" echo A license key is required. cxpaper.com/license/
 
 echo Publishing...
 gh release create "v%VER%" "%EXE%" --repo "%REPO%" --title "%TITLE%" --notes-file "!NOTES!"
