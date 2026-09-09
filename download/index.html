@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Download — Construction Paper</title>
+<meta name="description" content="Download the current build of Construction Paper for Windows, with its SHA-256.">
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <img class="mark" src="../assets/mark.svg" alt="">
+    <a class="name" href="/">Construction Paper</a>
+    <nav class="site-nav">
+      <a href="/">Overview</a>
+      <a href="/download/">Download</a>
+      <a href="/license/">License</a>
+    </nav>
+  </div>
+</header>
+<div class="ream" role="presentation"></div>
+
+<main>
+  <div class="wrap">
+
+    <p class="label">Windows 10 · Windows 11 · 64-bit</p>
+    <h1>Download</h1>
+    <p class="lede">
+      One executable. Nothing to install, nothing written outside the folder you
+      put it in. The details below are read live from the release, so this page
+      cannot go stale against the file.
+    </p>
+
+    <div class="btn-row">
+      <a class="btn" data-release="link" href="https://github.com/antigomer/cxpaper-releases/releases">Download for Windows</a>
+    </div>
+
+    <table class="kv" data-release-state="loading">
+      <tr><th>File</th><td class="wrapish" data-release="filename">…</td></tr>
+      <tr><th>Version</th><td data-release="version">…</td></tr>
+      <tr><th>Released</th><td data-release="date">…</td></tr>
+      <tr><th>Size</th><td data-release="size">…</td></tr>
+      <tr><th>SHA-256</th><td class="wrapish" data-release="hash">…</td></tr>
+    </table>
+
+    <h2>Check what you downloaded</h2>
+    <p>In PowerShell, from the folder you saved it in:</p>
+<pre><code>Get-FileHash .\ConstructionPaper.exe -Algorithm SHA256</code></pre>
+    <p>
+      The <code>Hash</code> it prints should match the SHA-256 above, ignoring
+      case. If it does not, delete the file and download it again.
+    </p>
+
+    <h2>First run</h2>
+    <ol>
+      <li>Put the executable in its own folder — it keeps its settings, layers,
+      profiles and tile cache beside itself.</li>
+      <li>Windows SmartScreen will warn you about an unrecognised publisher. Choose
+      <strong>More info</strong>, then <strong>Run anyway</strong>. The
+      executable is not code-signed yet; the SHA-256 above is how you verify it
+      instead.</li>
+      <li>You will be asked for a license. Import the <code>.igl</code> file you
+      were sent, or paste the key. Without one the program will not open.</li>
+    </ol>
+
+    <div class="panel">
+      <p class="label">No key?</p>
+      <p style="margin:0">
+        Construction Paper is in an invitation-only rollout. Email
+        <a href="mailto:chris@chrisputnam.me">chris@chrisputnam.me</a> and say
+        what project you are on.
+      </p>
+    </div>
+
+    <h2>Release notes</h2>
+    <pre><code data-release="notes">…</code></pre>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>Construction Paper</span>
+    <span>© <span data-year>2026</span> Chris Putnam</span>
+    <span class="spacer"><a href="mailto:chris@chrisputnam.me">chris@chrisputnam.me</a></span>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>
