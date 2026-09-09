@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>License — Construction Paper</title>
-<meta name="description" content="How Construction Paper licensing works, and the current signed status file.">
+<title>Request a license — Construction Paper</title>
+<meta name="description" content="How to get a license for Construction Paper.">
 <link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +20,7 @@
     <nav class="site-nav">
       <a href="/">Overview</a>
       <a href="/download/">Download</a>
-      <a href="/license/">License</a>
+      <a href="/license/">Request a license</a>
     </nav>
   </div>
 </header>
@@ -29,88 +29,30 @@
 <main>
   <div class="wrap">
 
-    <p class="label">Status host</p>
-    <h1>License</h1>
+    <h1>Request a license</h1>
     <p class="lede">
-      Construction Paper reads a signed status file — the revocation list — to
-      decide whether a key is still good. That file is published at this
-      address, and this page shows what it currently says. Copies already in
-      the field were built against an earlier address and do not read this one
-      yet.
+      Construction Paper is invitation-only right now. Ask for a license and
+      you will get a file back to open it with.
     </p>
 
-    <div class="panel" data-status>
-      <p class="label">Current status file</p>
-      <p style="margin:0 0 1rem"><span class="chip" data-status="chip">loading…</span></p>
-      <table class="kv">
-        <tr><th>Endpoint</th><td class="wrapish"><a href="status.json">https://cxpaper.com/license/status.json</a></td></tr>
-        <tr><th>Format</th><td data-status="format">…</td></tr>
-        <tr><th>Updated</th><td data-status="updated">…</td></tr>
-        <tr><th>Revoked keys</th><td data-status="count">…</td></tr>
-      </table>
-      <noscript>
-        <p style="margin:1rem 0 0">Those rows are read from
-        <code>status.json</code> by JavaScript. With it turned off they stay as
-        dots; the file itself is linked above and can be read directly.</p>
-      </noscript>
+    <div class="btn-row">
+      <a class="btn" href="mailto:chris@chrisputnam.me?subject=Construction%20Paper%20license%20request&amp;body=Name%3A%0AProject%3A%0A%0A">Request a license</a>
     </div>
-
-    <h2>How it works</h2>
     <p>
-      A license is a small signed file. It carries an id, an expiry, whether the
-      copy has to check in, and a machine field that is blank, one specific
-      fingerprint, or a wildcard. The program verifies that signature before it
-      opens. Those three machine values are the three kinds:
-    </p>
-    <table class="kv">
-      <tr><th>Redeemable</th><td>Blank. Binds to the first computer that runs it. The binding is recorded beside the program, not counted on a server.</td></tr>
-      <tr><th>Locked</th><td>One fingerprint. Issued for one specific machine and runs only there.</td></tr>
-      <tr><th>Master</th><td>Wildcard. Runs on any number of computers, never binds, and never runs the check-in clock. Revocable by id like any other key.</td></tr>
-    </table>
-
-    <h2>The status file</h2>
-    <p>
-      <code>status.json</code> is the revocation list. It is signed with the same
-      key as the licenses themselves, so a tampered or invented file is rejected
-      by every copy of the program. What a signature cannot do is force an
-      answer, or prove on its own that the copy that arrived is the newest one.
-      A host that cannot be reached leaves a withdrawn key looking good.
-      Revocation depends on a copy reaching this address.
-    </p>
-    <p>
-      What happens when that answer does not arrive depends on the key. A
-      license that has never reached this host is never blocked for it; one that
-      has keeps working for thirty days past its last successful check, and is
-      then blocked. A strict
-      check-in key, which is issued deliberately, starts that clock on the day it
-      is issued instead of at its first successful check. A master license
-      ignores the clock entirely.
+      That opens an email. Say who you are and what project you are on, and
+      send it.
     </p>
 
-    <h2>What is stored on your machine</h2>
+    <h2>When the license arrives</h2>
+    <ol>
+      <li>Save the file it comes with somewhere you can find it.</li>
+      <li>Open Construction Paper. It asks for a license.</li>
+      <li>Choose <strong>Import license file</strong> and pick that file.</li>
+    </ol>
     <p>
-      The license gate touches only its own files, and only beside the
-      executable: the license itself (<code>license.igl</code>, which it writes
-      when a key is imported or pasted), the binding record, the cached status,
-      and the machine fingerprint. On the author's own copy it also appends the
-      ledger of keys it has issued. It never touches your photos, layers,
-      profiles or output. That is a hard rule, not a current behavior.
-    </p>
-    <p class="data" style="color:var(--muted)">
-      The fingerprint is a SHA-256 of two values Windows already exposes about
-      the computer: its machine GUID and its computer name. It stays on the
-      machine. The status check is a plain download of the file above, and there
-      is nothing on this host that could receive anything back.
-    </p>
-
-    <h2>Getting a license</h2>
-    <p>
-      Construction Paper is invitation-only right now. Email
-      <a href="mailto:chris@chrisputnam.me">chris@chrisputnam.me</a> and include
-      the project you are on. If a key has to be withdrawn it goes on the
-      revocation list above. A copy issued with a strict check-in stops at its
-      next check; any other copy stops the next time it reaches this host
-      successfully.
+      It only has to be done once, on that computer. If you need it on a second
+      computer, ask and you will get a second one — the license is tied to the
+      machine it is opened on.
     </p>
 
   </div>
