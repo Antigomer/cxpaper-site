@@ -64,474 +64,575 @@ p.data[data-release-state="ready"] { display: block; }
     <h2>One pass over the day</h2>
     <p>Your camera numbers the photos. Construction Paper names them.</p>
 
-    <section class="cpa-scope" aria-label="How Construction Paper renames a day of photos">
-    <style>
-    .cpa-scope{
-      --cpa-ink:#161311;
-      --cpa-lid:#242020;
-      --cpa-paper:#F2ECDF;
-      --cpa-amber:#F0A53A;
-      --cpa-corn:#5083E2;
-      --cpa-corn-t:#2757B6;
-      --cpa-green:#637F08;
-      --cpa-green-t:#495F03;
-      --cpa-hair:rgba(22,19,17,.16);
-      --cpa-sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
-      --cpa-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
-      --cpa-dur:18s;
-      --cpa-ease:cubic-bezier(.4,0,.2,1);
-      font-family:var(--cpa-sans);
-      color:var(--cpa-ink);
-      display:block;
-      margin:0;
-      padding:2.5rem 0;
-      -webkit-font-smoothing:antialiased;
-    }
-    .cpa-scope *{box-sizing:border-box;}
+<!-- ================= BEGIN CONSTRUCTION PAPER STORYBOOK — paste into index.html ================= -->
+<section class="cps-scope" aria-label="How Construction Paper turns a day of field photos into station-named files and a Google Earth KMZ">
+<style>
+/* ============================================================
+   Construction Paper — cut-paper storybook
+   One 20s loop, three beats. Everything scoped to .cps-scope.
+   Transform + opacity only. One static grain filter, reused.
+   ============================================================ */
+.cps-scope{
+  --cps-ink:#161311; --cps-lid:#242020; --cps-paper:#F2ECDF; --cps-ground:#F5F1E8;
+  --cps-amber:#F0A53A; --cps-corn:#5083E2; --cps-green:#637F08; --cps-red:#BB0A10;
+  --cps-corn-t:#2757B6; --cps-green-t:#495F03; --cps-red-t:#AC040C;
+  --cps-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --cps-sans:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  --cps-dur:20s;
+  margin:2.5rem 0; overflow:hidden;
+}
+.cps-stagewrap{
+  position:relative; width:100%; border-radius:3px; overflow:hidden;
+  background:var(--cps-ground);
+}
+.cps-svg{display:block; width:100%; height:auto;}
 
-    /* ---------- heading ---------- */
-    .cpa-eyebrow{
-      font-family:var(--cpa-mono);
-      font-size:11px;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      color:rgba(22,19,17,.55);
-      margin:0 0 .75rem;
-    }
-    .cpa-h{
-      font-family:var(--cpa-sans);
-      font-size:clamp(1.05rem,2.4vw,1.45rem);
-      line-height:1.35;
-      font-weight:500;
-      letter-spacing:-.005em;
-      margin:0 0 1.5rem;
-      max-width:34rem;
-    }
-    .cpa-h b{font-weight:600;}
+/* ---- master fade so the loop point reads as clearing the table ---- */
+.cps-stage{animation:cps-stage var(--cps-dur) linear infinite both;}
+@keyframes cps-stage{0%{opacity:0}2%,95%{opacity:1}99.5%,100%{opacity:0}}
 
-    /* ---------- stage ---------- */
-    .cpa-stage{
-      background:var(--cpa-paper);
-      border:1px solid var(--cpa-hair);
-      border-radius:2px;
-      padding:1.5rem 1.25rem 1.375rem;
-    }
-    .cpa-track{
-      display:grid;
-      grid-template-columns:1fr;
-      align-items:start;
-    }
+/* ---- shared animation defaults ---- */
+.cps-scope [class*="cps-a-"],
+.cps-world,.cps-side,.cps-map,.cps-figure,.cps-truck,.cps-lapmove,.cps-lapfiles,.cps-flash,.cps-flashbig{
+  animation-duration:var(--cps-dur);
+  animation-iteration-count:infinite;
+  animation-fill-mode:both;
+  animation-timing-function:cubic-bezier(.32,.72,.28,1);
+  transform-box:view-box; transform-origin:0 0;
+}
 
-    /* ---------- a beat ---------- */
-    .cpa-beat{
-      min-width:0;
-      opacity:1;
-      animation-duration:var(--cpa-dur);
-      animation-iteration-count:infinite;
-      animation-timing-function:var(--cpa-ease);
-      animation-fill-mode:both;
-    }
-    .cpa-b1{animation-name:cpa-lit1;}
-    .cpa-b2{animation-name:cpa-lit2;}
-    .cpa-b3{animation-name:cpa-lit3;}
-    .cpa-b4{animation-name:cpa-lit4;}
+/* ---- THE WORLD: side-on -> tilts to top-down -> shrinks into the laptop ---- */
+.cps-world{transform-origin:500px 290px; animation-name:cps-world;}
+@keyframes cps-world{
+  0%,24%   {transform:none;}
+  29%      {transform:translate(0px,26px) scale(1.02,.44);}
+  33%,66%  {transform:translate(0px,6px) scale(1,.93);}
+  74%,100% {transform:translate(150px,-122px) scale(.30,.30);}
+}
+.cps-side{animation-name:cps-side; animation-timing-function:linear;}
+@keyframes cps-side{0%,25%{opacity:1}31%,100%{opacity:0}}
+.cps-map{opacity:0; animation-name:cps-map; animation-timing-function:linear;}
+@keyframes cps-map{0%,27%{opacity:0}33%,100%{opacity:1}}
 
-    .cpa-rule{height:1px;background:var(--cpa-ink);}
-    .cpa-lab{
-      font-family:var(--cpa-mono);
-      font-size:11px;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      color:var(--cpa-ink);
-      margin:.5rem 0 .3rem;
-      white-space:nowrap;
-    }
-    .cpa-cap{
-      font-size:11.5px;
-      line-height:1.45;
-      color:rgba(22,19,17,.62);
-      margin:0 0 .8rem;
-    }
-    .cpa-body{min-height:6.75rem;}
+/* ---- beat 1 arrivals: paper laid down by hand ---- */
+.cps-a-sky{animation-name:cps-a-sky;}
+@keyframes cps-a-sky{0%{transform:translateY(-90px)}2.5%,100%{transform:translateY(0)}}
+.cps-a-gnd{animation-name:cps-a-gnd;}
+@keyframes cps-a-gnd{0%,.4%{transform:translateY(110px)}3%,100%{transform:translateY(0)}}
+.cps-a-pipe{animation-name:cps-a-pipe;}
+@keyframes cps-a-pipe{0%,1%{transform:translateX(-260px)}4%,100%{transform:translateX(0)}}
+.cps-a-stake{animation-name:cps-a-stake;}
+@keyframes cps-a-stake{0%,2%{transform:translateY(-70px)}4.5%,100%{transform:translateY(0)}}
 
-    /* ---------- shared type ---------- */
-    .cpa-f{
-      font-family:var(--cpa-mono);
-      font-size:11px;
-      line-height:1.55;
-      white-space:nowrap;
-      color:var(--cpa-ink);
-    }
-    .cpa-sc{
-      font-family:var(--cpa-mono);
-      font-size:10px;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      color:rgba(22,19,17,.5);
-      white-space:nowrap;
-    }
+/* ---- the inspector ---- */
+.cps-figure{animation-name:cps-figure;}
+@keyframes cps-figure{
+  0%,1.5%{opacity:0;transform:translateY(80px)}
+  5%,24%{opacity:1;transform:translateY(0)}
+  30%,100%{opacity:0;transform:translate(-40px,-40px) scale(.94)}
+}
+.cps-bob{animation:cps-bob 1.9s ease-in-out infinite both;transform-box:view-box;}
+@keyframes cps-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3.5px)}}
+.cps-arm{animation-name:cps-arm; animation-duration:var(--cps-dur);
+  animation-iteration-count:infinite; animation-fill-mode:both; transform-box:view-box;}
+@keyframes cps-arm{0%,5%{transform:translate(-12px,20px)}11%,100%{transform:translate(0,0)}}
 
-    /* ---------- connectors: the one moving thing ---------- */
-    .cpa-link{
-      position:relative;
-      background:rgba(22,19,17,.16);
-      width:1px;
-      height:1.75rem;
-      margin:.35rem 0 .35rem 0;
-    }
-    .cpa-fill{
-      position:absolute;
-      left:0;top:0;width:100%;height:100%;
-      background:var(--cpa-ink);
-      animation-duration:var(--cpa-dur);
-      animation-iteration-count:infinite;
-      animation-timing-function:linear;
-      animation-fill-mode:both;
-    }
-    .cpa-l1 .cpa-fill{animation-name:cpa-draw1v;}
-    .cpa-l2 .cpa-fill{animation-name:cpa-draw2v;}
-    .cpa-l3 .cpa-fill{animation-name:cpa-draw3v;}
-    .cpa-tip{
-      position:absolute;
-      left:50%;bottom:-2px;
-      width:5px;height:5px;margin-left:-2.5px;
-      background:var(--cpa-ink);
-      opacity:0;
-      animation-duration:var(--cpa-dur);
-      animation-iteration-count:infinite;
-      animation-timing-function:linear;
-      animation-fill-mode:both;
-    }
-    .cpa-l1 .cpa-tip{animation-name:cpa-tip1;}
-    .cpa-l2 .cpa-tip{animation-name:cpa-tip2;}
-    .cpa-l3 .cpa-tip{animation-name:cpa-tip3;}
+/* ---- the shutter ---- */
+.cps-flash{opacity:0;transform-origin:483px 320px;animation-name:cps-flash;}
+@keyframes cps-flash{
+  0%,20%{opacity:0;transform:scale(.15)}
+  21%{opacity:1;transform:scale(1)}
+  23.5%,100%{opacity:0;transform:scale(2.4)}
+}
+.cps-flashbig{opacity:0;animation-name:cps-flashbig;animation-timing-function:linear;}
+@keyframes cps-flashbig{0%,20.6%{opacity:0}21.4%{opacity:.55}26%,100%{opacity:0}}
 
-    /* ---------- beat 1 : day folder ---------- */
-    .cpa-list>*{
-      opacity:1;
-      animation:cpa-in1 var(--cpa-dur) var(--cpa-ease) infinite both;
-    }
-    .cpa-list>*:nth-child(2){animation-delay:.15s;}
-    .cpa-list>*:nth-child(3){animation-delay:.3s;}
-    .cpa-list>*:nth-child(4){animation-delay:.45s;}
-    .cpa-list>*:nth-child(5){animation-delay:.65s;}
-    .cpa-more{margin-top:.45rem;}
+/* ---- BEAT 2: lines that genuinely draw (pathLength=100) ---- */
+.cps-draw{stroke-dasharray:100;stroke-dashoffset:100;fill:none;stroke-linecap:round;stroke-linejoin:round;
+  animation-duration:var(--cps-dur);animation-iteration-count:infinite;animation-fill-mode:both;
+  animation-timing-function:cubic-bezier(.4,0,.2,1);}
+.cps-dA{animation-name:cps-dA} @keyframes cps-dA{0%,33%{stroke-dashoffset:100}42%,100%{stroke-dashoffset:0}}
+.cps-dB{animation-name:cps-dB} @keyframes cps-dB{0%,34%{stroke-dashoffset:100}43.5%,100%{stroke-dashoffset:0}}
+.cps-dC{animation-name:cps-dC} @keyframes cps-dC{0%,39%{stroke-dashoffset:100}46%,100%{stroke-dashoffset:0}}
+.cps-dD{animation-name:cps-dD} @keyframes cps-dD{0%,42%{stroke-dashoffset:100}50%,100%{stroke-dashoffset:0}}
+.cps-dE{animation-name:cps-dE} @keyframes cps-dE{0%,44%{stroke-dashoffset:100}52.5%,100%{stroke-dashoffset:0}}
+.cps-dF{animation-name:cps-dF} @keyframes cps-dF{0%,46%{stroke-dashoffset:100}55%,100%{stroke-dashoffset:0}}
 
-    /* ---------- beat 2 : read ---------- */
-    .cpa-read>*{
-      opacity:1;
-      animation:cpa-in2 var(--cpa-dur) var(--cpa-ease) infinite both;
-    }
-    .cpa-read>*:nth-child(2){animation-delay:.22s;}
-    .cpa-read>*:nth-child(3){animation-delay:.44s;}
-    .cpa-read>*:nth-child(4){animation-delay:.66s;}
-    .cpa-read>*:nth-child(5){animation-delay:.88s;}
-    .cpa-pair{margin-bottom:.5rem;}
-    .cpa-coord{
-      font-family:var(--cpa-mono);
-      font-size:11px;
-      line-height:1.55;
-      color:var(--cpa-corn-t);
-      white-space:nowrap;
-      position:relative;
-      padding-left:14px;
-      margin-top:1px;
-    }
-    .cpa-coord::before{
-      content:"";
-      position:absolute;
-      left:2px;top:-3px;bottom:50%;
-      width:7px;
-      border-left:1px solid rgba(80,131,226,.55);
-      border-bottom:1px solid rgba(80,131,226,.55);
-    }
-    .cpa-readlab{margin-bottom:.5rem;}
+/* wetland wash fades in behind its outline */
+.cps-a-wash{opacity:0;animation-name:cps-a-wash;animation-timing-function:linear;}
+@keyframes cps-a-wash{0%,45%{opacity:0}53%,100%{opacity:.88}}
 
-    /* ---------- beat 3 : match ---------- */
-    .cpa-rail{position:relative;height:74px;margin-top:.15rem;}
-    .cpa-railline{
-      position:absolute;left:28px;top:2px;bottom:2px;
-      width:1px;background:rgba(22,19,17,.3);
-      animation:cpa-in3 var(--cpa-dur) var(--cpa-ease) infinite both;
-    }
-    .cpa-st{
-      position:absolute;left:28px;height:14px;
-      display:flex;align-items:center;gap:8px;
-      color:var(--cpa-ink);
-      animation:cpa-in3 var(--cpa-dur) var(--cpa-ease) infinite both;
-    }
-    .cpa-st i{display:block;width:8px;height:1px;background:currentColor;flex:none;}
-    .cpa-st span{
-      font-family:var(--cpa-mono);
-      font-size:11px;line-height:14px;
-      color:currentColor;white-space:nowrap;
-    }
-    .cpa-s1{top:5px;animation-delay:.08s;}
-    .cpa-s2{
-      top:29px;color:var(--cpa-green-t);
-      animation:cpa-in3 var(--cpa-dur) var(--cpa-ease) infinite both,
-                cpa-hit var(--cpa-dur) steps(1,end) infinite both;
-      animation-delay:.16s,0s;
-    }
-    .cpa-s3{top:53px;animation-delay:.24s;}
-    .cpa-fix{
-      position:absolute;left:28px;top:36px;
-      width:9px;height:9px;margin:-4.5px 0 0 -4.5px;
-      border-radius:50%;
-      background:var(--cpa-green);
-      opacity:1;
-      animation:cpa-fix var(--cpa-dur) var(--cpa-ease) infinite both;
-    }
-    .cpa-raillab{
-      margin-bottom:.35rem;
-      animation:cpa-in3 var(--cpa-dur) var(--cpa-ease) infinite both;
-    }
+/* station ticks count along the line */
+.cps-a-tick{opacity:0;animation-name:cps-a-tick;}
+@keyframes cps-a-tick{0%,47%{opacity:0;transform:translateY(7px)}51%,100%{opacity:1;transform:translateY(0)}}
+.cps-t2{animation-delay:.5s}.cps-t3{animation-delay:1s}.cps-t4{animation-delay:1.5s}
 
-    /* ---------- beat 4 : write ---------- */
-    .cpa-outlist>*{
-      opacity:1;
-      animation:cpa-in4 var(--cpa-dur) var(--cpa-ease) infinite both;
-    }
-    .cpa-outlist>*:nth-child(2){animation-delay:.12s;}
-    .cpa-outlist>*:nth-child(3){animation-delay:.24s;}
-    .cpa-outlist>*:nth-child(4){animation-delay:.36s;}
-    .cpa-pre{
-      display:inline-block;
-      overflow:hidden;
-      white-space:nowrap;
-      vertical-align:bottom;
-      max-width:18ch;
-      color:var(--cpa-green-t);
-      font-weight:500;
-      /* a caret sits at the writing edge so a half-typed prefix reads as an
-         insertion point, not as a malformed filename */
-      border-right:1px solid transparent;
-      /* stepped one character at a time: no frame ever shows a half-cut name */
-      animation:cpa-wipe var(--cpa-dur) steps(18,end) infinite both,
-                cpa-caret var(--cpa-dur) steps(1,end) infinite both;
-    }
-    .cpa-outlist>*:nth-child(2) .cpa-pre{animation-delay:.14s;}
-    .cpa-outlist>*:nth-child(3) .cpa-pre{animation-delay:.28s;}
-    .cpa-old{color:rgba(22,19,17,.72);}
-    .cpa-extra{
-      margin-top:.7rem;padding-top:.6rem;
-      border-top:1px solid var(--cpa-hair);
-      animation:cpa-in4b var(--cpa-dur) var(--cpa-ease) infinite both;
-    }
-    .cpa-extra .cpa-f{margin-top:.15rem;}
-    .cpa-held{
-      margin-top:.55rem;
-      display:flex;align-items:center;gap:6px;
-      animation:cpa-in4b var(--cpa-dur) var(--cpa-ease) infinite both;
-      animation-delay:.4s;
-    }
-    .cpa-held i{display:block;width:7px;height:7px;background:var(--cpa-amber);flex:none;}
-    .cpa-held span{
-      font-family:var(--cpa-mono);
-      font-size:10px;letter-spacing:.16em;text-transform:uppercase;
-      color:rgba(22,19,17,.72);white-space:nowrap;
-    }
+/* photo pins drop where he stood */
+.cps-a-pin{opacity:0;animation-name:cps-a-pin;}
+@keyframes cps-a-pin{0%,53%{opacity:0;transform:translateY(-34px)}56.5%{opacity:1;transform:translateY(3px)}58%,100%{opacity:1;transform:translateY(0)}}
+.cps-p2{animation-delay:.42s}.cps-p3{animation-delay:.84s}
 
-    /* ---------- footnote ---------- */
-    .cpa-foot{
-      font-size:11.5px;line-height:1.5;
-      color:rgba(22,19,17,.55);
-      margin:.9rem 0 0;
-      max-width:44rem;
-    }
+/* map labels */
+.cps-a-lab{opacity:0;animation-name:cps-a-lab;animation-timing-function:linear;}
+@keyframes cps-a-lab{0%,55%{opacity:0}61%,100%{opacity:1}}
+.cps-a-chip{opacity:0;animation-name:cps-a-chip;}
+@keyframes cps-a-chip{0%,58%{opacity:0;transform:translateY(8px)}62%,100%{opacity:1;transform:translateY(0)}}
 
-    /* ---------- wide: four across, one continuous rule ---------- */
-    @media (min-width:960px){
-      .cpa-track{
-        grid-template-columns:1fr 2.5rem 1fr 2.5rem 1fr 2.5rem 1fr;
-      }
-      .cpa-link{
-        align-self:start;
-        width:100%;height:1px;
-        margin:0;
-      }
-      .cpa-l1 .cpa-fill{animation-name:cpa-draw1h;}
-      .cpa-l2 .cpa-fill{animation-name:cpa-draw2h;}
-      .cpa-l3 .cpa-fill{animation-name:cpa-draw3h;}
-      .cpa-tip{
-        left:auto;right:-2px;bottom:auto;top:50%;
-        margin-left:0;margin-top:-2.5px;
-      }
-      .cpa-f,.cpa-coord,.cpa-st span{font-size:10px;}
-      .cpa-body{min-height:7.25rem;}
-    }
-    @media (max-width:959.98px){
-      .cpa-track{max-width:34rem;}
-      .cpa-body{min-height:0;}
-    }
+/* ---- BEAT 3: the truck assembles, the laptop slides in ---- */
+.cps-truck{opacity:0;animation-name:cps-truck;}
+@keyframes cps-truck{0%,64%{opacity:0;transform:translateY(110px)}66%{opacity:1}71%,100%{opacity:1;transform:translateY(0)}}
+.cps-lapmove{opacity:0;animation-name:cps-lap;}
+@keyframes cps-lap{
+  0%,64%{opacity:0;transform:translateX(560px)}
+  65.5%{opacity:1;transform:translateX(400px)}
+  70%,100%{opacity:1;transform:translateX(0)}
+}
+/* the results panel rides in with the laptop but only lights up once the map has landed */
+.cps-lapfiles{opacity:0;animation-name:cps-lapfiles;}
+@keyframes cps-lapfiles{
+  0%,64%{opacity:0;transform:translateX(560px)}
+  65.5%{opacity:0;transform:translateX(400px)}
+  70%,73.5%{opacity:0;transform:translateX(0)}
+  75.5%,100%{opacity:1;transform:translateX(0)}
+}
+.cps-a-row{opacity:0;animation-name:cps-a-row;}
+@keyframes cps-a-row{0%,75%{opacity:0;transform:translateX(-16px)}79%,100%{opacity:1;transform:translateX(0)}}
+.cps-r2{animation-delay:.55s}.cps-r3{animation-delay:1.1s}.cps-r4{animation-delay:1.75s}
 
-    /* ================= keyframes ================= */
-    /* beat illumination */
-    @keyframes cpa-lit1{0%{opacity:.5}2.2%,94.4%{opacity:1}97.8%,100%{opacity:.5}}
-    @keyframes cpa-lit2{0%,18.9%{opacity:.5}21.1%,94.4%{opacity:1}97.8%,100%{opacity:.5}}
-    @keyframes cpa-lit3{0%,38.9%{opacity:.5}41.1%,94.4%{opacity:1}97.8%,100%{opacity:.5}}
-    @keyframes cpa-lit4{0%,58.9%{opacity:.5}61.1%,94.4%{opacity:1}97.8%,100%{opacity:.5}}
+/* ---- type ---- */
+.cps-lab{font-family:var(--cps-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;}
+.cps-num{font-family:var(--cps-mono);font-size:11px;letter-spacing:.06em;fill:#242020;}
+.cps-file{font-family:var(--cps-mono);font-size:11px;letter-spacing:0;}
+.cps-hd{font-family:var(--cps-mono);font-size:10px;letter-spacing:.18em;fill:#8A8078;}
+.cps-chiptxt{font-family:var(--cps-mono);font-size:12px;letter-spacing:.04em;fill:var(--cps-ink);}
+/* marker on wood: mono, heavy, a hair off-square so it reads as handwriting */
+.cps-stakenum{font-family:var(--cps-mono);font-size:15px;font-weight:600;letter-spacing:.04em;fill:#2B2521;}
 
-    /* connector draw — horizontal */
-    @keyframes cpa-draw1h{0%,16.7%{width:0}20%,94.4%{width:100%}97.2%,100%{width:0}}
-    @keyframes cpa-draw2h{0%,36.7%{width:0}40%,94.4%{width:100%}97.2%,100%{width:0}}
-    @keyframes cpa-draw3h{0%,56.7%{width:0}60%,94.4%{width:100%}97.2%,100%{width:0}}
-    /* connector draw — vertical */
-    @keyframes cpa-draw1v{0%,16.7%{height:0}20%,94.4%{height:100%}97.2%,100%{height:0}}
-    @keyframes cpa-draw2v{0%,36.7%{height:0}40%,94.4%{height:100%}97.2%,100%{height:0}}
-    @keyframes cpa-draw3v{0%,56.7%{height:0}60%,94.4%{height:100%}97.2%,100%{height:0}}
-    /* the travelling tip */
-    @keyframes cpa-tip1{0%,16.4%{opacity:0}16.7%,20%{opacity:1}21.7%,100%{opacity:0}}
-    @keyframes cpa-tip2{0%,36.4%{opacity:0}36.7%,40%{opacity:1}41.7%,100%{opacity:0}}
-    @keyframes cpa-tip3{0%,56.4%{opacity:0}56.7%,60%{opacity:1}61.7%,100%{opacity:0}}
+/* ---- flagging ribbon: hangs off the lath and moves in the air ---- */
+.cps-ribbon{animation:cps-ribbon 2.7s ease-in-out infinite both;
+  transform-box:fill-box;transform-origin:50% 2%;}
+@keyframes cps-ribbon{0%,100%{transform:rotate(-3.5deg)}50%{transform:rotate(5deg)}}
 
-    /* content reveals */
-    @keyframes cpa-in1{
-      0%,1.7%{opacity:0;transform:translateY(4px)}
-      4.4%,94.4%{opacity:1;transform:none}
-      97.2%,100%{opacity:0;transform:translateY(4px)}
-    }
-    @keyframes cpa-in2{
-      0%,20.6%{opacity:0;transform:translateY(4px)}
-      23.3%,94.4%{opacity:1;transform:none}
-      97.2%,100%{opacity:0;transform:translateY(4px)}
-    }
-    @keyframes cpa-in3{
-      0%,40.6%{opacity:0;transform:translateY(4px)}
-      43.3%,94.4%{opacity:1;transform:none}
-      97.2%,100%{opacity:0;transform:translateY(4px)}
-    }
-    @keyframes cpa-in4{
-      0%,61.1%{opacity:0;transform:translateY(4px)}
-      63.9%,94.4%{opacity:1;transform:none}
-      97.2%,100%{opacity:0;transform:translateY(4px)}
-    }
-    @keyframes cpa-in4b{
-      0%,72.2%{opacity:0;transform:translateY(4px)}
-      74.4%,94.4%{opacity:1;transform:none}
-      97.2%,100%{opacity:0;transform:translateY(4px)}
-    }
-    /* the fix arrives off-station, then snaps to the nearest one */
-    @keyframes cpa-fix{
-      0%,46.1%{opacity:0;top:46px;transform:translateX(-24px);background:var(--cpa-corn)}
-      48.3%{opacity:1;top:46px;transform:translateX(-24px);background:var(--cpa-corn)}
-      50.6%,52.8%{opacity:1;top:46px;transform:translateX(0);background:var(--cpa-corn)}
-      54.4%,94.4%{opacity:1;top:36px;transform:translateX(0);background:var(--cpa-green)}
-      97.2%,100%{opacity:0;top:36px;transform:translateX(0);background:var(--cpa-green)}
-    }
-    @keyframes cpa-hit{
-      0%,53.9%{color:var(--cpa-ink)}
-      54.4%,100%{color:var(--cpa-green-t)}
-    }
-    /* the software writes the name in front of the camera's */
-    @keyframes cpa-caret{
-      0%,66%{border-right-color:transparent}
-      66.1%,70.5%{border-right-color:var(--cpa-green-t)}
-      70.6%,100%{border-right-color:transparent}
-    }
-    @keyframes cpa-wipe{
-      0%,66.1%{max-width:0}
-      70.6%,100%{max-width:18ch}
-    }
+/* ---- grain: ONE static filtered rect over the lot ---- */
+.cps-grain{pointer-events:none;mix-blend-mode:multiply;opacity:.10;}
 
-    /* ---------- reduced motion: hold the finished state ---------- */
-    @media (prefers-reduced-motion:reduce){
-      .cpa-scope *,
-      .cpa-scope *::before,
-      .cpa-scope *::after{
-        animation:none !important;
-        transition:none !important;
-      }
-    }
-    </style>
+/* ---- caption chips under the picture ---- */
+.cps-steps{display:flex;flex-wrap:wrap;gap:.4rem 1.25rem;margin:.9rem 0 0;padding:0;list-style:none;
+  font-family:var(--cps-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cps-ink);}
+.cps-steps li{opacity:.34;animation-duration:var(--cps-dur);animation-iteration-count:infinite;
+  animation-fill-mode:both;animation-timing-function:linear;}
+.cps-steps li b{font-weight:400;color:var(--cps-red-t);margin-right:.5em;}
+.cps-s1{animation-name:cps-s1}@keyframes cps-s1{0%,24%{opacity:1}28%,100%{opacity:.34}}
+.cps-s2{animation-name:cps-s2}@keyframes cps-s2{0%,24%{opacity:.34}28%,64%{opacity:1}68%,100%{opacity:.34}}
+.cps-s3{animation-name:cps-s3}@keyframes cps-s3{0%,64%{opacity:.34}68%,96%{opacity:1}100%{opacity:.34}}
 
-      <div class="cpa-stage">
-        <div class="cpa-track">
+/* ---- small screens: the on-screen filenames stop being legible, so give them as real text ---- */
+.cps-mobfiles{display:none;}
+@media (max-width:640px){
+  .cps-mobfiles{display:block;margin:.85rem 0 0;padding:0;list-style:none;
+    font-family:var(--cps-mono);font-size:12px;line-height:1.75;color:var(--cps-ink);
+    word-break:break-all;}
+  .cps-mobfiles li::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
+    background:var(--cps-green);margin-right:.6em;vertical-align:.15em;}
+  .cps-mobfiles li:last-child::before{background:var(--cps-corn-t);}
+  .cps-steps{font-size:10px;gap:.35rem .9rem;}
+}
 
-          <!-- 01 -->
-          <div class="cpa-beat cpa-b1">
-            <div class="cpa-rule"></div>
-            <div class="cpa-lab">01 &middot; Day folder</div>
-            <p class="cpa-cap">As the camera left them.</p>
-            <div class="cpa-body">
-              <div class="cpa-list">
-                <div class="cpa-f">IMG_4487.JPG</div>
-                <div class="cpa-f">IMG_4488.JPG</div>
-                <div class="cpa-f">IMG_4489.JPG</div>
-                <div class="cpa-f">IMG_4490.JPG</div>
-                <div class="cpa-sc cpa-more">+ 214 more</div>
-              </div>
-            </div>
-          </div>
+/* ---- reduced motion: a finished, informative still ----------------
+   The map is fully drawn at full size, the inspector is standing on it,
+   and the renamed files sit in the corner. No motion at all.          */
+@media (prefers-reduced-motion:reduce){
+  .cps-scope *{animation:none !important;transition:none !important;}
+  .cps-stage{opacity:1;}
+  .cps-world{transform:none;}
+  .cps-side{display:none;}
+  .cps-map{opacity:1;}
+  .cps-draw{stroke-dashoffset:0;}
+  .cps-a-wash{opacity:.88;}
+  .cps-a-tick,.cps-a-pin,.cps-a-lab,.cps-a-chip,.cps-a-row{opacity:1;transform:none;}
+  .cps-figure{opacity:1;transform:translate(-8px,236px) scale(.6);}
+  .cps-flash,.cps-flashbig{opacity:0;}
+  .cps-truck,.cps-lap-back,.cps-lap-front{display:none;}
+  .cps-files{opacity:1;transform:translate(96px,218px);}
+  .cps-filecard{stroke-width:2.4;}
+  .cps-filecard-sh{opacity:.18;}
+  .cps-steps li{opacity:1;}
+}
+</style>
 
-          <div class="cpa-link cpa-l1" aria-hidden="true"><span class="cpa-fill"><span class="cpa-tip"></span></span></div>
+<div class="cps-stagewrap">
+<svg class="cps-svg" viewBox="0 0 1000 580" preserveAspectRatio="xMidYMid meet" role="img"
+     aria-labelledby="cps-t cps-d" focusable="false">
+<title id="cps-t">From the right-of-way to named files</title>
+<desc id="cps-d">An inspector in a hi-vis vest photographs a pipeline right-of-way. The view tilts to a map, where the right-of-way edges, a workspace boundary, a wetland, a stream, station ticks and camera pins draw themselves. The map then lands on a laptop in a truck cab, listing photos renamed with their station numbers and a Google Earth KMZ for the day.</desc>
 
-          <!-- 02 -->
-          <div class="cpa-beat cpa-b2">
-            <div class="cpa-rule"></div>
-            <div class="cpa-lab">02 &middot; Read</div>
-            <p class="cpa-cap">GPS out of every file.</p>
-            <div class="cpa-body">
-              <div class="cpa-read">
-                <div class="cpa-sc cpa-readlab">EXIF &middot; GPS</div>
-                <div class="cpa-pair">
-                  <div class="cpa-f">IMG_4487.JPG</div>
-                  <div class="cpa-coord">41.83019, -79.65412</div>
-                </div>
-                <div class="cpa-pair">
-                  <div class="cpa-f">IMG_4488.JPG</div>
-                  <div class="cpa-coord">41.83007, -79.65402</div>
-                </div>
-              </div>
-            </div>
-          </div>
+<defs>
+  <filter id="cps-grainf" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="3" seed="7" result="n"/>
+    <feColorMatrix in="n" type="saturate" values="0"/>
+  </filter>
+</defs>
 
-          <div class="cpa-link cpa-l2" aria-hidden="true"><span class="cpa-fill"><span class="cpa-tip"></span></span></div>
+<rect x="0" y="0" width="1000" height="580" fill="#F5F1E8"/>
 
-          <!-- 03 -->
-          <div class="cpa-beat cpa-b3">
-            <div class="cpa-rule"></div>
-            <div class="cpa-lab">03 &middot; Match</div>
-            <p class="cpa-cap">Nearest station on the alignment.</p>
-            <div class="cpa-body">
-              <div class="cpa-sc cpa-raillab">Alignment &middot; KMZ</div>
-              <div class="cpa-rail">
-                <div class="cpa-railline"></div>
-                <div class="cpa-st cpa-s1"><i></i><span>1043+00</span></div>
-                <div class="cpa-st cpa-s2"><i></i><span>1043+50</span></div>
-                <div class="cpa-st cpa-s3"><i></i><span>1044+00</span></div>
-                <div class="cpa-fix"></div>
-              </div>
-            </div>
-          </div>
+<g class="cps-stage">
 
-          <div class="cpa-link cpa-l3" aria-hidden="true"><span class="cpa-fill"><span class="cpa-tip"></span></span></div>
+  <!-- ============ BEAT 3 : the truck cab ============ -->
+  <g class="cps-truck">
+    <rect x="-10" y="-10" width="1020" height="600" fill="#EDE4D2"/>
+    <!-- windshield -->
+    <path d="M42 10 L958 14 L972 198 C700 210 300 210 26 198 Z" fill="#CFE0F8"/>
+    <path d="M26 170 Q92 150 152 170 Q222 148 292 170 Q362 150 432 170 Q502 148 572 170 Q642 150 712 170 Q782 148 852 170 Q922 152 972 168 L972 198 C700 210 300 210 26 198 Z" fill="#4B6006"/>
+    <path d="M26 186 L972 182 L972 198 C700 210 300 210 26 198 Z" fill="#CFBC99"/>
+    <!-- pillars -->
+    <path d="M-10 -10 L44 -10 L28 204 L-10 206 Z" fill="#242020"/>
+    <path d="M1010 -10 L956 -10 L972 204 L1010 206 Z" fill="#242020"/>
+    <!-- dash -->
+    <path d="M-10 190 C300 208 700 208 1010 190 L1010 272 C700 288 300 288 -10 272 Z" fill="#2A2320"/>
+    <path d="M-10 266 C300 282 700 282 1010 266 L1010 402 L-10 400 Z" fill="#242020"/>
+    <!-- seat / console -->
+    <path d="M-10 394 C300 404 700 404 1010 394 L1010 590 L-10 590 Z" fill="#E4DAC6"/>
+    <path d="M-10 462 C300 472 700 470 1010 460 L1010 470 C700 480 300 482 -10 472 Z" fill="#D6C9AE"/>
+    <!-- steering wheel -->
+    <circle cx="140" cy="486" r="104" fill="none" stroke="#161311" stroke-width="21"/>
+    <circle cx="140" cy="486" r="27" fill="#161311"/>
+    <path d="M40 480 h200 v14 h-200z" fill="#161311"/>
+    <path d="M133 486 h14 v96 h-14z" fill="#161311"/>
+    <!-- vents -->
+    <path d="M642 314 h150 v13 h-150z M642 336 h150 v13 h-150z" fill="#161311" opacity="0"/>
+    <path d="M62 316 h124 v13 h-124z M60 338 h124 v13 h-124z" fill="#161311" opacity=".5"/>
+    <!-- coffee, earning its place -->
+    <ellipse cx="326" cy="500" rx="42" ry="10" fill="#161311" opacity=".16"/>
+    <path d="M304 500 L348 499 L357 402 L295 403 Z" fill="#F2ECDF"/>
+    <path d="M300 452 L352 451 L354 425 L298 426 Z" fill="#C9A46A"/>
+    <path d="M298 406 L356 404 L357 392 L299 394 Z" fill="#E4DAC6"/>
+    <path d="M298 400 L356 398 L357 392 L299 394 Z" fill="#C8B995"/>
+  </g>
 
-          <!-- 04 -->
-          <div class="cpa-beat cpa-b4">
-            <div class="cpa-rule"></div>
-            <div class="cpa-lab">04 &middot; Write</div>
-            <p class="cpa-cap">Renamed, stamped, exported.</p>
-            <div class="cpa-body">
-              <div class="cpa-outlist">
-                <div class="cpa-f"><span class="cpa-pre">1043+50_SireWest_</span><span class="cpa-old">IMG_4487.JPG</span></div>
-                <div class="cpa-f"><span class="cpa-pre">1044+00_SireWest_</span><span class="cpa-old">IMG_4488.JPG</span></div>
-                <div class="cpa-f"><span class="cpa-pre">1044+50_SireWest_</span><span class="cpa-old">IMG_4489.JPG</span></div>
-                <div class="cpa-sc cpa-more">+ 214 more</div>
-              </div>
-              <div class="cpa-extra">
-                <div class="cpa-sc">Google Earth export</div>
-                <div class="cpa-f">SireWest_2026-09-09.kmz</div>
-              </div>
-              <div class="cpa-held"><i></i><span>1 held &middot; stale GPS</span></div>
-            </div>
-          </div>
+  <!-- laptop back : the map lands in this screen -->
+  <g class="cps-lapmove cps-lap-back">
+    <path d="M441 66 L869 66 L873 374 L437 372 Z" fill="#161311" opacity=".18"/>
+    <rect x="436" y="61" width="428" height="308" rx="7" fill="#161311"/>
+    <rect x="455" y="80" width="390" height="270" fill="#F2ECDF"/>
+  </g>
 
-        </div>
-      </div>
+  <!-- ============ THE WORLD ============ -->
+  <g class="cps-world">
 
-      <p class="cpa-foot">Station, project, original filename &mdash; nothing thrown away, nothing filed at the wrong station.</p>
-    </section>
+    <!-- ---------- BEAT 1 : side-on, on the right-of-way ---------- -->
+    <g class="cps-side">
+
+      <g class="cps-a-sky">
+        <path d="M-10 -10 H1010 V246 C820 253 640 240 480 249 C320 258 150 243 -10 251 Z" fill="#B4CEF4"/>
+        <circle cx="858" cy="74" r="22" fill="#F4E4C4"/>
+        <path d="M118 78 c14-23 47-25 61-6 c23-15 53 1 53 21 c0 16-16 24-35 24 h-65 c-21 0-31-23-14-39z" fill="#F7F2E6" transform="rotate(-1.4 175 89)"/>
+        <path d="M600 52 c11-18 37-20 48-5 c18-12 42 1 42 17 c0 13-13 19-28 19 h-51 c-16 0-25-18-11-31z" fill="#F7F2E6" opacity=".85"/>
+        <!-- far treeline -->
+        <path d="M-10 254 L-10 220 Q30 178 70 220 Q112 172 155 220 Q196 182 240 220 Q282 170 325 220 Q368 184 410 220 Q452 174 495 220 Q538 180 580 220 Q622 172 665 220 Q708 184 750 220 Q792 176 835 220 Q878 182 920 220 Q962 174 1010 221 L1010 254 Z" fill="#4B6006"/>
+        <!-- near treeline -->
+        <path d="M-10 266 L-10 233 Q22 201 58 233 Q96 197 134 233 Q172 203 210 233 Q248 199 286 233 Q324 205 362 233 Q400 197 438 233 Q476 205 514 233 Q552 199 590 233 Q628 203 666 233 Q704 197 742 233 Q780 205 818 233 Q856 199 894 233 Q932 203 970 233 Q996 205 1010 231 L1010 266 Z" fill="#637F08"/>
+        <rect x="252" y="248" width="7" height="22" fill="#2A2320"/>
+        <rect x="640" y="250" width="7" height="20" fill="#2A2320"/>
+        <rect x="880" y="247" width="7" height="23" fill="#2A2320"/>
+      </g>
+
+      <g class="cps-a-gnd">
+        <!-- grass shoulder -->
+        <path d="M-10 258 H1010 V300 C820 293 600 307 400 299 C240 293 90 303 -10 297 Z" fill="#6E8C1A"/>
+        <!-- spoil windrow : the torn edge -->
+        <path d="M-10 302 L20 288 L44 297 L70 282 L98 293 L124 280 L152 291 L182 277 L210 289 L238 275 L268 287 L296 274 L326 286 L356 273 L386 285 L416 272 L448 284 L478 271 L508 283 L538 272 L568 282 L598 270 L630 282 L660 269 L690 281 L720 270 L752 280 L782 268 L812 280 L842 269 L872 279 L904 267 L934 278 L966 268 L1010 277 L1010 344 L-10 348 Z" fill="#8F7B59"/>
+        <!-- graded corridor -->
+        <path d="M-10 340 C200 332 420 346 640 336 C800 329 920 340 1010 334 L1010 524 C760 530 480 518 220 526 L-10 522 Z" fill="#CFBC99"/>
+        <!-- trench lip -->
+        <path d="M-10 364 C220 358 460 372 700 360 C830 353 940 362 1010 356 L1010 406 C880 412 700 402 520 410 C340 418 150 406 -10 412 Z" fill="#AF9F82"/>
+        <!-- open trench : far wall in shade, then the floor -->
+        <path d="M-10 373 C220 367 460 381 700 369 C830 362 940 371 1010 365 L1010 397 C880 403 700 393 520 401 C340 409 150 397 -10 403 Z" fill="#5B5142"/>
+        <path d="M-10 381 C220 375 460 389 700 377 C830 370 940 379 1010 373 L1010 397 C880 403 700 393 520 401 C340 409 150 397 -10 403 Z" fill="#2A2320"/>
+        <path d="M-10 393 C220 387 460 401 700 389 C830 382 940 391 1010 385 L1010 397 C880 403 700 393 520 401 C340 409 150 397 -10 403 Z" fill="#161311"/>
+        <!-- the whisper of shadow that says each band is a separate piece of paper -->
+        <path d="M-10 299 H1010" fill="none" stroke="#161311" stroke-width="5" opacity=".10"/>
+        <path d="M-10 337 C200 329 420 343 640 333 C800 326 920 337 1010 331" fill="none" stroke="#161311" stroke-width="5" opacity=".11"/>
+        <path d="M-10 361 C220 355 460 369 700 357 C830 350 940 359 1010 353" fill="none" stroke="#161311" stroke-width="4" opacity=".10"/>
+        <!-- near grass -->
+        <path d="M-10 512 L26 505 L58 514 L92 504 L128 513 L164 503 L198 512 L236 502 L270 511 L306 501 L342 510 L378 500 L414 509 L452 499 L488 508 L524 498 L560 507 L598 498 L634 506 L670 497 L706 505 L742 496 L778 504 L814 495 L850 503 L886 494 L922 502 L958 493 L1010 500 L1010 590 L-10 590 Z" fill="#6E8C1A"/>
+        <path d="M78 512 l7-16 l7 16z M96 514 l6-13 l6 13z M742 514 l7-15 l7 15z M760 516 l6-12 l6 12z" fill="#4B6006"/>
+      </g>
+
+      <g class="cps-a-stake">
+        <!-- survey lath at 1043+00 : driven, ribboned, and written on -->
+        <g transform="translate(232,356) rotate(-2.0)">
+          <ellipse cx="0" cy="3" rx="24" ry="5" fill="#161311" opacity=".16"/>
+          <path d="M-11 -172 L11 -172 L9 4 L-9 4 Z" fill="#DAC68A"/>
+          <path d="M4 -172 L11 -172 L9 4 L3 4 Z" fill="#BEA96E"/>
+          <path d="M-5 -168 L-4.2 -4 M0.5 -170 L1.1 -6" fill="none" stroke="#BEA96E" stroke-width="1.1" opacity=".8"/>
+          <path d="M-11 -172 L11 -172 L9 4 L-9 4 Z" fill="none" stroke="#161311" stroke-width="1.8"/>
+          <!-- the station, written down the lath in marker -->
+          <text class="cps-stakenum" transform="rotate(90.7)" x="-148" y="5.3">1043+00</text>
+          <!-- flagging ribbon, tied at the top and hanging off the lath -->
+          <g class="cps-ribbon" style="animation-delay:0s">
+            <path d="M-6 -160 C-15 -147 -11 -134 -18 -121 C-23 -110 -22 -99 -27 -86" fill="none" stroke="#BB0A10" stroke-width="7" stroke-linecap="round"/>
+            <path d="M-18 -121 C-23 -110 -22 -99 -27 -86" fill="none" stroke="#AC040C" stroke-width="7" stroke-linecap="round" opacity=".85"/>
+            <path d="M0 -158 C-2 -150 -5 -143 -4 -134" fill="none" stroke="#AC040C" stroke-width="4.5" stroke-linecap="round" opacity=".9"/>
+            <path d="M6 -160 C14 -151 12 -141 16 -131 C19 -123 18 -114 21 -104" fill="none" stroke="#BB0A10" stroke-width="6" stroke-linecap="round"/>
+          </g>
+          <!-- the tie itself, wrapped round the lath -->
+          <path d="M-12.5 -168 L12.5 -168 L12.5 -158 L-12.5 -158 Z" fill="#BB0A10"/>
+          <path d="M-12.5 -168 L12.5 -168 L12.5 -164 L-12.5 -164 Z" fill="#D8383D" opacity=".5"/>
+          <path d="M-12.5 -168 L12.5 -168 L12.5 -158 L-12.5 -158 Z" fill="none" stroke="#161311" stroke-width="1.4" opacity=".8"/>
+        </g>
+        <!-- survey lath at 1044+00 : driven, ribboned, and written on -->
+        <g transform="translate(838,346) rotate(2.4)">
+          <ellipse cx="0" cy="3" rx="24" ry="5" fill="#161311" opacity=".16"/>
+          <path d="M-11 -172 L11 -172 L9 4 L-9 4 Z" fill="#DAC68A"/>
+          <path d="M4 -172 L11 -172 L9 4 L3 4 Z" fill="#BEA96E"/>
+          <path d="M-5 -168 L-4.2 -4 M0.5 -170 L1.1 -6" fill="none" stroke="#BEA96E" stroke-width="1.1" opacity=".8"/>
+          <path d="M-11 -172 L11 -172 L9 4 L-9 4 Z" fill="none" stroke="#161311" stroke-width="1.8"/>
+          <!-- the station, written down the lath in marker -->
+          <text class="cps-stakenum" transform="rotate(90.7)" x="-148" y="5.3">1044+00</text>
+          <!-- flagging ribbon, tied at the top and hanging off the lath -->
+          <g class="cps-ribbon" style="animation-delay:-1.15s">
+            <path d="M-6 -160 C-15 -147 -11 -134 -18 -121 C-23 -110 -22 -99 -27 -86" fill="none" stroke="#BB0A10" stroke-width="7" stroke-linecap="round"/>
+            <path d="M-18 -121 C-23 -110 -22 -99 -27 -86" fill="none" stroke="#AC040C" stroke-width="7" stroke-linecap="round" opacity=".85"/>
+            <path d="M0 -158 C-2 -150 -5 -143 -4 -134" fill="none" stroke="#AC040C" stroke-width="4.5" stroke-linecap="round" opacity=".9"/>
+            <path d="M6 -160 C14 -151 12 -141 16 -131 C19 -123 18 -114 21 -104" fill="none" stroke="#BB0A10" stroke-width="6" stroke-linecap="round"/>
+          </g>
+          <!-- the tie itself, wrapped round the lath -->
+          <path d="M-12.5 -168 L12.5 -168 L12.5 -158 L-12.5 -158 Z" fill="#BB0A10"/>
+          <path d="M-12.5 -168 L12.5 -168 L12.5 -164 L-12.5 -164 Z" fill="#D8383D" opacity=".5"/>
+          <path d="M-12.5 -168 L12.5 -168 L12.5 -158 L-12.5 -158 Z" fill="none" stroke="#161311" stroke-width="1.4" opacity=".8"/>
+        </g>
+      </g>
+
+      <g class="cps-a-pipe">
+        <!-- timber skids -->
+        <path d="M96 448 h44 v16 h-44z M400 450 h44 v16 h-44z M700 446 h44 v16 h-44z M916 449 h44 v16 h-44z" fill="#87724E"/>
+        <!-- strung pipe : fusion-bonded epoxy, so it is green -- but a manufactured green,
+             darker and cleaner than any grass, with a sheen strike and a shadowed underside -->
+        <path d="M-10 462 C240 456 480 471 720 460 C860 454 950 462 1010 458 L1010 466 C880 472 700 461 520 469 C340 477 140 465 -10 471 Z" fill="#161311" opacity=".16"/>
+        <!-- body : a shade of the identity green, driven well below every grass value -->
+        <path d="M-10 428 C240 422 480 437 720 426 C860 420 950 428 1010 424 L1010 454 C880 460 700 449 520 457 C340 465 140 453 -10 459 Z" fill="#384C06"/>
+        <!-- shadowed underside -->
+        <path d="M-10 449 C240 443 480 458 720 447 C860 441 950 449 1010 445 L1010 454 C880 460 700 449 520 457 C340 465 140 453 -10 459 Z" fill="#1F2A06"/>
+        <!-- specular strike along the crown : a tint, well above every grass value -->
+        <path d="M-10 429 C240 423 480 438 720 427 C860 421 950 429 1010 425 L1010 431 C880 437 700 426 520 434 C340 442 140 430 -10 436 Z" fill="#A5B75B"/>
+        <!-- ink outline, so it stays a cut-paper object -->
+        <path d="M-10 428 C240 422 480 437 720 426 C860 420 950 428 1010 424 L1010 454 C880 460 700 449 520 457 C340 465 140 453 -10 459 Z" fill="none" stroke="#161311" stroke-width="2.6"/>
+        <!-- a gap between two joints, so it reads as pipe and not as another trench -->
+        <path d="M524 424 L578 424 L578 466 L524 466 Z" fill="#CFBC99"/>
+        <path d="M524 430 L578 430 L578 462 L524 462 Z" fill="#AF9F82"/>
+        <ellipse cx="524" cy="446" rx="8" ry="16" fill="#A5B75B" stroke="#161311" stroke-width="1.8"/>
+        <ellipse cx="524" cy="446" rx="4" ry="10" fill="#242020"/>
+        <ellipse cx="578" cy="445" rx="8" ry="16" fill="#A5B75B" stroke="#161311" stroke-width="1.8"/>
+        <ellipse cx="578" cy="445" rx="4" ry="10" fill="#242020"/>
+      </g>
+    </g>
+
+    <!-- the shutter, at the phone -->
+    <g class="cps-flash">
+      <path d="M483 296 l7 17 l18-6 l-11 15 l17 9 l-19 3 l3 19 l-15-12 l-12 15 l-1-19 l-19 1 l14-12 l-14-13 l19 2 l-1-19 z" fill="#F7F2E6"/>
+    </g>
+
+    <!-- ---------- BEAT 2 : the map draws itself ---------- -->
+    <g class="cps-map">
+      <rect x="-150" y="0" width="1300" height="580" fill="#7F9A24"/>
+      <path d="M-150 300 C100 332 300 300 520 331 C760 364 950 330 1150 357 L1150 580 L-150 580 Z" fill="#8CA637"/>
+      <path d="M628 14 L992 26 L978 148 L668 158 L640 96 Z" fill="#93AD42"/>
+      <path d="M286 466 L566 480 L552 584 L292 578 L276 520 Z" fill="#8FA93C"/>
+      <path d="M-150 396 L96 404 L120 468 L14 502 L-150 486 Z" fill="#8FA93C"/>
+      <!-- tree stands -->
+      <g fill="#161311" opacity=".14" transform="translate(5,7)">
+        <path d="M-40 58 C40 22 152 30 212 66 C268 100 250 174 178 192 C110 210 20 190 -22 150 C-54 118 -60 76 -40 58 Z"/>
+        <path d="M700 470 C782 438 902 452 962 500 C1012 540 990 602 900 608 C798 614 720 580 696 536 C680 506 684 480 700 470 Z"/>
+        <path d="M40 470 C112 446 192 466 212 508 C230 548 180 592 100 598 C28 602 -32 578 -32 530 C-32 494 0 482 40 470 Z"/>
+      </g>
+      <path d="M-40 58 C40 22 152 30 212 66 C268 100 250 174 178 192 C110 210 20 190 -22 150 C-54 118 -60 76 -40 58 Z" fill="#4B6006"/>
+      <path d="M700 470 C782 438 902 452 962 500 C1012 540 990 602 900 608 C798 614 720 580 696 536 C680 506 684 480 700 470 Z" fill="#4B6006"/>
+      <path d="M40 470 C112 446 192 466 212 508 C230 548 180 592 100 598 C28 602 -32 578 -32 530 C-32 494 0 482 40 470 Z" fill="#4B6006"/>
+      <path d="M268 88 a9 9 0 1 0 .1 0z M320 140 a7 7 0 1 0 .1 0z M256 176 a8 8 0 1 0 .1 0z M382 60 a7 7 0 1 0 .1 0z M470 96 a9 9 0 1 0 .1 0z M556 62 a7 7 0 1 0 .1 0z M760 190 a8 8 0 1 0 .1 0z M840 232 a7 7 0 1 0 .1 0z M120 384 a8 8 0 1 0 .1 0z M232 470 a7 7 0 1 0 .1 0z M400 520 a9 9 0 1 0 .1 0z M636 452 a7 7 0 1 0 .1 0z M886 452 a8 8 0 1 0 .1 0z M960 402 a7 7 0 1 0 .1 0z" fill="#4B6006" opacity=".8"/>
+      <!-- access road off the ROW -->
+      <path d="M120 582 C126 510 106 470 132 430 C150 400 148 372 140 344" fill="none" stroke="#D6C9AE" stroke-width="13"/>
+      <!-- the cleared right-of-way -->
+      <path d="M-160 362 C-40 356 60 350 140 344 C240 337 300 318 390 311 C480 304 560 300 640 296 C740 291 820 277 900 268 C990 258 1090 258 1160 256"
+            fill="none" stroke="#CFBC99" stroke-width="128"/>
+      <path d="M-160 362 C-40 356 60 350 140 344 C240 337 300 318 390 311 C480 304 560 300 640 296 C740 291 820 277 900 268 C990 258 1090 258 1160 256"
+            fill="none" stroke="#B9A98D" stroke-width="34"/>
+
+      <!-- ROW edges draw out along the corridor -->
+      <path pathLength="100" class="cps-draw cps-dA" stroke="#161311" stroke-width="2.6"
+            d="M-160 298 C-40 292 60 286 140 280 C240 273 300 254 390 247 C480 240 560 236 640 232 C740 227 820 213 900 204 C990 194 1090 194 1160 192"/>
+      <path pathLength="100" class="cps-draw cps-dB" stroke="#161311" stroke-width="2.6"
+            d="M-160 426 C-40 420 60 414 140 408 C240 401 300 382 390 375 C480 368 560 364 640 360 C740 355 820 341 900 332 C990 322 1090 322 1160 320"/>
+      <!-- the alignment -->
+      <path pathLength="100" class="cps-draw cps-dC" stroke="#BB0A10" stroke-width="2.6"
+            d="M-160 362 C-40 356 60 350 140 344 C240 337 300 318 390 311 C480 304 560 300 640 296 C740 291 820 277 900 268 C990 258 1090 258 1160 256"/>
+
+      <!-- wetland -->
+      <path class="cps-a-wash" fill="#8FB2E8"
+            d="M700 392 C688 348 716 320 762 316 C812 312 862 328 884 356 C906 384 896 424 852 438 C806 452 748 442 722 424 C706 412 704 404 700 392 Z"/>
+      <path class="cps-a-wash" fill="none" stroke="#2757B6" stroke-width="2.4" opacity=".55"
+            d="M724 356 h34 M776 344 h34 M828 356 h30 M740 392 h34 M792 380 h34 M844 392 h26 M760 424 h34 M812 418 h30"/>
+      <path pathLength="100" class="cps-draw cps-dE" stroke="#2757B6" stroke-width="2.6"
+            d="M700 392 C688 348 716 320 762 316 C812 312 862 328 884 356 C906 384 896 424 852 438 C806 452 748 442 722 424 C706 412 704 404 700 392 Z"/>
+      <!-- stream -->
+      <path pathLength="100" class="cps-draw cps-dF" stroke="#5083E2" stroke-width="5"
+            d="M232 118 C258 180 244 232 272 282 C298 330 286 386 316 446 C336 488 330 528 352 580"/>
+      <!-- workspace boundary closes -->
+      <path pathLength="100" class="cps-draw cps-dD" stroke="#F0A53A" stroke-width="3.2"
+            d="M436 250 L436 178 C500 170 566 174 620 180 L620 240 C560 244 496 246 436 250 Z"/>
+
+      <!-- station ticks count along the line -->
+      <g class="cps-a-tick cps-t1">
+        <path d="M180 328 L180 354" stroke="#161311" stroke-width="2.4"/>
+        <text class="cps-num" x="180" y="372" text-anchor="middle">1042+00</text>
+      </g>
+      <g class="cps-a-tick cps-t2">
+        <path d="M420 295 L420 321" stroke="#161311" stroke-width="2.4"/>
+        <text class="cps-num" x="420" y="339" text-anchor="middle">1043+00</text>
+      </g>
+      <g class="cps-a-tick cps-t3">
+        <path d="M660 282 L660 308" stroke="#161311" stroke-width="2.4"/>
+        <text class="cps-num" x="660" y="326" text-anchor="middle">1044+00</text>
+      </g>
+      <g class="cps-a-tick cps-t4">
+        <path d="M900 255 L900 281" stroke="#161311" stroke-width="2.4"/>
+        <text class="cps-num" x="900" y="299" text-anchor="middle">1045+00</text>
+      </g>
+
+      <!-- camera pins, pointed the way the camera was pointed -->
+      <g class="cps-a-pin cps-p1">
+        <path d="M452 306 L436 276 A34 34 0 0 1 468 276 Z" fill="#F2ECDF" opacity=".6"/>
+        <circle cx="452" cy="306" r="12" fill="#F0A53A" stroke="#161311" stroke-width="2.4"/>
+        <path d="M446 302 h12 v8 h-12z M449 299 h5 v3 h-5z" fill="#161311"/>
+      </g>
+      <g class="cps-a-pin cps-p2">
+        <path d="M500 300 L484 270 A34 34 0 0 1 516 270 Z" fill="#F2ECDF" opacity=".6"/>
+        <circle cx="500" cy="300" r="12" fill="#F0A53A" stroke="#161311" stroke-width="2.4"/>
+        <path d="M494 296 h12 v8 h-12z M497 293 h5 v3 h-5z" fill="#161311"/>
+      </g>
+      <g class="cps-a-pin cps-p3">
+        <path d="M588 298 L604 268 A34 34 0 0 1 620 292 Z" fill="#F2ECDF" opacity=".6"/>
+        <circle cx="588" cy="298" r="12" fill="#F0A53A" stroke="#161311" stroke-width="2.4"/>
+        <path d="M582 294 h12 v8 h-12z M585 291 h5 v3 h-5z" fill="#161311"/>
+      </g>
+
+      <!-- the station the middle photo matched to -->
+      <g class="cps-a-chip">
+        <path d="M460 331 L552 328 L553 354 L461 357 Z" fill="#161311" opacity=".18" transform="translate(3,4)"/>
+        <path d="M460 331 L552 328 L553 354 L461 357 Z" fill="#F2ECDF"/>
+        <path d="M460 331 L552 328 L553 354 L461 357 Z" fill="none" stroke="#161311" stroke-width="1.6"/>
+        <path d="M500 312 L506 331 L494 331 Z" fill="#F2ECDF"/>
+        <text class="cps-chiptxt" x="506" y="348" text-anchor="middle">1043+00</text>
+      </g>
+
+      <g class="cps-a-lab">
+        <text class="cps-lab" x="528" y="203" text-anchor="middle" fill="#161311">Workspace</text>
+        <text class="cps-lab" x="792" y="386" text-anchor="middle" fill="#2757B6">Wetland</text>
+        <text class="cps-lab" x="560" y="452" text-anchor="middle" fill="#161311">Right-of-way</text>
+        <path d="M560 438 L560 364" fill="none" stroke="#161311" stroke-width="1.4" opacity=".55"/>
+        <path d="M944 44 L954 74 L944 67 L934 74 Z" fill="#161311"/>
+        <text class="cps-lab" x="944" y="94" text-anchor="middle" fill="#161311">N</text>
+      </g>
+    </g>
+
+    <!-- ---------- THE INSPECTOR ---------- -->
+    <g class="cps-figure">
+      <g transform="translate(430,506) rotate(-1.6)">
+        <g class="cps-bob">
+          <ellipse cx="6" cy="2" rx="38" ry="9" fill="#161311" opacity=".16"/>
+          <!-- boots -->
+          <path d="M-24 -12 L-4 -12 L-4 -1 L-31 0 Z" fill="#161311"/>
+          <path d="M6 -12 L26 -12 L33 0 L6 -1 Z" fill="#161311"/>
+          <!-- trousers -->
+          <path d="M-23 -70 L23 -71 L28 -10 L5 -10 L1 -44 L-4 -10 L-26 -10 Z" fill="#242020"/>
+          <!-- left arm, at his side -->
+          <path d="M-26 -128 L-41 -124 L-35 -84 L-24 -87 Z" fill="#5083E2"/>
+          <circle cx="-33" cy="-83" r="6.5" fill="#E8C79A"/>
+          <!-- hi-vis vest -->
+          <path d="M-27 -133 L27 -134 L33 -63 L-31 -62 Z" fill="#F0A53A"/>
+          <path d="M-28 -110 L29 -111 L30 -101 L-28 -100 Z" fill="#F2ECDF" opacity=".92"/>
+          <path d="M-29 -92 L31 -93 L32 -83 L-29 -82 Z" fill="#F2ECDF" opacity=".92"/>
+          <path d="M-3 -134 L4 -134 L5 -63 L-4 -63 Z" fill="#D08A22"/>
+          <!-- head -->
+          <circle cx="0" cy="-151" r="18" fill="#E8C79A"/>
+          <circle cx="-6" cy="-154" r="2.3" fill="#161311"/>
+          <circle cx="6" cy="-154" r="2.3" fill="#161311"/>
+          <path d="M-7 -144 q7 6 14 0" fill="none" stroke="#161311" stroke-width="2.2" stroke-linecap="round"/>
+          <!-- hard hat -->
+          <path d="M-23 -160 a23 21 0 0 1 46 0 Z" fill="#F0A53A"/>
+          <path d="M-32 -161 L31 -163 L32 -154 L-32 -152 Z" fill="#F0A53A"/>
+          <path d="M-3 -180 L4 -180 L4 -160 L-3 -160 Z" fill="#D08A22"/>
+          <!-- raised arm + phone -->
+          <g class="cps-arm">
+            <path d="M22 -130 L41 -139 L58 -163 L47 -171 L31 -148 L19 -142 Z" fill="#5083E2"/>
+            <circle cx="52" cy="-168" r="6.5" fill="#E8C79A"/>
+            <path d="M40 -197 L67 -199 L69 -164 L42 -162 Z" fill="#161311"/>
+            <path d="M43.5 -193 L63.5 -194.5 L65 -167.5 L45 -166 Z" fill="#5083E2"/>
+          </g>
+        </g>
+      </g>
+    </g>
+
+  </g>
+
+  <!-- the shutter whiting out the whole frame -->
+  <rect class="cps-flashbig" x="0" y="0" width="1000" height="580" fill="#F7F2E6"/>
+
+  <!-- laptop front : bezel, deck, and the results -->
+  <g class="cps-lapmove cps-lap-front">
+    <rect x="451" y="76" width="398" height="6" fill="#161311"/>
+    <rect x="451" y="348" width="398" height="6" fill="#161311"/>
+    <rect x="449" y="76" width="7" height="278" fill="#161311"/>
+    <rect x="844" y="76" width="7" height="278" fill="#161311"/>
+    <path d="M424 369 L876 369 L906 428 L394 428 Z" fill="#242020"/>
+    <path d="M450 380 L850 380 L872 412 L428 412 Z" fill="#3A332E"/>
+    <path d="M598 416 L702 416 L706 424 L594 424 Z" fill="#3A332E"/>
+  </g>
+
+  <!-- the results list : renamed files + the day as a KMZ -->
+  <g class="cps-files cps-lapfiles">
+    <rect class="cps-filecard-sh" x="455" y="252" width="390" height="98" fill="#161311" opacity="0" transform="translate(4,5)"/>
+    <rect x="455" y="252" width="390" height="98" fill="#F2ECDF"/>
+    <rect class="cps-filecard" x="455" y="252" width="390" height="98" fill="none" stroke="#161311" stroke-width="0"/>
+    <rect x="455" y="252" width="390" height="2" fill="#D6C9AE"/>
+    <text class="cps-hd" x="470" y="270">Renamed</text>
+    <g class="cps-a-row cps-r1">
+      <circle cx="474" cy="285" r="3.6" fill="#637F08"/>
+      <text class="cps-file" x="486" y="289"><tspan fill="#8A8078">IMG_4487.JPG</tspan><tspan fill="#8A8078">  &#8594;  </tspan><tspan fill="#161311">1043+00_Sire West_IMG_4487.JPG</tspan></text>
+    </g>
+    <g class="cps-a-row cps-r2">
+      <circle cx="474" cy="303" r="3.6" fill="#637F08"/>
+      <text class="cps-file" x="486" y="307"><tspan fill="#8A8078">IMG_4488.JPG</tspan><tspan fill="#8A8078">  &#8594;  </tspan><tspan fill="#161311">1043+00_Sire West_IMG_4488.JPG</tspan></text>
+    </g>
+    <g class="cps-a-row cps-r3">
+      <circle cx="474" cy="321" r="3.6" fill="#637F08"/>
+      <text class="cps-file" x="486" y="325"><tspan fill="#8A8078">IMG_4489.JPG</tspan><tspan fill="#8A8078">  &#8594;  </tspan><tspan fill="#161311">1044+00_Sire West_IMG_4489.JPG</tspan></text>
+    </g>
+    <g class="cps-a-row cps-r4">
+      <circle cx="474" cy="339" r="3.6" fill="#2757B6"/>
+      <text class="cps-file" x="486" y="343"><tspan fill="#8A8078">Google Earth</tspan><tspan fill="#8A8078">  &#8594;  </tspan><tspan fill="#161311">9-9-26.kmz</tspan></text>
+    </g>
+  </g>
+
+  <!-- one static grain layer for the whole picture -->
+  <rect class="cps-grain" x="0" y="0" width="1000" height="580" filter="url(#cps-grainf)"/>
+</g>
+</svg>
+</div>
+
+<ul class="cps-steps">
+  <li class="cps-s1"><b>01</b>The GPS in the photo</li>
+  <li class="cps-s2"><b>02</b>The nearest station in your KMZ</li>
+  <li class="cps-s3"><b>03</b>The station in front of the name</li>
+</ul>
+
+<ul class="cps-mobfiles">
+  <li>1043+00_Sire West_IMG_4487.JPG</li>
+  <li>1043+00_Sire West_IMG_4488.JPG</li>
+  <li>1044+00_Sire West_IMG_4489.JPG</li>
+  <li>9-9-26.kmz</li>
+</ul>
+</section>
+<!-- ================= END CONSTRUCTION PAPER STORYBOOK ================= -->
 
     <h2>What it does</h2>
 
