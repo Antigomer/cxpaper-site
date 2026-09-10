@@ -103,6 +103,47 @@ verified against the 2026-08-24 file with the public key, not assumed. Any other
 form — a space after a colon, unsorted keys, a trailing newline inside the
 signed bytes — produces a file every client rejects. Do not tidy that call.
 
+### The `updated` stamp, and the note beside the key
+
+`updated` must be strictly greater than the `updated` of the file it replaces —
+always, not usually. The app orders Chris's signed files by that number and by
+nothing else (never by the machine clock, which a customer can move), so a
+reinstatement stamped below the revocation it is meant to supersede never
+lands, and the customer stays locked out offline.
+
+`publish_status.py` takes the floor for the next stamp as the **higher of two
+readings**:
+
+* the `updated` in `license/status.json`, and
+* `dist\ig_admin_key.igk.laststamp` — one decimal integer, written by this
+  script beside the signing key, **outside this repository**.
+
+Neither alone is enough. The published file gets truncated by a full disk,
+rolled back by a `git checkout`, or is simply absent in a fresh clone; the note
+survives all of those but knows nothing about a publish made from another
+machine. `.gitignore` already excludes `ig_admin_key*`, so the note cannot be
+committed by accident.
+
+A damaged file is read **upward**. Every stamp is Unix seconds — ten digits for
+any date between 2001 and 2286 — so if `status.json` is cut off in the middle
+of its `updated` (a full disk, a half-written copy), the surviving digits are
+padded with trailing 9s to ten digits and *that* is the file's floor:
+`200000000` becomes `2000000009`, `2` becomes `2999999999`, and a cut exactly
+at the end of the number recovers the number itself. A whole `updated` shorter
+than ten digits in a file that will not parse is treated the same way (one
+corrupted byte can make a cut number look finished), every `updated` found in
+the raw text competes and the highest wins, and the padding widens to match the
+note beside the key if the field has ever passed ten digits. The result competes
+with the note like any other floor and the script warns, naming the padded
+value. This is deliberate: a floor too high costs one number (the next publish
+is floor + 1, with a warning); a floor too low publishes a stamp the field has
+already passed, and a reinstatement stamped that way never lands.
+
+If the script warns, read the warning — every fallback that could emit a stamp
+below what is already published says so. **It never refuses to publish**: a
+publisher that will not run leaves a customer locked out, and the file it most
+often publishes is the one that puts somebody back.
+
 ### The seed
 
 `tools/publish_status.py` reads the Ed25519 seed from `dist\ig_admin_key.igk`
