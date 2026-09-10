@@ -6,8 +6,9 @@ GitHub Pages from this repository. No server, no monthly bill, nothing to patch.
     index.html            overview
     download/             download page — reads the current build live from
                           the Releases API, so it cannot go stale
-    license/              how licensing works
+    license/              how to request a license
     license/status.json   THE SIGNED STATUS FILE the program checks
+    404.html              served by Pages for any address that is not one of the three
     assets/               css, js, the mark (also the favicon)
     tools/publish_status.py   re-sign status.json from tools/revoked.txt
     tools/release.bat         publish a build to GitHub Releases

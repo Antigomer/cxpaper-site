@@ -24,6 +24,7 @@ p.data[data-release-state="ready"] { display: block; }
 <meta property="og:description" content="Field photo tools for pipeline inspection. Rename by station, stamp with GPS, export to Google Earth.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://cxpaper.com/">
+<link rel="canonical" href="https://cxpaper.com/">
 </head>
 <body>
 
@@ -258,6 +259,9 @@ p.data[data-release-state="ready"] { display: block; }
   .cps-filecard-sh{opacity:.18;}
   .cps-steps li{opacity:1;}
 }
+
+/* ---- parked: site.js adds this while the storybook is scrolled off screen ---- */
+.cps-scope.is-parked *{animation-play-state:paused !important;}
 </style>
 
 <div class="cps-stagewrap">

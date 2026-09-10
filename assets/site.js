@@ -72,6 +72,10 @@ var CONFIG = {
           if (asset) {
             a.setAttribute("href", asset.browser_download_url);
             a.removeAttribute("aria-disabled");
+            // The button now points straight at the exe, so say so: a label
+            // that still reads "on GitHub" promises a page and delivers a
+            // 30 MB download.
+            a.textContent = "Download " + asset.name + " (" + bytes(asset.size) + ")";
           } else {
             a.setAttribute("href", rel.html_url || "#");
           }
@@ -136,8 +140,20 @@ var CONFIG = {
 
   function stampYear() { setText("[data-year]", String(new Date().getFullYear())); }
 
+  // The storybook is a 20 s loop that never stops. Off screen it is still
+  // costing paint time and battery on a phone, so it is parked (paused, not
+  // reset) while it is scrolled out of view and resumes where it left off.
+  function parkStorybook() {
+    var scope = $(".cps-scope");
+    if (!scope || !("IntersectionObserver" in window)) return;
+    new IntersectionObserver(function (entries) {
+      scope.classList.toggle("is-parked", !entries[0].isIntersecting);
+    }, { threshold: 0 }).observe(scope);
+  }
+
   markNav();
   stampYear();
   fillRelease();
   fillStatus();
+  parkStorybook();
 })();

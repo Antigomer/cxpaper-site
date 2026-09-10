@@ -73,8 +73,11 @@ a:hover { text-decoration-thickness: 2px; }
 }
 .site-head .name:hover { text-decoration: none; }
 
-.site-nav { display: flex; gap: 1.4rem; }
+/* Labels never break mid-phrase ("REQUEST A / LICENSE" at 375px); the row
+   wraps as whole links instead. */
+.site-nav { display: flex; gap: 0.6rem 1.4rem; flex-wrap: wrap; }
 .site-nav a {
+  white-space: nowrap;
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: 0.18em;
@@ -197,6 +200,8 @@ main { padding: 3.5rem 0 5rem; }
 code, kbd { font-family: var(--mono); font-size: 0.9em; background: rgba(22,19,17,0.06); padding: 0.1em 0.35em; border-radius: 2px; }
 pre { font-family: var(--mono); font-size: 13px; background: var(--paper); border: 1px solid var(--rule); border-radius: 3px; padding: 1rem 1.15rem; overflow-x: auto; max-width: var(--measure); }
 pre code { background: none; padding: 0; }
+/* Prose in a pre (the release notes) wraps at the box; a command still scrolls. */
+pre.wrap { white-space: pre-wrap; overflow-wrap: anywhere; }
 
 hr { border: 0; border-top: 1px solid var(--rule); margin: 3rem 0; }
 
