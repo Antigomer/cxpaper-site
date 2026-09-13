@@ -8,7 +8,15 @@
 var CONFIG = {
   releasesOwner: "antigomer",
   releasesRepo: "cxpaper-releases",
-  assetMatch: /^ConstructionPaper.*\.exe$/i
+  assetMatch: /^ConstructionPaper.*\.exe$/i,
+
+  // Where a license request is sent. GitHub Pages serves files and nothing
+  // else - it cannot receive a form - so this is the one address on the site
+  // that is not GitHub. Empty until the endpoint exists, and while it is
+  // empty the form says so and hands the visitor the email instead of
+  // pretending to send. Fill it in and nothing else here changes.
+  licenseApi: "",
+  supportEmail: "chris@chrisputnam.me"
 };
 
 (function () {
@@ -151,9 +159,173 @@ var CONFIG = {
     }, { threshold: 0 }).observe(scope);
   }
 
+
+  // ---- the license request form -----------------------------------------
+  // Four answers, sent to CONFIG.licenseApi, which mints a key and emails it.
+  // Everything that can go wrong ends with the visitor holding an address to
+  // write to: a form that fails silently is a customer who never asks twice.
+
+  function fieldOf(input) { return input.closest ? input.closest(".field") : null; }
+
+  function complain(input, why) {
+    var field = fieldOf(input);
+    if (!field) return;
+    field.classList.add("bad");
+    var note = field.querySelector(".why");
+    if (!note) {
+      note = document.createElement("p");
+      note.className = "why";
+      field.appendChild(note);
+    }
+    note.textContent = why;
+  }
+
+  function clearComplaint(input) {
+    var field = fieldOf(input);
+    if (!field) return;
+    field.classList.remove("bad");
+    var note = field.querySelector(".why");
+    if (note) note.remove();
+  }
+
+  function looksLikeEmail(v) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+  }
+
+  function looksLikePhone(v) {
+    // Ten digits or more, however they were typed. Country codes, spaces,
+    // brackets and dashes are all somebody's normal way of writing it.
+    return (v.match(/\d/g) || []).length >= 10;
+  }
+
+  function checkForm(fields) {
+    var firstBad = null;
+    Object.keys(fields).forEach(function (key) {
+      var input = fields[key];
+      var v = input.value.trim();
+      clearComplaint(input);
+      var why = "";
+      if (!v) {
+        why = "Needed.";
+      } else if (key === "email" && !looksLikeEmail(v)) {
+        why = "That address is missing something - the key is sent to it.";
+      } else if (key === "phone" && !looksLikePhone(v)) {
+        why = "That looks short for a phone number.";
+      }
+      if (why) {
+        complain(input, why);
+        if (!firstBad) firstBad = input;
+      }
+    });
+    return firstBad;
+  }
+
+  function wireRequestForm() {
+    var form = $("#license-request");
+    if (!form) return;
+
+    var state = $("[data-request=state]", form);
+    var button = $("[data-request=submit]", form);
+    var sent = $("[data-request=sent]");
+    var fields = {
+      name: $("#rq-name"), email: $("#rq-email"),
+      phone: $("#rq-phone"), project: $("#rq-project")
+    };
+    var trap = $("#rq-company");
+
+    Object.keys(fields).forEach(function (key) {
+      fields[key].addEventListener("input", function () { clearComplaint(fields[key]); });
+    });
+
+    function say(message, bad) {
+      state.textContent = message || "";
+      state.className = "form-state" + (bad ? " bad" : "");
+    }
+
+    function mailtoFallback() {
+      var body = "Name: " + fields.name.value + "
+Phone: " + fields.phone.value +
+                 "
+Email: " + fields.email.value + "
+Project: " + fields.project.value + "
+";
+      return "mailto:" + CONFIG.supportEmail +
+             "?subject=" + encodeURIComponent("Construction Paper license request") +
+             "&body=" + encodeURIComponent(body);
+    }
+
+    function failOver(message) {
+      say("", false);
+      var row = button.parentNode;
+      var link = row.querySelector("[data-request=mailto]");
+      if (!link) {
+        link = document.createElement("a");
+        link.className = "btn ghost";
+        link.setAttribute("data-request", "mailto");
+        row.insertBefore(link, state);
+      }
+      link.setAttribute("href", mailtoFallback());
+      link.textContent = "Send it as an email instead";
+      say(message, true);
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var firstBad = checkForm(fields);
+      if (firstBad) {
+        say("Fix the marked answers and send again.", true);
+        firstBad.focus();
+        return;
+      }
+      if (trap && trap.value) {          // a person never fills this in
+        say("Thanks - that has been sent.", false);
+        return;
+      }
+      if (!CONFIG.licenseApi) {
+        failOver("Requests are not switched on yet. Email it and you will get the same answer.");
+        return;
+      }
+
+      button.disabled = true;
+      say("Sending...", false);
+
+      fetch(CONFIG.licenseApi, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: fields.name.value.trim(),
+          email: fields.email.value.trim(),
+          phone: fields.phone.value.trim(),
+          project: fields.project.value.trim()
+        })
+      })
+        .then(function (r) {
+          return r.json().catch(function () { return {}; }).then(function (doc) {
+            if (!r.ok) throw new Error(doc.error || ("HTTP " + r.status));
+            return doc;
+          });
+        })
+        .then(function () {
+          form.hidden = true;
+          if (sent) {
+            var where = $("[data-request=sent-email]", sent);
+            if (where) where.textContent = fields.email.value.trim();
+            sent.hidden = false;
+            sent.scrollIntoView({ block: "nearest" });
+          }
+        })
+        .catch(function (err) {
+          button.disabled = false;
+          failOver("That did not go through. Nothing was lost - send it as an email.");
+          if (window.console) console.warn("license request:", err);
+        });
+    });
+  }
+
   markNav();
   stampYear();
   fillRelease();
   fillStatus();
   parkStorybook();
+  wireRequestForm();
 })();

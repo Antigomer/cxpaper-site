@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Request a license — Construction Paper</title>
-<meta name="description" content="How to get a license for Construction Paper.">
+<meta name="description" content="Ask for a license for Construction Paper. Four questions, and the key comes back by email.">
 <link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,28 +32,84 @@
 
     <h1>Request a license</h1>
     <p class="lede">
-      Construction Paper is invitation-only right now. Ask for a license and
-      you will get a file back to open it with.
+      Construction Paper will not open without a license. Answer these four
+      and the key comes back to your email, with the download link beside it.
     </p>
 
-    <div class="btn-row">
-      <a class="btn" href="mailto:chris@chrisputnam.me?subject=Construction%20Paper%20license%20request&amp;body=Name%3A%0AProject%3A%0A%0A">Request a license</a>
+    <form class="form" id="license-request" novalidate>
+      <div class="field">
+        <label for="rq-name">Your name</label>
+        <input id="rq-name" name="name" type="text" autocomplete="name" required>
+      </div>
+      <div class="field">
+        <label for="rq-email">Email</label>
+        <input id="rq-email" name="email" type="email" autocomplete="email" required>
+        <p class="help">The key is sent here, so check it before you send.</p>
+      </div>
+      <div class="field">
+        <label for="rq-phone">Phone</label>
+        <input id="rq-phone" name="phone" type="tel" autocomplete="tel" required>
+      </div>
+      <div class="field">
+        <label for="rq-project">Project you are working on</label>
+        <input id="rq-project" name="project" type="text" required>
+        <p class="help">The pipeline, spread or job name is enough.</p>
+      </div>
+
+      <!-- Not for people. A form filled in by a machine fills this in too, and
+           that is how it is told apart from a person. Hidden from screen
+           readers and skipped by the keyboard, so nobody real ever meets it. -->
+      <div class="field trap" aria-hidden="true">
+        <label for="rq-company">Company</label>
+        <input id="rq-company" name="company" type="text" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div class="btn-row">
+        <button class="btn" type="submit" data-request="submit">Send the request</button>
+        <span class="form-state" data-request="state" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+
+    <div class="panel" data-request="sent" hidden>
+      <p class="label">Sent</p>
+      <p style="margin:0 0 0.75rem">
+        Your key is on its way to <strong data-request="sent-email">your email</strong>.
+        It usually arrives within a minute. Check the spam folder if it does not.
+      </p>
+      <p style="margin:0">
+        The email carries the download link and the key. Open the program, click
+        <strong>Paste license key</strong>, and paste the block from the email.
+      </p>
     </div>
-    <p>
-      That opens an email. Say who you are and what project you are on, and
-      send it.
-    </p>
 
-    <h2>When the license arrives</h2>
+    <noscript>
+      <div class="panel">
+        <p class="label">The form needs JavaScript</p>
+        <p style="margin:0">
+          With it turned off, email
+          <a href="mailto:chris@chrisputnam.me?subject=Construction%20Paper%20license%20request&amp;body=Name%3A%0APhone%3A%0AEmail%3A%0AProject%3A%0A%0A">chris@chrisputnam.me</a>
+          with your name, phone, email and project instead. Same answer, by hand.
+        </p>
+      </div>
+    </noscript>
+
+    <h2>What happens next</h2>
     <ol>
-      <li>Save the file it comes with somewhere you can find it.</li>
-      <li>Open Construction Paper. It asks for a license.</li>
-      <li>Choose <strong>Import license file</strong> and pick that file.</li>
+      <li>The email arrives with a download link and your license key.</li>
+      <li>Put the program in a folder of its own and open it.</li>
+      <li>It asks for a license. Click <strong>Paste license key</strong> and
+      paste the block from the email.</li>
     </ol>
     <p>
-      It only has to be done once, on that computer. If you need it on a second
-      computer, ask and you will get a second one — the license is tied to the
-      machine it is opened on.
+      The key locks to the first computer that opens it. If you need it on a
+      second machine, ask and you will get a second key — copying the license
+      across will not work.
+    </p>
+    <p>
+      The program checks in with this site about once a month. It does not need
+      the internet while you work; it needs it once in the month. Somewhere
+      with no signal at all for weeks on end is worth mentioning when you ask,
+      and the key can be issued to suit.
     </p>
 
   </div>

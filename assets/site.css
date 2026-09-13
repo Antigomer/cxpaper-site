@@ -225,3 +225,54 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: 3rem 0; }
   .kv th { width: auto; display: block; padding-bottom: 0; border-bottom: 0; }
   .kv td { display: block; padding-top: 0.15rem; }
 }
+
+/* ---- the license request form ------------------------------------------ */
+
+.form { max-width: var(--measure); margin: 2rem 0 0; }
+
+.field { margin: 0 0 1.25rem; }
+.field label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.35rem;
+}
+.field input {
+  width: 100%;
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 0.7rem 0.8rem;
+}
+.field input:focus {
+  outline: 2px solid var(--cornflower);
+  outline-offset: 1px;
+  border-color: var(--cornflower);
+}
+.field .help { font-size: 0.9rem; color: var(--muted); margin: 0.35rem 0 0; max-width: none; }
+
+/* A field the form says is wrong says WHY, under the box it is about - not in
+   a summary somewhere else that has to be matched back up to it. */
+.field.bad input { border-color: var(--red-text); }
+.field .why { font-size: 0.9rem; color: var(--red-text); margin: 0.35rem 0 0; max-width: none; }
+
+/* The machine trap. Off screen rather than display:none, because some bots
+   skip anything that is genuinely hidden. */
+.field.trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.form-state { font-size: 0.95rem; color: var(--muted); }
+.form-state.bad { color: var(--red-text); }
+
+.btn[disabled] { opacity: 0.55; cursor: default; }
+.btn[disabled]:hover { background: var(--ink); }
+
+button.btn { font-family: inherit; cursor: pointer; }
