@@ -27,11 +27,17 @@ rejects. Do not "tidy" the dumps call.
 REPLACES. Not "usually". Always. THE APP DEPENDS ON IT, and here is exactly
 what depends on it and why:
 
-inspector_gadgets.py remembers a revocation as the SIGNED FILE that did the
-revoking, and clears it when a signed file that supersedes it says the id is
-fine again. "Supersedes" is decided by comparing the two "updated" fields --
-never by the machine clock, which a customer can move. So "updated" is the
-app's ONLY way to order two of Chris's files.
+inspector_gadgets.py writes a revocation down and keeps refusing -- offline
+included -- until a status file that SUPERSEDES the one that revoked it says
+the id is fine again. "Supersedes" is decided by comparing the two "updated"
+fields, never by the machine clock, which a customer can move. So "updated" is
+the app's ONLY way to order two of Chris's files.
+
+(For most of this file's life that paragraph described something the app did
+not actually do: it never read "updated" at all, so a genuine signed file from
+before a revocation was accepted as current and lifted it. The app reads it
+now -- see _license_marks and check_license_status -- so everything below is
+load-bearing again rather than aspirational.)
 
 While this script stamped `int(time.time())` and nothing else, two files
 published inside the same second carried the SAME "updated", and the app was
@@ -134,7 +140,13 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 
-DEFAULT_KEY = os.path.join(REPO, "..", "dist", "ig_admin_key.igk")
+# Where the signing seed actually is, on Chris's PC and nowhere else. This
+# used to be os.path.join(REPO, "..", "dist", ...), which resolves to
+# C:\Users\antig\Projects\dist - a folder that has never existed. Following
+# the README's revocation steps exactly, the script stopped on its first line
+# with "No signing key", which is the whole reason no .laststamp file has ever
+# been written from this tree. --key still overrides it.
+DEFAULT_KEY = r"C:\_CLAUDE\PST_Build\dist\ig_admin_key.igk"
 REVOKED_TXT = os.path.join(HERE, "revoked.txt")
 STATUS_JSON = os.path.join(REPO, "license", "status.json")
 
@@ -195,7 +207,10 @@ def load_seed(path):
     adjust -- nothing else in the file cares how the seed arrived.
     """
     if not os.path.exists(path):
-        sys.exit("No signing key at %s\n(use --key to point at it)" % path)
+        sys.exit("No signing key at %s\n\n"
+                 "The signing key lives on Chris's PC and is never in this\n"
+                 "folder and never in this repository. If it has moved, point\n"
+                 "at it with --key <path>." % path)
 
     with open(path, "rb") as fh:
         raw = fh.read()

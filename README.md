@@ -9,10 +9,20 @@ GitHub Pages from this repository. No server, no monthly bill, nothing to patch.
     license/              how to request a license
     license/status.json   THE SIGNED STATUS FILE the program checks
     404.html              served by Pages for any address that is not one of the three
+    admin/                the private licence desk dashboard
     assets/               css, js, the mark (also the favicon)
     tools/publish_status.py   re-sign status.json from tools/revoked.txt
     tools/release.bat         publish a build to GitHub Releases
+    tools/check_js.py         will the .js files run at all? (no Node here)
+    worker/cxpaper-license.js the Cloudflare Worker that hands out keys
+    worker/deploy_worker.py   put that Worker on Cloudflare
+    worker/mint_batch.py      sign a batch of keys and stock the Worker
+    worker/worker_test.py     the Worker's own checks
     CNAME                 cxpaper.com
+
+**This repository is public.** Nothing that is a secret goes in it — not the
+signing seed, and not the licence desk password. Both live in `C:\_CLAUDE\`
+on Chris's PC. See "The licence desk password" below.
 
 Two repositories, on purpose:
 
@@ -79,6 +89,27 @@ tools\release.bat 1.0.1 "Build 4"
 Computes the SHA-256, writes it into the release notes, uploads the exe. The
 download page picks it all up on the next load. Nothing here needs editing.
 
+## The licence desk password
+
+One password opens the dashboard at `/admin/` and lets `mint_batch.py` stock a
+batch. There is exactly one copy of it:
+
+    C:\_CLAUDE\cp-admin-token.txt
+
+`worker\deploy_worker.py` writes that file and sets the same string as the
+Worker's `ADMIN_TOKEN` secret, so the two cannot drift apart. **Run it once
+before stocking any keys** — the Worker has no fallback password, so until the
+secret is set the admin routes answer 503 and say so:
+
+    python worker\deploy_worker.py
+
+Until 2026-09-13 the password was a constant in `worker/cxpaper-license.js`
+instead — in this repository, which is public — and `deploy_worker.py` set a
+*different*, random secret that the Worker preferred, so deploying silently
+locked `mint_batch.py` out. Both problems are gone with the constant. The old
+one is still in this repository's history and is worthless: the Worker no
+longer accepts it.
+
 ## Revoking a key
 
 1. Add the license id to `tools/revoked.txt`.
@@ -89,8 +120,12 @@ The script prints the public key it derived from the seed — it must match
 `LICENSE_PUB_HEX` in `inspector_gadgets.py`. If it does not, stop: you signed
 with the wrong key and every client will reject the file.
 
-Copies with a strict check-in stop at their next check. Lenient copies stop when
-they next reach the host successfully.
+A copy stops at its next successful check-in, and **stays** stopped: the program
+writes the revocation down and keeps refusing — offline included — until a
+status file with a strictly greater `updated` says the id is clear again. That
+is what the stamp rules below are protecting. (Until 2026-09-13 the program
+never read `updated` at all, so a revocation lasted only as long as the
+network did.)
 
 ### The serialization rule
 
@@ -147,9 +182,13 @@ often publishes is the one that puts somebody back.
 
 ### The seed
 
-`tools/publish_status.py` reads the Ed25519 seed from `dist\ig_admin_key.igk`
-(accepts raw 32 bytes, base64, hex, or JSON with a `seed` key). **It must never
-enter this repository.** `.gitignore` excludes `*.igk` and `*.igl`; leave those
+`tools/publish_status.py` reads the Ed25519 seed from
+`C:\_CLAUDE\PST_Build\dist\ig_admin_key.igk` (accepts raw 32 bytes, base64,
+hex, or JSON with a `seed` key); `--key` points it somewhere else. That default
+used to resolve to `C:\Users\antig\Projects\dist\`, a folder which has never
+existed — so following step 2 above stopped on the first line with "No signing
+key", and no revocation has ever actually been published from this tree.
+**The seed must never enter this repository.** `.gitignore` excludes `*.igk` and `*.igl`; leave those
 lines alone. If a real `.igk` is shaped differently, `load_seed()` is the only
 function to adjust.
 

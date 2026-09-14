@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Licence desk — Construction Paper</title>
+<link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+/* The desk. Chris's own page - the site's type and colours, nothing new
+   invented, and no chart library: the rest of this site carries none and the
+   two charts here are drawn by hand in SVG. */
+
+.desk-gate { max-width: 26rem; margin: 3rem 0; }
+.desk-gate input { width: 100%; font: inherit; padding: 0.7rem 0.8rem;
+  border: 1px solid var(--rule); border-radius: 3px; background: var(--paper); color: var(--ink); }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 1rem; margin: 1.5rem 0 2rem; max-width: none; }
+.tile { background: var(--paper); border: 1px solid var(--rule); border-radius: 3px; padding: 1rem 1.1rem; }
+.tile .n { font-family: var(--mono); font-size: 2.1rem; line-height: 1.1; display: block; }
+.tile .k { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted); display: block; margin-top: 0.35rem; }
+.tile .sub { font-size: 0.85rem; color: var(--muted); margin: 0.4rem 0 0; max-width: none; }
+
+/* Status is reserved: it never doubles as a series colour. */
+.banner { border-left: 3px solid var(--amber); background: var(--paper);
+  padding: 0.9rem 1.1rem; margin: 1.5rem 0; max-width: var(--measure); border-radius: 0 3px 3px 0; }
+.banner.bad { border-left-color: var(--red-text); }
+.banner p { margin: 0; }
+
+.figure { margin: 2.5rem 0; }
+.figure h3 { margin: 0 0 0.15rem; font-size: 1.05rem; }
+.figure .why { color: var(--muted); font-size: 0.9rem; margin: 0 0 0.9rem; max-width: var(--measure); }
+.figure .plot { overflow-x: auto; }
+
+.legend { display: flex; gap: 1.2rem; flex-wrap: wrap; margin: 0 0 0.6rem;
+  font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.legend i { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+
+.controls { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin: 0 0 1.25rem; }
+.controls button { font: inherit; font-family: var(--mono); font-size: 12px;
+  letter-spacing: 0.06em; padding: 0.4rem 0.8rem; border: 1px solid var(--rule);
+  background: transparent; color: var(--muted); border-radius: 2px; cursor: pointer; }
+.controls button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+table.roster { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+table.roster th, table.roster td { text-align: left; padding: 0.55rem 0.6rem 0.55rem 0;
+  border-bottom: 1px solid var(--rule); vertical-align: top; }
+table.roster th { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted); font-weight: 400; }
+table.roster td.mono { font-family: var(--mono); font-size: 12px; }
+/* The licence id, which is the one thing tools\revoked.txt accepts. A button
+   rather than text because its whole job is to be copied. */
+button.keyid { font-family: var(--mono); font-size: 12px; background: none;
+  border: 0; padding: 0; color: var(--ink); cursor: pointer;
+  border-bottom: 1px dotted var(--muted); }
+button.keyid:hover, button.keyid:focus-visible { color: var(--cornflower-text); }
+.pill { font-family: var(--mono); font-size: 11px; padding: 0.15rem 0.45rem;
+  border-radius: 2px; border: 1px solid currentColor; white-space: nowrap; }
+.pill.on { color: var(--green-text); }
+.pill.off { color: var(--muted); }
+
+.tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--paper);
+  font-family: var(--mono); font-size: 12px; padding: 0.5rem 0.65rem; border-radius: 3px;
+  opacity: 0; transition: opacity 0.08s; z-index: 20; max-width: 18rem; }
+.tip.show { opacity: 1; }
+.tip b { display: block; font-weight: 600; margin-bottom: 0.2rem; }
+
+.readout { margin-top: 0.8rem; }
+.readout summary { font-family: var(--mono); font-size: 12px; color: var(--muted); cursor: pointer; }
+.readout table { margin-top: 0.6rem; }
+
+.reading { background: var(--paper); border: 1px solid var(--rule); border-radius: 3px;
+  padding: 1.25rem 1.4rem; margin: 2rem 0; max-width: var(--measure); }
+.reading p { margin: 0 0 0.7rem; }
+.reading p:last-child { margin-bottom: 0; }
+.reading .label { margin-bottom: 0.5rem; }
+</style>
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <img class="mark" src="../assets/mark.svg" alt="">
+    <a class="name" href="/">Construction Paper</a>
+    <nav class="site-nav">
+      <a href="/">Overview</a>
+      <a href="/download/">Download</a>
+      <a href="/license/">Request a license</a>
+    </nav>
+  </div>
+</header>
+<div class="ream" role="presentation"></div>
+
+<main>
+  <div class="wrap">
+
+    <p class="label">Private</p>
+    <h1>Licence desk</h1>
+
+    <form class="desk-gate" id="desk-gate">
+      <div class="field">
+        <label for="desk-pw">Password</label>
+        <input id="desk-pw" type="password" autocomplete="current-password">
+        <p class="help">Kept in this browser tab only. Closing the tab forgets it.</p>
+      </div>
+      <div class="btn-row" style="margin-top:1rem">
+        <button class="btn" type="submit">Open</button>
+        <span class="form-state" id="desk-state" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+
+    <div id="desk" hidden>
+
+      <div id="banners"></div>
+
+      <div class="tiles" id="tiles"></div>
+
+      <div class="reading" id="reading" hidden>
+        <p class="label">What this says</p>
+        <div id="reading-body"></div>
+      </div>
+
+      <div class="controls" id="range">
+        <button type="button" data-days="30" aria-pressed="true">Last 30 days</button>
+        <button type="button" data-days="90" aria-pressed="false">Last 90 days</button>
+        <button type="button" data-days="0" aria-pressed="false">All</button>
+      </div>
+
+      <div class="figure">
+        <h3>Requests and activations</h3>
+        <p class="why">Both lines are counted on the day the key was asked for, so a gap
+        between them is people who asked on that day and still have not opened the program.
+        That gap is the one to chase.</p>
+        <div class="legend">
+          <span><i style="background:#2757B6"></i> Asked for a licence</span>
+          <span><i style="background:#637F08"></i> Of those, have since started it</span>
+        </div>
+        <div class="plot" id="plot-time"></div>
+        <details class="readout"><summary>Show the numbers</summary><div id="table-time"></div></details>
+      </div>
+
+      <div class="figure" id="fig-tools" hidden>
+        <h3>Which tools get used</h3>
+        <p class="why">Counted from copies that are online and have agreed to report.
+        A tool near the bottom is either unwanted or undiscoverable — worth knowing which.</p>
+        <div class="plot" id="plot-tools"></div>
+        <details class="readout"><summary>Show the numbers</summary><div id="table-tools"></div></details>
+      </div>
+
+      <div class="figure">
+        <h3>Everyone who has asked</h3>
+        <p class="why">Newest first.</p>
+        <div class="plot"><table class="roster" id="roster"></table></div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<div class="tip" id="tip" role="status" aria-live="polite"></div>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>Construction Paper</span>
+    <span>© <span data-year>2026</span> Chris Putnam</span>
+    <span class="spacer"><a href="mailto:chris@chrisputnam.me">chris@chrisputnam.me</a></span>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+<script src="desk.js"></script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Request a license — Construction Paper</title>
-<meta name="description" content="Ask for a license for Construction Paper. Four questions, and the key comes back by email.">
+<meta name="description" content="Ask for a license for Construction Paper. Four questions, and the key comes straight back on the page.">
 <link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,7 +33,7 @@
     <h1>Request a license</h1>
     <p class="lede">
       Construction Paper will not open without a license. Answer these four
-      and the key comes back to your email, with the download link beside it.
+      and your key comes straight back, on this page.
     </p>
 
     <form class="form" id="license-request" novalidate>
@@ -44,7 +44,7 @@
       <div class="field">
         <label for="rq-email">Email</label>
         <input id="rq-email" name="email" type="email" autocomplete="email" required>
-        <p class="help">The key is sent here, so check it before you send.</p>
+        <p class="help">So Chris can reach you about the license later.</p>
       </div>
       <div class="field">
         <label for="rq-phone">Phone</label>
@@ -58,10 +58,13 @@
 
       <!-- Not for people. A form filled in by a machine fills this in too, and
            that is how it is told apart from a person. Hidden from screen
-           readers and skipped by the keyboard, so nobody real ever meets it. -->
+           readers and skipped by the keyboard, so nobody real ever meets it.
+           NOT named "company": a password manager recognises that word and
+           fills it in for a real person, who is then silently treated as a
+           bot. autocomplete="off" does not stop 1Password or LastPass. -->
       <div class="field trap" aria-hidden="true">
-        <label for="rq-company">Company</label>
-        <input id="rq-company" name="company" type="text" tabindex="-1" autocomplete="off">
+        <label for="rq-note-2">Leave this blank</label>
+        <input id="rq-note-2" name="rq-note-2" type="text" tabindex="-1" autocomplete="off">
       </div>
 
       <div class="btn-row">
@@ -71,14 +74,22 @@
     </form>
 
     <div class="panel" data-request="sent" hidden>
-      <p class="label">Sent</p>
+      <p class="label">Your license key</p>
       <p style="margin:0 0 0.75rem">
-        Your key is on its way to <strong data-request="sent-email">your email</strong>.
-        It usually arrives within a minute. Check the spam folder if it does not.
+        Copy it now — this is the only time it is shown. If you lose it, email
+        <a href="mailto:chris@chrisputnam.me">chris@chrisputnam.me</a> and say
+        who you are; it is recorded against your name.
       </p>
-      <p style="margin:0">
-        The email carries the download link and the key. Open the program, click
-        <strong>Paste license key</strong>, and paste the block from the email.
+      <textarea class="keybox" data-request="key" rows="4" readonly
+                aria-label="Your license key"></textarea>
+      <div class="btn-row" style="margin:0.75rem 0 0">
+        <button class="btn" type="button" data-request="copy">Copy the key</button>
+        <a class="btn ghost" href="/download/">Download the program</a>
+        <span class="form-state" data-request="copied" role="status" aria-live="polite"></span>
+      </div>
+      <p style="margin:1rem 0 0">
+        Then open Construction Paper, click <strong>Paste license key</strong>,
+        and paste it in.
       </p>
     </div>
 
@@ -95,10 +106,10 @@
 
     <h2>What happens next</h2>
     <ol>
-      <li>The email arrives with a download link and your license key.</li>
-      <li>Put the program in a folder of its own and open it.</li>
+      <li>Copy the key this page gives you.</li>
+      <li>Download the program, put it in a folder of its own, and open it.</li>
       <li>It asks for a license. Click <strong>Paste license key</strong> and
-      paste the block from the email.</li>
+      paste what you copied.</li>
     </ol>
     <p>
       The key locks to the first computer that opens it. If you need it on a
