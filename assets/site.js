@@ -15,7 +15,7 @@ var CONFIG = {
   // that is not GitHub. Empty until the endpoint exists, and while it is
   // empty the form says so and hands the visitor the email instead of
   // pretending to send. Fill it in and nothing else here changes.
-  licenseApi: "",
+  licenseApi: "https://cxpaper-license.chris-73e.workers.dev/request",
   supportEmail: "chris@chrisputnam.me"
 };
 
@@ -82,8 +82,11 @@ var CONFIG = {
             a.removeAttribute("aria-disabled");
             // The button now points straight at the exe, so say so: a label
             // that still reads "on GitHub" promises a page and delivers a
-            // 30 MB download.
-            a.textContent = "Download " + asset.name + " (" + bytes(asset.size) + ")";
+            // 30 MB download. It is the SECOND button now - requesting a
+            // licence comes first - so it names who it is for, because the
+            // file is useless to anybody without a key.
+            a.textContent = "Already have a key? Download " + asset.name +
+              " (" + bytes(asset.size) + ")";
           } else {
             a.setAttribute("href", rel.html_url || "#");
           }
@@ -161,7 +164,10 @@ var CONFIG = {
 
 
   // ---- the license request form -----------------------------------------
-  // Four answers, sent to CONFIG.licenseApi, which mints a key and emails it.
+  // Four answers, sent to CONFIG.licenseApi, which hands back a key from the
+  // batch. Nothing emails it: the key is shown on the page, once, and the
+  // panel says so. Any wording about an email arriving is a promise nothing
+  // in this system keeps.
   // Everything that can go wrong ends with the visitor holding an address to
   // write to: a form that fails silently is a customer who never asks twice.
 
@@ -175,9 +181,14 @@ var CONFIG = {
     if (!note) {
       note = document.createElement("p");
       note.className = "why";
+      note.id = input.id + "-why";
       field.appendChild(note);
     }
     note.textContent = why;
+    // Said out loud, not only shown. Without these, somebody using a screen
+    // reader lands back on the box and hears "Phone" - never the reason.
+    input.setAttribute("aria-invalid", "true");
+    input.setAttribute("aria-describedby", note.id);
   }
 
   function clearComplaint(input) {
@@ -186,6 +197,8 @@ var CONFIG = {
     field.classList.remove("bad");
     var note = field.querySelector(".why");
     if (note) note.remove();
+    input.removeAttribute("aria-invalid");
+    input.removeAttribute("aria-describedby");
   }
 
   function looksLikeEmail(v) {
@@ -231,7 +244,31 @@ var CONFIG = {
       name: $("#rq-name"), email: $("#rq-email"),
       phone: $("#rq-phone"), project: $("#rq-project")
     };
-    var trap = $("#rq-company");
+    var trap = $("#rq-note-2");
+    var copyBtn = sent ? $("[data-request=copy]", sent) : null;
+    var copied = sent ? $("[data-request=copied]", sent) : null;
+
+    if (copyBtn) {
+      copyBtn.addEventListener("click", function () {
+        var box = $("[data-request=key]", sent);
+        if (!box) return;
+        box.focus();
+        box.select();
+        var done = false;
+        try { done = document.execCommand("copy"); } catch (e) { done = false; }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(box.value).then(function () {
+            if (copied) copied.textContent = "Copied.";
+          }, function () {
+            // A blocked clipboard is not a dead end: the text is selected, so
+            // say the thing they can still do rather than "failed".
+            if (copied) copied.textContent = done ? "Copied." : "Press Ctrl+C now.";
+          });
+        } else if (copied) {
+          copied.textContent = done ? "Copied." : "Press Ctrl+C now.";
+        }
+      });
+    }
 
     Object.keys(fields).forEach(function (key) {
       fields[key].addEventListener("input", function () { clearComplaint(fields[key]); });
@@ -243,12 +280,10 @@ var CONFIG = {
     }
 
     function mailtoFallback() {
-      var body = "Name: " + fields.name.value + "
-Phone: " + fields.phone.value +
-                 "
-Email: " + fields.email.value + "
-Project: " + fields.project.value + "
-";
+      var body = "Name: "    + fields.name.value    + "\n" +
+                 "Phone: "   + fields.phone.value   + "\n" +
+                 "Email: "   + fields.email.value   + "\n" +
+                 "Project: " + fields.project.value + "\n";
       return "mailto:" + CONFIG.supportEmail +
              "?subject=" + encodeURIComponent("Construction Paper license request") +
              "&body=" + encodeURIComponent(body);
@@ -305,18 +340,27 @@ Project: " + fields.project.value + "
             return doc;
           });
         })
-        .then(function () {
+        .then(function (doc) {
+          // The key is IN this reply and the pool has already been debited for
+          // it. Dropping it on the floor here means a key spent, a customer
+          // recorded as served, and nothing in their hands.
           form.hidden = true;
           if (sent) {
-            var where = $("[data-request=sent-email]", sent);
-            if (where) where.textContent = fields.email.value.trim();
+            var box = $("[data-request=key]", sent);
+            if (box) box.value = doc.key || "";
             sent.hidden = false;
             sent.scrollIntoView({ block: "nearest" });
+            if (box) { box.focus(); box.select(); }
           }
         })
         .catch(function (err) {
           button.disabled = false;
-          failOver("That did not go through. Nothing was lost - send it as an email.");
+          // The worker's own sentences are already in Chris's voice and say
+          // something true and specific ("no keys in stock this minute, email
+          // him and you will get one today"). Replacing them with a house
+          // generic throws that away and reads like the visitor's fault.
+          failOver((err && err.message) ||
+                   "That did not go through. Nothing was lost - send it as an email.");
           if (window.console) console.warn("license request:", err);
         });
     });
