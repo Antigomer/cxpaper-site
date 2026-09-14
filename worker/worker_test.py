@@ -25,6 +25,11 @@ MAX_REPORT_BYTES = 256 * 1024
 # written against, so it can be seen going red. A check that cannot fail is
 # not evidence of anything.
 OLD = "--old" in sys.argv
+
+# What the old code fell back to when no ADMIN_TOKEN was set. NOT the real
+# string: the real one is exactly what should never be written into a file in
+# a public repository, and this check does not care what the value is - only
+# that a constant in the source used to be accepted at all, and no longer is.
 ADMIN_FALLBACK_WAS = "cp-OLD-CONSTANT-NO-LONGER-ACCEPTED"
 
 
@@ -386,8 +391,8 @@ def t_w05_no_password_no_admin():
     """W-05 / DASH-2. With no ADMIN_TOKEN set there is no fallback to a
     constant in the repository - the admin routes simply refuse."""
     d = Desk(KV(), None)
-    a = d.stock("cp-OLD-CONSTANT-NO-LONGER-ACCEPTED", {"keys": [{"id": "X", "code": "y"}]})
-    b = d.admin_data("cp-OLD-CONSTANT-NO-LONGER-ACCEPTED")
+    a = d.stock(ADMIN_FALLBACK_WAS, {"keys": [{"id": "X", "code": "y"}]})
+    b = d.admin_data(ADMIN_FALLBACK_WAS)
     check("W-05", "no fallback", a[0] == 503 and b[0] == 503,
           "stock=%s data=%s" % (a[0], b[0]))
 
