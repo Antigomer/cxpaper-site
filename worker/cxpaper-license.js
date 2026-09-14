@@ -15,6 +15,7 @@
  *   POST /report     what the program has been doing, and encrypted crops.
  *   POST /admin/stock a batch of freshly minted keys, from Chris's PC.
  *   GET  /admin/data  everything above, for the private dashboard.
+ *   GET  /admin/reports the usage totals, for the same dashboard.
  *
  * WHAT IS NOT HERE, ON PURPOSE: the signing seed. Keys are minted on Chris's
  * PC in KeyMaker and uploaded as a finished batch. If this Worker is ever
@@ -27,14 +28,16 @@
  *   claim:<id>    who got it, and which computer claimed it
  *   req:<ts>:<id> the request log, newest sorting last
  *   rate:<ip>     a short-lived counter
- *   report:<id>:<ts>
+ *   report:<id>:<ts>-<rand>
  *
- * The admin password is the constant below rather than a Cloudflare secret.
- * Setting a secret is another trip through a dashboard that has already cost
- * an evening, and a Worker's source is not public - workers.dev serves the
- * compiled worker, not this file. An ADMIN_TOKEN secret still wins if one is
- * ever set. To change the password, edit this one line: mint_batch.py reads
- * it straight out of this file, so there is nothing to keep in step.
+ * THE ADMIN PASSWORD IS NOT IN THIS FILE. It is the ADMIN_TOKEN secret, which
+ * deploy_worker.py creates and stores in C:\_CLAUDE\cp-admin-token.txt. That
+ * one file is the only copy: the dashboard is opened with it and mint_batch.py
+ * reads it to stock a batch. It used to be a constant here, which meant the
+ * password for the customer list was sitting in the public repository that
+ * publishes cxpaper.com, and meant deploying the Worker (which sets a random
+ * secret) silently locked Chris out of his own desk. If ADMIN_TOKEN is not
+ * set, the admin routes answer 503 rather than falling back to anything.
  */
 
 const SITE = "https://cxpaper.com";
@@ -44,10 +47,13 @@ const DOWNLOAD_PAGE = SITE + "/download/";
 // from one address is a machine working through the form.
 const MAX_REQUESTS_PER_HOUR = 3;
 
-// The password for /admin/stock and /admin/data. Not a licence secret: the
-// worst it can do is add keys to the pool or read the customer list. The
-// signing seed, which is the thing that actually matters, stays on Chris's PC.
-const ADMIN_FALLBACK = "cp-OLD-CONSTANT-NO-LONGER-ACCEPTED";
+// A running copy reports its usage once a day. More than this from one licence
+// is a loop, not a working day, and the store is not there to absorb it.
+const MAX_REPORTS_PER_DAY = 24;
+
+// Big enough for a day of counters and a few encrypted crops, small enough
+// that nobody can post the store full. KV's own ceiling is 25 MB per value.
+const MAX_REPORT_BYTES = 256 * 1024;
 
 const JSON_HEADERS = { "Content-Type": "application/json; charset=utf-8" };
 
@@ -93,12 +99,84 @@ async function overRate(env, ip) {
   return false;
 }
 
+async function overReportRate(env, id) {
+  const key = "rrate:" + id;
+  const seen = parseInt((await env.CP.get(key)) || "0", 10);
+  if (seen >= MAX_REPORTS_PER_DAY) return true;
+  await env.CP.put(key, String(seen + 1), { expirationTtl: 86400 });
+  return false;
+}
+
+/* A body that parses but is not an object - `null`, a bare number, a string -
+ * used to reach `body.name` and throw, which Cloudflare turns into a 500. The
+ * handler was already trying to say 400; this lets it. */
+async function readObject(request) {
+  const body = await request.json();
+  if (!body || typeof body !== "object" || Array.isArray(body)) throw new Error("not an object");
+  return body;
+}
+
+/* list() stops at 1,000 keys and says so in list_complete. Counting keys.length
+ * without following the cursor reports "1000 in stock" forever once the pool
+ * passes a thousand, and reports it to the one screen Chris uses to decide
+ * whether to mint more. */
+async function countPrefix(env, prefix) {
+  let total = 0, cursor;
+  do {
+    const page = await env.CP.list({ prefix, cursor });
+    total += page.keys.length;
+    cursor = page.list_complete ? null : page.cursor;
+  } while (cursor);
+  return total;
+}
+
+/* A licence key is base64url over {payload, sig}. The signature inside it is
+ * the one part the program can hand back byte for byte: it reads it straight
+ * out of license.igl and never re-encodes it, so hashing THAT rather than the
+ * whole key means the two sides cannot disagree over JSON spacing or field
+ * order. Returns null for anything that is not a key this desk can read. */
+function signatureOf(code) {
+  try {
+    let b64 = String(code).replace(/-/g, "+").replace(/_/g, "/");
+    while (b64.length % 4) b64 += "=";
+    const blob = JSON.parse(atob(b64));
+    const sig = blob && blob.sig;
+    if (typeof sig === "string" && sig) return sig;
+  } catch (e) { /* not a key, or not one we can read */ }
+  return null;
+}
+
+/* The claim records what a key's signature hashes to, never the key. That is
+ * enough to check that whoever calls /activate is holding the key, and not
+ * enough to reconstruct it if this store is ever read by someone else. */
+async function sha256hex(text) {
+  const bytes = new TextEncoder().encode(text);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+/* One password, and it has to be set. There is no constant to fall back to:
+ * a fallback in this file is a fallback in the repository. */
+function adminOk(request, env) {
+  const given = request.headers.get("X-CP-Admin") || "";
+  return Boolean(env.ADMIN_TOKEN) && given === env.ADMIN_TOKEN;
+}
+
+function adminRefusal(request, env) {
+  if (!env.ADMIN_TOKEN) {
+    return reply(request, 503, {
+      error: "This licence desk has no admin password set. Run deploy_worker.py."
+    });
+  }
+  return reply(request, 401, { error: "no" });
+}
+
 /* ---- POST /request ------------------------------------------------------ */
 
 async function handleRequest(request, env) {
   let body;
   try {
-    body = await request.json();
+    body = await readObject(request);
   } catch (e) {
     return reply(request, 400, { error: "Send the four answers as JSON." });
   }
@@ -127,37 +205,64 @@ async function handleRequest(request, env) {
     });
   }
 
-  // One key out of the batch. list() returns them in whatever order KV keeps
-  // them in, which is fine - a key is a key. If the batch is empty the visitor
-  // is told the truth rather than being handed a broken key.
-  const waiting = await env.CP.list({ prefix: "pool:", limit: 1 });
+  // One key out of the batch.
+  //
+  // This used to list with limit:1 and take keys[0]. KV returns keys in
+  // lexicographic order, so that is not "whatever order KV keeps them in" -
+  // it is the SAME key for every caller, every time. Two people sending the
+  // form in the same minute both got it, the second claim:<id> overwrote the
+  // first, and the customer it overwrote vanished from the roster entirely:
+  // a key sold, and no record that Chris had ever sold it.
+  //
+  // So: take a page of candidates, pick one at random, and refuse to write
+  // over a claim that already exists. Honest limits - KV has no
+  // compare-and-swap, so this narrows the window, it does not close it. Two
+  // requests in the same instant can still both read an unclaimed key; the
+  // check below means the loser is told to send the form again instead of
+  // quietly erasing the winner. Closing it properly needs a Durable Object,
+  // which is a bigger change than this file.
+  const waiting = await env.CP.list({ prefix: "pool:", limit: 50 });
   if (!waiting.keys.length) {
     return reply(request, 503, {
       error: "No keys are in stock this minute. Email chris@chrisputnam.me and you will get one today."
     });
   }
 
-  const poolKey = waiting.keys[0].name;
-  const id = poolKey.slice("pool:".length);
-  const code = await env.CP.get(poolKey);
-  if (!code) {
-    return reply(request, 503, { error: "That key could not be read. Try once more." });
+  const now = Math.floor(Date.now() / 1000);
+  let id = null, code = null;
+
+  for (let tries = 0; tries < 3 && !code; tries++) {
+    const pick = waiting.keys[Math.floor(Math.random() * waiting.keys.length)];
+    const candidate = pick.name.slice("pool:".length);
+    if (await env.CP.get("claim:" + candidate)) continue;   // gone already
+    const value = await env.CP.get(pick.name);
+    if (!value) continue;                                    // taken mid-read
+    id = candidate;
+    code = value;
   }
 
-  const now = Math.floor(Date.now() / 1000);
+  if (!code) {
+    return reply(request, 503, {
+      error: "That key was taken while you were sending. Send the form once more."
+    });
+  }
+
   const claim = {
     id, name, email, phone, project,
     issued_at: now,
     ip,
     machine: null,          // filled in by /activate, once, forever
-    activated_at: null
+    activated_at: null,
+    // Not the key. Enough to prove a caller is holding the key, and useless
+    // to anybody who reads this store - see /activate.
+    sig_sha256: await sha256hex(signatureOf(code) || code)
   };
 
   // Claim BEFORE handing it over. A key given out but not written down is a
   // key with no owner and no way to switch it off.
   await env.CP.put("claim:" + id, JSON.stringify(claim));
   await env.CP.put("req:" + now + ":" + id, JSON.stringify(claim));
-  await env.CP.delete(poolKey);
+  await env.CP.delete("pool:" + id);
 
   const left = await env.CP.list({ prefix: "pool:", limit: 25 });
   const low = left.keys.length < 20;
@@ -176,25 +281,50 @@ async function handleRequest(request, env) {
 async function handleActivate(request, env) {
   let body;
   try {
-    body = await request.json();
+    body = await readObject(request);
   } catch (e) {
     return reply(request, 400, { error: "bad request" });
   }
 
   const id = clean(body.id, 40).toUpperCase();
   const machine = clean(body.machine, 40).toUpperCase();
+  // The program sends the signature out of its licence file. A whole key is
+  // accepted too, for anything that has the key but not the file.
+  const sig = String(body.sig == null ? "" : body.sig).trim() ||
+              signatureOf(body.key) || "";
   if (!id || !machine) return reply(request, 400, { error: "bad request" });
 
   const raw = await env.CP.get("claim:" + id);
   const now = Math.floor(Date.now() / 1000);
 
-  // No record can mean a key Chris minted by hand in KeyMaker rather than one
-  // from the batch. Those are real keys and must work, so the first machine
-  // that presents one is recorded exactly as a batch key would be.
-  const claim = raw ? JSON.parse(raw) : {
-    id, name: "", email: "", phone: "", project: "(issued by hand)",
-    issued_at: now, ip: null, machine: null, activated_at: null
-  };
+  // An id this desk has never issued gets nothing. This used to invent a
+  // claim on the spot for any unknown id, which meant anyone who guessed or
+  // typed an id could have it bound to their machine - and then the real
+  // customer, arriving later with the real key, was told their key was
+  // already in use on another computer. Keys minted by hand in KeyMaker go
+  // into the pool through /admin/stock like every other key, so a key that
+  // is genuinely Chris's always has a claim here.
+  if (!raw) {
+    return reply(request, 404, {
+      ok: false,
+      error: "This licence desk has no record of that key. Email chris@chrisputnam.me."
+    });
+  }
+
+  const claim = JSON.parse(raw);
+
+  // Proof that the caller holds the key, not just its id. The id travels in
+  // the open - it is printed on the dashboard and in the reply to /request -
+  // so binding on the id alone let anybody who saw one burn the customer's
+  // single activation. Claims written before this field existed have nothing
+  // to check against; they keep the old first-come behaviour rather than
+  // locking out customers who are already running.
+  if (claim.sig_sha256) {
+    if (!sig) return reply(request, 400, { error: "bad request" });
+    if (await sha256hex(sig) !== claim.sig_sha256) {
+      return reply(request, 403, { ok: false, error: "That key does not match." });
+    }
+  }
 
   if (claim.machine && claim.machine !== machine) {
     return reply(request, 403, {
@@ -215,23 +345,69 @@ async function handleActivate(request, env) {
 /* ---- POST /report ------------------------------------------------------- */
 
 async function handleReport(request, env) {
+  // Read as text first, so an enormous body is refused before it is parsed
+  // rather than after. This route used to accept anything from anyone at any
+  // size: every usage chart on the dashboard was forgeable by hand, and a
+  // loop posting junk could burn the KV day-quota, which would take /request
+  // down with it - the form would stop handing out keys because somebody was
+  // spamming a route that has nothing to do with it.
+  let text;
+  try {
+    text = await request.text();
+  } catch (e) {
+    return reply(request, 400, { error: "bad request" });
+  }
+  if (text.length > MAX_REPORT_BYTES) {
+    return reply(request, 413, { error: "That report is too big." });
+  }
+
   let body;
   try {
-    body = await request.json();
+    body = JSON.parse(text);
+    if (!body || typeof body !== "object" || Array.isArray(body)) throw new Error("not an object");
   } catch (e) {
     return reply(request, 400, { error: "bad request" });
   }
 
   const id = clean(body.id, 40).toUpperCase();
-  if (!id) return reply(request, 400, { error: "bad request" });
+  const machine = clean(body.machine, 40).toUpperCase();
+  if (!id || !machine) return reply(request, 400, { error: "bad request" });
+
+  // Only a licence this desk issued, and only from the computer it was bound
+  // to. Anything else is somebody else's traffic and does not belong in
+  // Chris's numbers.
+  const raw = await env.CP.get("claim:" + id);
+  if (!raw) return reply(request, 404, { error: "no such licence" });
+  const claim = JSON.parse(raw);
+  if (!claim.machine || claim.machine !== machine) {
+    return reply(request, 403, { error: "not this computer" });
+  }
+
+  if (await overReportRate(env, id)) {
+    return reply(request, 429, { error: "too many reports today" });
+  }
 
   const now = Math.floor(Date.now() / 1000);
+
   // Stored as sent. Crops arrive already encrypted by the program, to a key
   // only Chris's PC holds - this Worker cannot read them and is not supposed
   // to be able to. Reports expire after a year; the point is trends, not a
   // permanent record of somebody's working day.
-  await env.CP.put("report:" + id + ":" + now, JSON.stringify(body),
+  //
+  // The random tail matters: two reports in the same second used to land on
+  // the same key and the second quietly replaced the first.
+  const stamp = now + "-" + crypto.randomUUID().slice(0, 8);
+  await env.CP.put("report:" + id + ":" + stamp, JSON.stringify(body),
                    { expirationTtl: 31536000 });
+
+  // The check-in used to leave no trace anywhere Chris could read, so "is
+  // anyone still using it" had no answer even in principle. Now the roster
+  // carries the date of the last time each copy spoke.
+  if (claim.last_report_at !== now) {
+    claim.last_report_at = now;
+    claim.reports = (claim.reports || 0) + 1;
+    await env.CP.put("claim:" + id, JSON.stringify(claim));
+  }
 
   return reply(request, 200, { ok: true });
 }
@@ -245,14 +421,11 @@ async function handleStock(request, env) {
   // the address and the dashboard password, both of which he already has.
   // The signing seed still never leaves his machine - what arrives here is
   // finished, signed keys.
-  const given = request.headers.get("X-CP-Admin") || "";
-  if (given !== (env.ADMIN_TOKEN || ADMIN_FALLBACK)) {
-    return reply(request, 401, { error: "no" });
-  }
+  if (!adminOk(request, env)) return adminRefusal(request, env);
 
   let body;
   try {
-    body = await request.json();
+    body = await readObject(request);
   } catch (e) {
     return reply(request, 400, { error: "Send {keys: [{id, code}, ...]}." });
   }
@@ -271,19 +444,15 @@ async function handleStock(request, env) {
     added++;
   }
 
-  const pool = await env.CP.list({ prefix: "pool:" });
   return reply(request, 200, {
-    ok: true, added, skipped, keys_in_stock: pool.keys.length
+    ok: true, added, skipped, keys_in_stock: await countPrefix(env, "pool:")
   });
 }
 
 /* ---- GET /admin/data ---------------------------------------------------- */
 
 async function handleAdminData(request, env) {
-  const given = request.headers.get("X-CP-Admin") || "";
-  if (given !== (env.ADMIN_TOKEN || ADMIN_FALLBACK)) {
-    return reply(request, 401, { error: "no" });
-  }
+  if (!adminOk(request, env)) return adminRefusal(request, env);
 
   const claims = [];
   let cursor;
@@ -291,19 +460,64 @@ async function handleAdminData(request, env) {
     const page = await env.CP.list({ prefix: "claim:", cursor });
     for (const k of page.keys) {
       const raw = await env.CP.get(k.name);
-      if (raw) claims.push(JSON.parse(raw));
+      if (!raw) continue;
+      const claim = JSON.parse(raw);
+      // The hash is proof-of-key machinery, not something the dashboard has
+      // any use for. It does not need to travel to a browser.
+      delete claim.sig_sha256;
+      claims.push(claim);
     }
     cursor = page.list_complete ? null : page.cursor;
   } while (cursor);
 
-  const pool = await env.CP.list({ prefix: "pool:" });
-
   return reply(request, 200, {
     ok: true,
-    keys_in_stock: pool.keys.length,
+    keys_in_stock: await countPrefix(env, "pool:"),
     issued: claims.length,
     activated: claims.filter(c => c.machine).length,
     claims: claims.sort((a, b) => b.issued_at - a.issued_at)
+  });
+}
+
+/* ---- GET /admin/reports ------------------------------------------------- */
+
+async function handleAdminReports(request, env) {
+  // The dashboard has always called this. Until now there was no such route:
+  // reports went in and nothing could read them back out, so the usage chart
+  // was permanently hidden and the desk's own advice said "no copy has
+  // reported its usage yet" no matter how many had.
+  if (!adminOk(request, env)) return adminRefusal(request, env);
+
+  const tools = {};
+  const seen = {};
+  let counted = 0, cursor;
+  do {
+    const page = await env.CP.list({ prefix: "report:", cursor });
+    for (const k of page.keys) {
+      const raw = await env.CP.get(k.name);
+      if (!raw) continue;
+      let doc;
+      try { doc = JSON.parse(raw); } catch (e) { continue; }
+      counted++;
+      const id = String(doc.id || "");
+      if (id) seen[id] = Math.max(seen[id] || 0, Number(doc.at) || 0);
+      const used = doc.tools;
+      if (used && typeof used === "object" && !Array.isArray(used)) {
+        for (const name of Object.keys(used)) {
+          const n = Number(used[name]);
+          if (!Number.isFinite(n) || n < 0) continue;
+          tools[clean(name, 60)] = (tools[clean(name, 60)] || 0) + n;
+        }
+      }
+    }
+    cursor = page.list_complete ? null : page.cursor;
+  } while (cursor);
+
+  return reply(request, 200, {
+    ok: true,
+    tools,
+    reports: counted,
+    copies_reporting: Object.keys(seen).length
   });
 }
 
@@ -311,23 +525,33 @@ async function handleAdminData(request, env) {
 
 export default {
   async fetch(request, env) {
-    const url = new URL(request.url);
-    const path = url.pathname.replace(/\/+$/, "") || "/";
+    try {
+      const url = new URL(request.url);
+      const path = url.pathname.replace(/\/+$/, "") || "/";
 
-    if (request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: cors(request) });
+      if (request.method === "OPTIONS") {
+        return new Response(null, { status: 204, headers: cors(request) });
+      }
+
+      if (request.method === "POST" && path === "/request") return handleRequest(request, env);
+      if (request.method === "POST" && path === "/activate") return handleActivate(request, env);
+      if (request.method === "POST" && path === "/report") return handleReport(request, env);
+      if (request.method === "POST" && path === "/admin/stock") return handleStock(request, env);
+      if (request.method === "GET" && path === "/admin/data") return handleAdminData(request, env);
+      if (request.method === "GET" && path === "/admin/reports") return handleAdminReports(request, env);
+
+      if (request.method === "GET" && path === "/") {
+        return reply(request, 200, { ok: true, service: "cxpaper license desk" });
+      }
+
+      return reply(request, 404, { error: "no such thing here" });
+    } catch (e) {
+      // Anything unforeseen still leaves the caller with a sentence and the
+      // CORS headers, rather than Cloudflare's bare 500 - which the form
+      // reads as a network failure and reports as "could not be reached".
+      return reply(request, 500, {
+        error: "The licence desk hit a problem. Email chris@chrisputnam.me."
+      });
     }
-
-    if (request.method === "POST" && path === "/request") return handleRequest(request, env);
-    if (request.method === "POST" && path === "/activate") return handleActivate(request, env);
-    if (request.method === "POST" && path === "/report") return handleReport(request, env);
-    if (request.method === "POST" && path === "/admin/stock") return handleStock(request, env);
-    if (request.method === "GET" && path === "/admin/data") return handleAdminData(request, env);
-
-    if (request.method === "GET" && path === "/") {
-      return reply(request, 200, { ok: true, service: "cxpaper license desk" });
-    }
-
-    return reply(request, 404, { error: "no such thing here" });
   }
 };

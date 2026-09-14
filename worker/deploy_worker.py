@@ -242,7 +242,15 @@ def upload(auth, account, ns_id):
 def admin_token(auth, account):
     """The password the dashboard uses to read the customer list. Made here,
     kept beside the Cloudflare token, and sent to Cloudflare as a secret - it
-    is never written into the worker's source."""
+    is never written into the worker's source.
+
+    It used to have a twin: a constant in cxpaper-license.js that the Worker
+    fell back to. That file is in a PUBLIC repository, so the password for the
+    customer list was on the internet - and because this function sets a
+    RANDOM secret, which the Worker preferred, deploying also silently locked
+    mint_batch.py out, since that read the constant. Both are gone. The Worker
+    now has no fallback at all: until this runs, the admin routes answer 503.
+    """
     if os.path.isfile(ADMIN_FILE):
         value = open(ADMIN_FILE, encoding="utf-8").read().strip()
         made = False
@@ -289,6 +297,11 @@ def main():
         print("")
         print("Open the address in a browser to check it is alive - it should")
         print("answer with one line of text, not an error.")
+        print("")
+        print("The dashboard is at /admin/ on the site. The password to open")
+        print("it is the one line in %s," % ADMIN_FILE)
+        print("and it is the same password mint_batch.py uses. One password,")
+        print("one file, and no copy of it in the repository.")
     else:
         print("")
         print("Uploaded, but Cloudflare did not report the public address.")
