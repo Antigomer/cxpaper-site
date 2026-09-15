@@ -121,6 +121,13 @@ def post(url, path, admin, body):
     req = urllib.request.Request(url.rstrip("/") + path, data=data, method="POST")
     req.add_header("Content-Type", "application/json")
     req.add_header("X-CP-Admin", admin)
+    # Cloudflare turns away urllib's default "Python-urllib/3.x" with a 403
+    # and error code 1010 - a bot check, refused in front of the Worker, which
+    # never sees the request at all. So the FIRST batch could not be stocked:
+    # the desk was deployed and working, and this said "the licence desk said
+    # no". Everything else that talks to the desk already names itself; this
+    # was the one caller that did not.
+    req.add_header("User-Agent", "ConstructionPaper-mint/1 (key batch)")
     try:
         with urllib.request.urlopen(req, timeout=60) as r:
             return json.loads(r.read().decode("utf-8"))
