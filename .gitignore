@@ -13,3 +13,6 @@ Thumbs.db
 
 # Workshop drafts — not part of the site
 _workshop/
+
+# Local preview server config, not site content
+.claude/
