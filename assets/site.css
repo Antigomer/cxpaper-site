@@ -276,3 +276,21 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: 3rem 0; }
 .btn[disabled]:hover { background: var(--ink); }
 
 button.btn { font-family: inherit; cursor: pointer; }
+
+/* The key, once it comes back. A textarea rather than a styled div: it wraps a
+   320-character line, taps select it on a phone, and Ctrl+C still works when
+   the clipboard API is blocked. */
+.keybox {
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--ground);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 0.7rem 0.8rem;
+  resize: vertical;
+  word-break: break-all;
+}
+.keybox:focus { outline: 2px solid var(--cornflower); outline-offset: 1px; }

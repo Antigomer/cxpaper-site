@@ -155,11 +155,79 @@ var CONFIG = {
   // costing paint time and battery on a phone, so it is parked (paused, not
   // reset) while it is scrolled out of view and resumes where it left off.
   function parkStorybook() {
-    var scope = $(".cps-scope");
-    if (!scope || !("IntersectionObserver" in window)) return;
-    new IntersectionObserver(function (entries) {
-      scope.classList.toggle("is-parked", !entries[0].isIntersecting);
-    }, { threshold: 0 }).observe(scope);
+    // Was one storybook, is now one per tab of the program. Each gets its own
+    // observer entry; a panel that is hidden is not animating at all, so this
+    // only ever has real work to do for the tab on show.
+    var scopes = document.querySelectorAll(".cps-scope, .gst-scope");
+    if (!scopes.length || !("IntersectionObserver" in window)) return;
+    var io = new IntersectionObserver(function (entries) {
+      for (var i = 0; i < entries.length; i++) {
+        entries[i].target.classList.toggle("is-parked", !entries[i].isIntersecting);
+      }
+    }, { threshold: 0 });
+    for (var i = 0; i < scopes.length; i++) io.observe(scopes[i]);
+  }
+
+
+  // ---- the storybook tabs -------------------------------------------------
+  // Switching hides the other panel outright rather than stacking them, so the
+  // animation that is not on screen is not running: display:none stops CSS
+  // animation dead, which is the cheapest pause there is.
+  function storybookTabs() {
+    var bar = $(".tabshow-bar");
+    if (!bar) return;
+    var tabs = bar.querySelectorAll('[role="tab"]');
+    if (!tabs.length) return;
+
+    function show(tab) {
+      for (var i = 0; i < tabs.length; i++) {
+        var on = tabs[i] === tab;
+        tabs[i].setAttribute("aria-selected", on ? "true" : "false");
+        tabs[i].tabIndex = on ? 0 : -1;
+        var panel = document.getElementById(tabs[i].getAttribute("aria-controls"));
+        if (panel) panel.hidden = !on;
+      }
+    }
+
+    // Hover switches tabs, per Chris. The small delay is not hesitation: the
+    // tabs sit side by side, so reaching the fourth one drags the pointer
+    // across the three before it, and without this each one would be shown and
+    // torn down in turn - restarting a 20 s animation three times for tabs
+    // nobody asked to see. 70 ms is under what reads as lag and is longer than
+    // a sweep spends on a tab it is only passing over.
+    var pending = null;
+    function later(tab) {
+      if (pending) clearTimeout(pending);
+      if (tab.getAttribute("aria-selected") === "true") return;
+      pending = setTimeout(function () { pending = null; show(tab); }, 70);
+    }
+    function cancel() { if (pending) { clearTimeout(pending); pending = null; } }
+
+    for (var i = 0; i < tabs.length; i++) {
+      // Click still works, and has to: a phone has no hover, and a tap that
+      // did nothing would look broken.
+      tabs[i].addEventListener("click", function () { cancel(); show(this); });
+      tabs[i].addEventListener("mouseenter", function () { later(this); });
+      tabs[i].addEventListener("mouseleave", cancel);
+      // Tabbing to one with the keyboard shows it too, so the focus ring is
+      // never sitting on a tab whose panel is not the one underneath.
+      tabs[i].addEventListener("focus", function () { cancel(); show(this); });
+    }
+    bar.addEventListener("mouseleave", cancel);
+
+    // Left/right arrows move between tabs, which is what a tablist is expected
+    // to do and what a keyboard user will try.
+    bar.addEventListener("keydown", function (e) {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      var list = [], k;
+      for (k = 0; k < tabs.length; k++) list.push(tabs[k]);
+      var at = list.indexOf(document.activeElement);
+      if (at < 0) return;
+      var next = list[(at + (e.key === "ArrowRight" ? 1 : list.length - 1)) % list.length];
+      show(next);
+      next.focus();
+      e.preventDefault();
+    });
   }
 
 
@@ -371,5 +439,6 @@ var CONFIG = {
   fillRelease();
   fillStatus();
   parkStorybook();
+  storybookTabs();
   wireRequestForm();
 })();
