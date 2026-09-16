@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Request a license — Construction Paper</title>
-<meta name="description" content="Ask for a license for Construction Paper. Four questions, and the key comes straight back on the page.">
+<meta name="description" content="Request a license for Construction Paper and get your key on the page, then download the program, check it against its SHA-256 and run it.">
 <link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +20,6 @@
     <a class="name" href="/">Construction Paper</a>
     <nav class="site-nav">
       <a href="/">Overview</a>
-      <a href="/download/">Download</a>
       <a href="/license/">Request a license</a>
     </nav>
   </div>
@@ -84,7 +83,8 @@
                 aria-label="Your license key"></textarea>
       <div class="btn-row" style="margin:0.75rem 0 0">
         <button class="btn" type="button" data-request="copy">Copy the key</button>
-        <a class="btn ghost" href="/download/">Download the program</a>
+        <a class="btn ghost" data-release="link" aria-disabled="true"
+           href="https://github.com/antigomer/cxpaper-releases/releases">Download the program</a>
         <span class="form-state" data-request="copied" role="status" aria-live="polite"></span>
       </div>
       <p style="margin:1rem 0 0">
@@ -107,9 +107,17 @@
     <h2>What happens next</h2>
     <ol>
       <li>Copy the key this page gives you.</li>
-      <li>Download the program, put it in a folder of its own, and open it.</li>
+      <li>Download the file and put it in a folder of its own &mdash; it keeps its
+      settings, layers, profiles and tile cache beside itself.</li>
+      <li>The browser may block it first as a file that is not commonly
+      downloaded; choose <strong>Keep</strong>. On launch, Windows shows
+      <em>Windows protected your PC</em>; choose <strong>More info</strong>,
+      then <strong>Run anyway</strong>. Both warnings mean the same thing: the
+      executable is not code-signed, so Windows has never seen it before. The
+      SHA-256 below is how you verify it instead.</li>
       <li>It asks for a license. Click <strong>Paste license key</strong> and
-      paste what you copied.</li>
+      paste what you copied. If you were sent an <code>.igl</code> file
+      instead, choose <strong>Import license file</strong> and pick it.</li>
     </ol>
     <p>
       The key locks to the first computer that opens it. If you need it on a
@@ -122,6 +130,66 @@
       with no signal at all for weeks on end is worth mentioning when you ask,
       and the key can be issued to suit.
     </p>
+
+    <h2>The file</h2>
+    <p>
+      One executable, no installer. Settings, layers, profiles, license and
+      tile cache all live in the folder you run it from. The rows below are
+      read from the published release each time this page loads, so nothing
+      here is copied by hand.
+    </p>
+    <p>
+      Builds are published to <code>antigomer/cxpaper-releases</code>. If the
+      rows do not fill in, either no build has been published yet or GitHub did
+      not answer &mdash; this page cannot tell those apart.
+    </p>
+
+    <table class="kv" data-release-state="loading">
+      <tr><th>File</th><td class="wrapish" data-release="filename">&hellip;</td></tr>
+      <tr><th>Version</th><td data-release="version">&hellip;</td></tr>
+      <tr><th>Released</th><td data-release="date">&hellip;</td></tr>
+      <tr><th>Size</th><td data-release="size">&hellip;</td></tr>
+      <tr><th>SHA-256</th><td class="wrapish" data-release="hash">&hellip;</td></tr>
+    </table>
+    <noscript>
+      <p>Those rows are filled in from GitHub by JavaScript. With it turned
+      off they stay as dots; the release page itself lists the file, its size
+      and its SHA-256.</p>
+    </noscript>
+
+    <h2>Check what you downloaded</h2>
+    <p>In PowerShell, from the folder you saved it in:</p>
+<pre><code>Get-FileHash .\ConstructionPaper.exe -Algorithm SHA256</code></pre>
+    <p>
+      The <code>Hash</code> it prints should match the SHA-256 above, ignoring
+      case. If it does not, delete the file and download it again. That hash
+      is the one written into the release notes when the build was published;
+      this page does not compute it from the file.
+    </p>
+    <p>
+      The size above is counted the way Windows Explorer counts it, in units
+      of 1,024 bytes. GitHub's release listing uses units of 1,000, so the two
+      give different numbers for the same file.
+    </p>
+    <p>
+      Every build is made and tested on 64-bit Windows 11. Windows 10 has not
+      been tested; if you try it there, email
+      <a href="mailto:chris@chrisputnam.me">chris@chrisputnam.me</a> and say
+      how it went.
+    </p>
+    <p>
+      Renaming photos needs nothing else installed. Reading GPS out of video
+      files needs <code>ffmpeg</code> on the machine &mdash; it is not bundled with
+      the executable, and without it videos are left alone.
+    </p>
+
+    <h2>Release notes</h2>
+    <p>
+      The notes below come from the newest release. If the block reports that
+      the Releases API could not be reached, that is the same condition as the
+      rows above &mdash; it does not mean there is a build waiting somewhere else.
+    </p>
+    <pre class="wrap"><code data-release="notes">&hellip;</code></pre>
 
   </div>
 </main>

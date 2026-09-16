@@ -41,7 +41,9 @@
  */
 
 const SITE = "https://cxpaper.com";
-const DOWNLOAD_PAGE = SITE + "/download/";
+// The licence page carries the file, the hash and the first-run steps.
+// There is no separate download page as of 2026-09-16.
+const DOWNLOAD_PAGE = SITE + "/license/";
 
 // A person asking for a license does it once. Anything past this in an hour
 // from one address is a machine working through the form.

@@ -92,6 +92,6 @@ if errorlevel 1 (
 
 del "!NOTES!" >nul 2>&1
 echo.
-echo Done. cxpaper.com/download/ will show v%VER% on its next load.
+echo Done. cxpaper.com/license/ will show v%VER% on its next load.
 echo.
 endlocal
