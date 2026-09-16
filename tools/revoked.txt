@@ -4,5 +4,5 @@
 #     python tools\publish_status.py
 # and commit the regenerated license/status.json.
 #
-# The id is the "id" field of the licence — the same value the KeyMaker
+# The id is the "id" field of the license — the same value the KeyMaker
 # ledger (issued_licenses.json) records when the key is minted.

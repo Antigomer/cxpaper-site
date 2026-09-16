@@ -1,6 +1,6 @@
-"""Put the licence desk on Cloudflare, asking Chris for one thing at most.
+"""Put the license desk on Cloudflare, asking Chris for one thing at most.
 
-Started by the "Set up licence desk" shortcut on the Desktop. Nothing to type.
+Started by the "Set up license desk" shortcut on the Desktop. Nothing to type.
 
 It checks the Cloudflare credential first. If the saved one still works it goes
 straight on and deploys. If it does not - which is where this stalled, because
@@ -123,12 +123,12 @@ def ask_for_a_new_one():
 
 
 def deploy():
-    say("", RULE, "  Putting the licence desk on Cloudflare...", RULE, "")
+    say("", RULE, "  Putting the license desk on Cloudflare...", RULE, "")
     return subprocess.call([sys.executable, DEPLOY])
 
 
 def main():
-    say("", "Construction Paper - licence desk setup", "")
+    say("", "Construction Paper - license desk setup", "")
 
     state = any_line_works()
 
@@ -165,7 +165,7 @@ def main():
     say("")
     if code == 0:
         say(RULE,
-            "  Done. The licence desk is live with its new password.",
+            "  Done. The license desk is live with its new password.",
             "",
             "  The dashboard opens with the line in:",
             "      C:\\_CLAUDE\\cp-admin-token.txt",

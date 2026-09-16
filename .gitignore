@@ -10,3 +10,6 @@ __pycache__/
 .DS_Store
 Thumbs.db
 *.tmp
+
+# Workshop drafts — not part of the site
+_workshop/

@@ -43,11 +43,11 @@
 const SITE = "https://cxpaper.com";
 const DOWNLOAD_PAGE = SITE + "/download/";
 
-// A person asking for a licence does it once. Anything past this in an hour
+// A person asking for a license does it once. Anything past this in an hour
 // from one address is a machine working through the form.
 const MAX_REQUESTS_PER_HOUR = 3;
 
-// A running copy reports its usage once a day. More than this from one licence
+// A running copy reports its usage once a day. More than this from one license
 // is a loop, not a working day, and the store is not there to absorb it.
 const MAX_REPORTS_PER_DAY = 24;
 
@@ -60,7 +60,7 @@ const JSON_HEADERS = { "Content-Type": "application/json; charset=utf-8" };
 function cors(request) {
   // The form is served from cxpaper.com and this runs somewhere else, so the
   // browser will not let it post without being told that is allowed. Only
-  // that origin - this endpoint hands out licence keys and has no business
+  // that origin - this endpoint hands out license keys and has no business
   // answering a form on somebody else's site.
   const origin = request.headers.get("Origin") || "";
   const allowed = origin === SITE || origin === "https://www.cxpaper.com";
@@ -130,7 +130,7 @@ async function countPrefix(env, prefix) {
   return total;
 }
 
-/* A licence key is base64url over {payload, sig}. The signature inside it is
+/* A license key is base64url over {payload, sig}. The signature inside it is
  * the one part the program can hand back byte for byte: it reads it straight
  * out of license.igl and never re-encodes it, so hashing THAT rather than the
  * whole key means the two sides cannot disagree over JSON spacing or field
@@ -165,7 +165,7 @@ function adminOk(request, env) {
 function adminRefusal(request, env) {
   if (!env.ADMIN_TOKEN) {
     return reply(request, 503, {
-      error: "This licence desk has no admin password set. Run deploy_worker.py."
+      error: "This license desk has no admin password set. Run deploy_worker.py."
     });
   }
   return reply(request, 401, { error: "no" });
@@ -288,7 +288,7 @@ async function handleActivate(request, env) {
 
   const id = clean(body.id, 40).toUpperCase();
   const machine = clean(body.machine, 40).toUpperCase();
-  // The program sends the signature out of its licence file. A whole key is
+  // The program sends the signature out of its license file. A whole key is
   // accepted too, for anything that has the key but not the file.
   const sig = String(body.sig == null ? "" : body.sig).trim() ||
               signatureOf(body.key) || "";
@@ -307,7 +307,7 @@ async function handleActivate(request, env) {
   if (!raw) {
     return reply(request, 404, {
       ok: false,
-      error: "This licence desk has no record of that key. Email chris@chrisputnam.me."
+      error: "This license desk has no record of that key. Email chris@chrisputnam.me."
     });
   }
 
@@ -373,11 +373,11 @@ async function handleReport(request, env) {
   const machine = clean(body.machine, 40).toUpperCase();
   if (!id || !machine) return reply(request, 400, { error: "bad request" });
 
-  // Only a licence this desk issued, and only from the computer it was bound
+  // Only a license this desk issued, and only from the computer it was bound
   // to. Anything else is somebody else's traffic and does not belong in
   // Chris's numbers.
   const raw = await env.CP.get("claim:" + id);
-  if (!raw) return reply(request, 404, { error: "no such licence" });
+  if (!raw) return reply(request, 404, { error: "no such license" });
   const claim = JSON.parse(raw);
   if (!claim.machine || claim.machine !== machine) {
     return reply(request, 403, { error: "not this computer" });
@@ -550,7 +550,7 @@ export default {
       // CORS headers, rather than Cloudflare's bare 500 - which the form
       // reads as a network failure and reports as "could not be reached".
       return reply(request, 500, {
-        error: "The licence desk hit a problem. Email chris@chrisputnam.me."
+        error: "The license desk hit a problem. Email chris@chrisputnam.me."
       });
     }
   }

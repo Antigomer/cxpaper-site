@@ -1,4 +1,4 @@
-"""Mint a batch of licence keys and send them to the licence desk.
+"""Mint a batch of license keys and send them to the license desk.
 
 Run this on Chris's PC, where the signing seed lives. It signs the keys here
 and posts only the finished, signed keys to the Worker - the seed itself never
@@ -10,8 +10,8 @@ leaves this machine and is never sent anywhere.
 
 It reads:
     C:\\_CLAUDE\\PST_Build\\dist\\ig_admin_key.igk   the Ed25519 signing seed
-    C:\\_CLAUDE\\cp-worker-url.txt                  the licence desk's address
-    C:\\_CLAUDE\\cp-admin-token.txt                 the licence desk's password
+    C:\\_CLAUDE\\cp-worker-url.txt                  the license desk's address
+    C:\\_CLAUDE\\cp-admin-token.txt                 the license desk's password
 
 The password comes from the file deploy_worker.py writes, which is the same
 string it sets as the Worker's ADMIN_TOKEN secret - so the two cannot drift
@@ -85,13 +85,13 @@ def worker_password():
     list was in the repository that publishes cxpaper.com - one click of
     "make public" and it was on the internet. And deploy_worker.py sets a
     RANDOM ADMIN_TOKEN secret on Cloudflare, which the Worker prefers, so
-    deploying the licence desk silently locked Chris out of stocking it: the
+    deploying the license desk silently locked Chris out of stocking it: the
     constant here and the secret up there were never the same string.
 
     Now there is one copy, in the file deploy_worker.py writes.
     """
     if not os.path.isfile(ADMIN_FILE):
-        die("The licence desk password is not at %s.\n\n"
+        die("The license desk password is not at %s.\n\n"
             "That file is made by:\n"
             "    python worker\\deploy_worker.py\n\n"
             "Run that once and the password will be there for both of us."
@@ -124,7 +124,7 @@ def post(url, path, admin, body):
     # Cloudflare turns away urllib's default "Python-urllib/3.x" with a 403
     # and error code 1010 - a bot check, refused in front of the Worker, which
     # never sees the request at all. So the FIRST batch could not be stocked:
-    # the desk was deployed and working, and this said "the licence desk said
+    # the desk was deployed and working, and this said "the license desk said
     # no". Everything else that talks to the desk already names itself; this
     # was the one caller that did not.
     req.add_header("User-Agent", "ConstructionPaper-mint/1 (key batch)")
@@ -134,12 +134,12 @@ def post(url, path, admin, body):
     except urllib.error.HTTPError as e:
         text = e.read().decode("utf-8", "replace")
         if e.code == 401:
-            die("The licence desk refused the password.\n\n"
+            die("The license desk refused the password.\n\n"
                 "The desk is running with a different password than the one\n"
                 "in %s.\n"
                 "Run worker\\deploy_worker.py: it sets the password up there\n"
                 "and writes the same one down here." % ADMIN_FILE)
-        die("The licence desk said no (HTTP %s): %s" % (e.code, text[:300]))
+        die("The license desk said no (HTTP %s): %s" % (e.code, text[:300]))
     except Exception as e:
         die("Could not reach %s: %s" % (url, e))
 
@@ -174,7 +174,7 @@ def main():
 
     url, made_url = read_or_make(URL_FILE, "worker address")
     if not url:
-        die("I do not know the licence desk's address.\n\n"
+        die("I do not know the license desk's address.\n\n"
             "Put it in %s - one line, like:\n"
             "    https://cxpaper-license.something.workers.dev\n\n"
             "It is on the Worker's page under Settings -> Domains & Routes."
@@ -224,7 +224,7 @@ def main():
                      "expires": payload["expires"], "online": 0,
                      "job": "", "batch": now})
 
-    print("Sending them to the licence desk...")
+    print("Sending them to the license desk...")
     doc = post(url, "/admin/stock", admin, {"keys": keys})
     record(rows)
 

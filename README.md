@@ -9,7 +9,7 @@ GitHub Pages from this repository. No server, no monthly bill, nothing to patch.
     license/              how to request a license
     license/status.json   THE SIGNED STATUS FILE the program checks
     404.html              served by Pages for any address that is not one of the three
-    admin/                the private licence desk dashboard
+    admin/                the private license desk dashboard
     assets/               css, js, the mark (also the favicon)
     tools/publish_status.py   re-sign status.json from tools/revoked.txt
     tools/release.bat         publish a build to GitHub Releases
@@ -21,8 +21,8 @@ GitHub Pages from this repository. No server, no monthly bill, nothing to patch.
     CNAME                 cxpaper.com
 
 **This repository is public.** Nothing that is a secret goes in it — not the
-signing seed, and not the licence desk password. Both live in `C:\_CLAUDE\`
-on Chris's PC. See "The licence desk password" below.
+signing seed, and not the license desk password. Both live in `C:\_CLAUDE\`
+on Chris's PC. See "The license desk password" below.
 
 Two repositories, on purpose:
 
@@ -89,7 +89,7 @@ tools\release.bat 1.0.1 "Build 4"
 Computes the SHA-256, writes it into the release notes, uploads the exe. The
 download page picks it all up on the next load. Nothing here needs editing.
 
-## The licence desk password
+## The license desk password
 
 One password opens the dashboard at `/admin/` and lets `mint_batch.py` stock a
 batch. There is exactly one copy of it:

@@ -86,7 +86,7 @@ def candidates(line):
     says nothing about which part was wrong. So: the line as typed, the line
     with the usual decorations stripped, and every run of token characters in
     it that is the right length. The same trick the program uses on a pasted
-    licence key, for the same reason - people select more than the thing.
+    license key, for the same reason - people select more than the thing.
     """
     out = []
 
@@ -276,7 +276,7 @@ def public_address(auth, account):
 
 
 def main():
-    print("Putting the licence desk on Cloudflare.")
+    print("Putting the license desk on Cloudflare.")
     print("")
     auth, account = read_credentials()
     account = find_account(auth, account)

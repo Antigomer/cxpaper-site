@@ -1,7 +1,7 @@
-"""Run the licence desk's own code against a stand-in KV, on this machine.
+"""Run the license desk's own code against a stand-in KV, on this machine.
 
 There is no Node here, so cxpaper-license.js has never been executed before a
-deploy - it went straight from an editor to the thing that hands out licence
+deploy - it went straight from an editor to the thing that hands out license
 keys. This runs the real handlers by translating the file into Python: the
 same branches, the same order, the same replies. It is a translation, not the
 article, and it says so - but a translation that goes red on the defects the
@@ -185,7 +185,7 @@ class Desk:
         raw = self.kv.get("claim:" + lic_id)
         if not raw:
             if OLD:
-                # An unknown id used to be handed a licence invented on the
+                # An unknown id used to be handed a license invented on the
                 # spot, and bound to whoever asked.
                 claim = {"id": lic_id, "project": "(issued by hand)",
                          "machine": None, "activated_at": None}
@@ -236,7 +236,7 @@ class Desk:
             return 400, {"error": "bad request"}
         raw = self.kv.get("claim:" + lic_id)
         if not raw:
-            return 404, {"error": "no such licence"}
+            return 404, {"error": "no such license"}
         claim = json.loads(raw)
         if not claim.get("machine") or claim["machine"] != machine:
             return 403, {"error": "not this computer"}
@@ -419,7 +419,7 @@ def t_w07_activate_needs_the_key():
 
 def t_w08_report_is_not_a_free_write():
     """W-08 / REP-05 / DASH-5. /report takes nothing from a stranger, nothing
-    oversized, and not an unlimited number from one licence."""
+    oversized, and not an unlimited number from one license."""
     kv = KV()
     d = Desk(kv, "pw")
     d.stock("pw", {"keys": [{"id": "ID000000001", "code": a_key(1)}]})
@@ -519,7 +519,7 @@ def t_admin_data_keeps_the_proof_private():
 
 
 def main():
-    print("licence desk (a Python translation of cxpaper-license.js)")
+    print("license desk (a Python translation of cxpaper-license.js)")
     if OLD:
         print("--old: the behaviour BEFORE the fixes. Every check should go red.")
     print("")

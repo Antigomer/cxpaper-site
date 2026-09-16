@@ -1,4 +1,4 @@
-/* The licence desk. Reads the Worker's admin data and draws it.
+/* The license desk. Reads the Worker's admin data and draws it.
  *
  * No chart library. The rest of this site carries none, and two charts do not
  * justify 300 KB of somebody else's JavaScript. The SVG is written by hand.
@@ -128,7 +128,7 @@
 
     var svg = el("svg", {
       viewBox: "0 0 " + W + " " + H, width: W, height: H,
-      role: "img", "aria-label": "Licence requests and activations per day"
+      role: "img", "aria-label": "License requests and activations per day"
     });
 
     for (var t = 0; t <= ticks; t++) {
@@ -268,11 +268,11 @@
     var period = state.days ? ("the last " + state.days + " days") : "all time";
 
     if (!claims.length) {
-      lines.push("Nobody has asked for a licence yet.");
+      lines.push("Nobody has asked for a license yet.");
     } else {
       lines.push("<strong>" + askedIn.length + "</strong> " +
         (askedIn.length === 1 ? "person has" : "people have") +
-        " asked for a licence in " + period + ", and <strong>" +
+        " asked for a license in " + period + ", and <strong>" +
         startedIn.length + "</strong> started the program.");
     }
 
@@ -317,7 +317,7 @@
     var set = [
       { n: data.keys_in_stock, k: "keys in stock",
         sub: data.keys_in_stock < 20 ? "Running low" : "" },
-      { n: claims.length, k: "licences issued", sub: "" },
+      { n: claims.length, k: "licenses issued", sub: "" },
       { n: activated, k: "in use", sub: "opened on a computer" },
       { n: waiting, k: "never opened", sub: waiting ? "asked, but has not started it" : "" }
     ];
@@ -341,8 +341,8 @@
   function roster(data) {
     var claims = (data.claims || []).slice().sort(function (a, b) {
       return (b.issued_at || 0) - (a.issued_at || 0); });
-    // The Key column is not decoration. tools/revoked.txt takes the licence
-    // id and nothing else, so without this column switching off one licence
+    // The Key column is not decoration. tools/revoked.txt takes the license
+    // id and nothing else, so without this column switching off one license
     // meant opening dev-tools to find the id that was already on the screen's
     // own data. Click it to copy.
     var out = ["<tr><th>Key</th><th>Name</th><th>Project</th><th>Phone</th><th>Email</th>" +
@@ -414,7 +414,7 @@
     return fetch(API + "/admin/data", { headers: { "X-CP-Admin": password } })
       .then(function (r) {
         if (r.status === 401) throw new Error("That password was not accepted.");
-        if (!r.ok) throw new Error("The licence desk answered " + r.status + ".");
+        if (!r.ok) throw new Error("The license desk answered " + r.status + ".");
         return r.json();
       })
       .then(function (doc) {

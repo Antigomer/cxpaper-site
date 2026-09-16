@@ -83,7 +83,7 @@ var CONFIG = {
             // The button now points straight at the exe, so say so: a label
             // that still reads "on GitHub" promises a page and delivers a
             // 30 MB download. It is the SECOND button now - requesting a
-            // licence comes first - so it names who it is for, because the
+            // license comes first - so it names who it is for, because the
             // file is useless to anybody without a key.
             a.textContent = "Already have a key? Download " + asset.name +
               " (" + bytes(asset.size) + ")";
