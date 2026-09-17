@@ -699,23 +699,36 @@
 
       <div class="tabshow-panel" role="tabpanel" id="tp-marco" aria-labelledby="tb-marco" hidden>
 <!-- ================= BEGIN MARCO POLOCATOR STORYBOOK ================= -->
-<section class="mpo-scope" aria-label="How Marco Polocator burns a compass, a caption and a mini-map onto a copy of a field photograph">
+<section class="mpo-scope" aria-label="An inspector photographs the right-of-way, and the photograph comes back carrying where it was taken">
 <style>
 /* ============================================================
-   Marco Polocator - a photograph comes out knowing where it is.
-   One 20s loop, four beats, everything scoped to .mpo-scope.
-   Transform + opacity only, and every stagger is in the keyframe
-   percentages rather than animation-delay, which shifts phase and
-   desyncs on the second loop.
-   The overlay matches what the program actually draws: compass
-   rose bottom-right, the caption block from its <TAG> template,
-   a station mini-map, all composited at the designed 52% so the
-   photograph still reads through it, with #F0524A on the needle
-   and the view cone.
+   Marco Polocator. An inspector takes a photograph on the ROW,
+   and the world he was looking at settles into the photograph
+   he just took.
+
+   THE OVERLAY IS COPIED FROM HIS ACTUAL OUTPUT, not from
+   DEFAULT_OVERLAY_CFG and not from ui_settings.json - neither
+   described what his finished photographs look like. Measured
+   off two of them in IMG\9-11-26\Overlays\, consistent across
+   both, as fractions of the frame:
+
+     mini-map     x .005-.315   y .627-.973   bottom left, big
+     compass      centre .911, .618   diameter .105 of width
+     bearing pill centre .911, .766
+     caption      x .755-.995   y .813-.945   bottom right
+
+   The rose is CAMERA-UP: the needle stays pointing up and the
+   ring turns, which is why his 259 deg and 286 deg photographs
+   both show W near the top. The caption text is GREEN with the
+   project name in white, and the date is ISO. There is no
+   "Pre-construction" line in either photograph.
+
+   One 20s loop. Transform and opacity only; every stagger is in
+   the keyframe percentages, never animation-delay.
    ============================================================ */
 .mpo-scope{
-  --mpo-ink:#161311; --mpo-paper:#F2ECDF; --mpo-ground:#F5F1E8;
-  --mpo-accent:#F0524A; --mpo-corn-t:#2757B6; --mpo-red-t:#AC040C;
+  --mpo-ink:#161311; --mpo-ground:#F5F1E8;
+  --mpo-accent:#E8322A; --mpo-green:#8FD16A; --mpo-red-t:#AC040C;
   --mpo-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   --mpo-dur:20s;
   margin:0; overflow:hidden;
@@ -734,50 +747,60 @@
   transform-box:view-box; transform-origin:0 0;
 }
 
-/* ---- BEAT 1: the photograph, as it came off the camera ---- */
-.mpo-photo{animation-name:mpo-photo;}
-@keyframes mpo-photo{0%,2%{opacity:0;transform:translateY(-26px) scale(.97)}
-                     10%,100%{opacity:1;transform:none}}
-.mpo-name{opacity:0;animation-name:mpo-name;}
-@keyframes mpo-name{0%,6%{opacity:0}11%,100%{opacity:1}}
-
-/* ---- BEAT 2: the compass, and the needle finding the bearing ----
-   The photograph carries GPSImgDirection; the needle swings to it rather
-   than appearing already pointed, because the swing is the thing being
-   explained. */
-.mpo-glass{opacity:0;animation-name:mpo-glass;}
-@keyframes mpo-glass{0%,30%{opacity:0;transform:scale(.86)}37%,100%{opacity:1;transform:none}}
-.mpo-needle{animation-name:mpo-needle;}
-@keyframes mpo-needle{
-  0%,36%  {transform:rotate(-58deg)}
-  44%     {transform:rotate(132deg)}
-  47%     {transform:rotate(112deg)}
-  50%,100%{transform:rotate(118deg)}
+/* ---- BEAT 1 -> 2: the world he is looking at becomes the photograph ---- */
+.mpo-world{animation-name:mpo-world;}
+@keyframes mpo-world{
+  0%,24%  {transform:none;}
+  34%,100%{transform:translate(110px,62px) scale(.78);}
 }
-.mpo-cone{opacity:0;animation-name:mpo-cone;}
-@keyframes mpo-cone{0%,44%{opacity:0}52%,100%{opacity:1}}
+.mpo-figure{animation-name:mpo-figure;}
+@keyframes mpo-figure{
+  0%      {opacity:0;transform:translateY(26px);}
+  6%,20%  {opacity:1;transform:none;}
+  26%,100%{opacity:0;transform:none;}
+}
+.mpo-arm{animation-name:mpo-arm;}
+@keyframes mpo-arm{0%,7%{transform:translate(-10px,22px)}14%,100%{transform:none}}
+.mpo-flash{opacity:0;animation-name:mpo-flash;animation-timing-function:linear;}
+@keyframes mpo-flash{0%,19%{opacity:0}20.5%{opacity:.85}26%,100%{opacity:0}}
+.mpo-frame{opacity:0;animation-name:mpo-frame;}
+@keyframes mpo-frame{0%,28%{opacity:0}36%,100%{opacity:1}}
+.mpo-name{opacity:0;animation-name:mpo-name;}
+@keyframes mpo-name{0%,33%{opacity:0}39%,100%{opacity:1}}
 
-/* ---- BEAT 3: the caption block, a line at a time ---- */
-.mpo-cap{opacity:0;animation-name:mpo-cap;}
-@keyframes mpo-cap{0%,52%{opacity:0;transform:translateY(10px)}58%,100%{opacity:1;transform:none}}
-.mpo-c1{opacity:0;animation-name:mpo-c1;}
-@keyframes mpo-c1{0%,56%{opacity:0}59%,100%{opacity:1}}
-.mpo-c2{opacity:0;animation-name:mpo-c2;}
-@keyframes mpo-c2{0%,59%{opacity:0}62%,100%{opacity:1}}
-.mpo-c3{opacity:0;animation-name:mpo-c3;}
-@keyframes mpo-c3{0%,62%{opacity:0}65%,100%{opacity:1}}
-.mpo-c4{opacity:0;animation-name:mpo-c4;}
-@keyframes mpo-c4{0%,65%{opacity:0}68%,100%{opacity:1}}
-
-/* ---- BEAT 3b: the station mini-map ---- */
+/* ---- BEAT 3: the mini-map, bottom left, and the cone that is its point ---- */
 .mpo-map{opacity:0;animation-name:mpo-map;}
-@keyframes mpo-map{0%,68%{opacity:0;transform:scale(.88)}75%,100%{opacity:1;transform:none}}
+@keyframes mpo-map{0%,40%{opacity:0;transform:translateY(16px)}48%,100%{opacity:1;transform:none}}
+.mpo-cone{opacity:0;animation-name:mpo-cone;}
+@keyframes mpo-cone{0%,50%{opacity:0;transform:scale(.4)}58%,100%{opacity:1;transform:none}}
+.mpo-sta{opacity:0;animation-name:mpo-sta;}
+@keyframes mpo-sta{0%,52%{opacity:0}59%,100%{opacity:1}}
 
-/* ---- BEAT 4: two files. The original is not one of them. ---- */
+/* ---- BEAT 4: the rose. Needle fixed, RING turns to the heading. ---- */
+.mpo-rose{opacity:0;animation-name:mpo-rose;}
+@keyframes mpo-rose{0%,58%{opacity:0;transform:scale(.8)}66%,100%{opacity:1;transform:none}}
+.mpo-ring{animation-name:mpo-ring;}
+@keyframes mpo-ring{
+  0%,60%  {transform:rotate(0deg)}
+  70%     {transform:rotate(108deg)}
+  73%,100%{transform:rotate(101deg)}
+}
+.mpo-pill{opacity:0;animation-name:mpo-pill;}
+@keyframes mpo-pill{0%,70%{opacity:0;transform:translateY(-6px)}75%,100%{opacity:1;transform:none}}
+
+/* ---- BEAT 5: caption panel, bottom right, a line at a time ---- */
+.mpo-cap{opacity:0;animation-name:mpo-cap;}
+@keyframes mpo-cap{0%,72%{opacity:0;transform:translateY(8px)}77%,100%{opacity:1;transform:none}}
+.mpo-c1{opacity:0;animation-name:mpo-c1;}@keyframes mpo-c1{0%,75%{opacity:0}78%,100%{opacity:1}}
+.mpo-c2{opacity:0;animation-name:mpo-c2;}@keyframes mpo-c2{0%,77%{opacity:0}80%,100%{opacity:1}}
+.mpo-c3{opacity:0;animation-name:mpo-c3;}@keyframes mpo-c3{0%,79%{opacity:0}82%,100%{opacity:1}}
+.mpo-c4{opacity:0;animation-name:mpo-c4;}@keyframes mpo-c4{0%,81%{opacity:0}84%,100%{opacity:1}}
+
+/* ---- BEAT 6: two files. The original is not one of them. ---- */
 .mpo-f1{opacity:0;animation-name:mpo-f1;}
-@keyframes mpo-f1{0%,82%{opacity:0;transform:translateX(-10px)}87%,100%{opacity:1;transform:none}}
+@keyframes mpo-f1{0%,86%{opacity:0;transform:translateX(-10px)}89%,100%{opacity:1;transform:none}}
 .mpo-f2{opacity:0;animation-name:mpo-f2;}
-@keyframes mpo-f2{0%,86%{opacity:0;transform:translateX(-10px)}91%,100%{opacity:1;transform:none}}
+@keyframes mpo-f2{0%,88%{opacity:0;transform:translateX(-10px)}92%,100%{opacity:1;transform:none}}
 
 /* ---- captions under the stage ---- */
 .mpo-steps{display:flex;gap:.5rem 1.6rem;flex-wrap:wrap;list-style:none;margin:.9rem 0 0;padding:0;
@@ -786,17 +809,18 @@
 .mpo-steps li{display:flex;align-items:baseline;gap:.45rem;opacity:.34;}
 .mpo-steps b{font-weight:400;color:var(--mpo-red-t);}
 .mpo-scope .mpo-steps li{animation-timing-function:linear;}
-.mpo-s1{animation-name:mpo-s1}@keyframes mpo-s1{0%,28%{opacity:1}33%,100%{opacity:.34}}
-.mpo-s2{animation-name:mpo-s2}@keyframes mpo-s2{0%,28%{opacity:.34}33%,100%{opacity:1}}
+.mpo-s1{animation-name:mpo-s1}@keyframes mpo-s1{0%,30%{opacity:1}35%,100%{opacity:.34}}
+.mpo-s2{animation-name:mpo-s2}@keyframes mpo-s2{0%,30%{opacity:.34}35%,100%{opacity:1}}
 @media (max-width:40rem){ .mpo-steps{font-size:10px;gap:.35rem .9rem;} }
 
-/* ---- reduced motion: the finished photograph, everything burned on,
-       both files listed. No swing, because nothing moved. ---- */
+/* ---- reduced motion: the finished photograph ---- */
 @media (prefers-reduced-motion:reduce){
   .mpo-scope *{animation:none !important;transition:none !important;}
   .mpo-stage{opacity:1;}
   .mpo-scope [class^="mpo-"]{opacity:1;transform:none;}
-  .mpo-scope .mpo-needle{transform:rotate(118deg);}
+  .mpo-scope .mpo-world{transform:translate(110px,62px) scale(.78);}
+  .mpo-scope .mpo-ring{transform:rotate(101deg);}
+  .mpo-scope .mpo-figure,.mpo-scope .mpo-flash{opacity:0;}
   .mpo-scope .mpo-steps li{opacity:1;}
 }
 
@@ -807,103 +831,226 @@
 <div class="mpo-stagewrap">
 <svg class="mpo-svg" viewBox="0 0 1000 580" preserveAspectRatio="xMidYMid meet" role="img"
      aria-labelledby="mpo-t mpo-d" focusable="false">
-<title id="mpo-t">A field photograph comes out knowing where it was taken</title>
-<desc id="mpo-d">A photograph of a pipeline right-of-way appears. A compass rose is drawn onto its bottom corner and the needle swings round to the direction the camera was pointed, with a view cone fanning out from it. A caption block writes itself line by line - station and project, the feature, the coordinates and bearing, the date and time - and a small station mini-map appears. Two files are listed at the end: the original, untouched, and a marked copy written into an Overlays folder beside it.</desc>
+<title id="mpo-t">An inspector photographs the right-of-way, and the photograph comes back knowing where it was taken</title>
+<desc id="mpo-d">An inspector in a hi-vis vest raises a camera on a pipeline right-of-way and takes a photograph. The view settles into the photograph he just took. A mini-map opens in the bottom left showing the corridor, its wetland and waterbody layers and the numbered stations, with a red cone fanning out from the camera position in the direction he was shooting. A compass rose appears on the right and its ring turns until the bearing is at the top, with the bearing under it. A caption panel writes itself in the bottom right in green - station and project, the feature, the coordinates and bearing, the date. Two files are listed: the original, untouched, and a marked copy in an Overlays folder beside it.</desc>
 
 <defs>
-  <clipPath id="mpo-frame"><rect x="150" y="70" width="700" height="420"/></clipPath>
+  <clipPath id="mpo-clip"><rect x="0" y="0" width="1000" height="580"/></clipPath>
+  <clipPath id="mpo-mapclip"><rect x="114" y="338" width="250" height="169" rx="7"/></clipPath>
+  <pattern id="mpo-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <rect width="7" height="7" fill="#E8E03A"/>
+    <path d="M0 0 v7" stroke="#161311" stroke-width="3"/>
+  </pattern>
+  <pattern id="mpo-lattice" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <path d="M0 0 h8 M0 0 v8" stroke="#5CE8D0" stroke-width="1.6" fill="none"/>
+  </pattern>
 </defs>
 
 <rect x="0" y="0" width="1000" height="580" fill="#F5F1E8"/>
 
 <g class="mpo-stage">
 
-  <g class="mpo-name" font-family="IBM Plex Mono, monospace" font-size="15" fill="#161311" opacity=".72">
-    <text x="150" y="52">1043+00_Sire West_IMG_4487.JPG</text>
-  </g>
-
-  <!-- ============ the photograph ============ -->
-  <g class="mpo-photo" clip-path="url(#mpo-frame)">
-    <rect x="150" y="70" width="700" height="420" fill="#CFE0F8"/>
-    <!-- treeline -->
-    <path d="M150 232 q40 -26 82 -6 q44 -30 92 -4 q46 -26 96 -2 q50 -28 100 -4
-             q48 -24 96 -2 q42 -20 84 -4 L850 224 L850 272 L150 272 Z" fill="#4B6006"/>
-    <rect x="150" y="262" width="700" height="34" fill="#637F08"/>
-    <!-- graded right-of-way -->
-    <path d="M150 296 L850 296 L850 358 L150 386 Z" fill="#B9A67E"/>
-    <path d="M150 386 L850 358 L850 402 L150 438 Z" fill="#C9B894"/>
-    <!-- the trench and the pipe in it -->
-    <path d="M150 350 L850 326 L850 344 L150 372 Z" fill="#6B5B3E"/>
-    <path d="M150 358 L850 332 L850 340 L150 366 Z" fill="#242020"/>
-    <!-- foreground -->
-    <rect x="150" y="402" width="700" height="88" fill="#637F08"/>
-    <path d="M150 402 q60 -12 120 2 q64 14 128 -2 q62 -14 126 2 q64 14 126 -2
-             q60 -12 200 2 l0 16 l-700 0 Z" fill="#4B6006"/>
+  <!-- ============ the world: full bleed, then the photograph ============ -->
+  <g class="mpo-world" clip-path="url(#mpo-clip)">
+    <rect x="0" y="0" width="1000" height="580" fill="#BCD8F2"/>
+    <path d="M0 120 q120 -22 240 6 q130 30 250 -4 q120 -34 250 4 q130 36 260 -6 l0 60 l-1000 0 Z"
+          fill="#FFFFFF" opacity=".55"/>
+    <!-- treeline, closed on absolute coordinates so it spans the full width -->
+    <path d="M0 250 q58 -34 118 -8 q62 -38 130 -6 q66 -34 138 -4 q70 -36 142 -6
+             q68 -32 138 -4 q60 -26 120 -6 q56 -22 114 -4 L1000 240 L1000 316 L0 316 Z"
+          fill="#3F5A16"/>
+    <rect x="0" y="300" width="1000" height="46" fill="#7E8C3A"/>
+    <!-- spoil pile and graded right-of-way -->
+    <path d="M0 346 L1000 346 L1000 436 L0 474 Z" fill="#8A6F4C"/>
+    <path d="M60 346 q120 -96 246 0 Z" fill="#5B4529"/>
+    <path d="M0 474 L1000 436 L1000 500 L0 538 Z" fill="#A98C63"/>
+    <!-- trench, and the pipe strung in it -->
+    <path d="M0 418 L1000 384 L1000 408 L0 442 Z" fill="#6B5B3E"/>
+    <path d="M0 428 L1000 392 L1000 402 L0 438 Z" fill="#2A2320"/>
+    <rect x="0" y="500" width="1000" height="80" fill="#7E8C3A"/>
     <!-- a station stake -->
-    <path d="M330 300 l14 0 l4 96 l-22 0 Z" fill="#E8D9AE"/>
-    <path d="M326 310 l26 -4 l0 9 l-26 4 Z" fill="#BB0A10"/>
-    <path d="M326 326 l26 -4 l0 9 l-26 4 Z" fill="#BB0A10"/>
-    <!-- sun -->
-    <circle cx="742" cy="130" r="23" fill="#F0E2B8"/>
+    <path d="M700 352 l16 0 l5 104 l-26 0 Z" fill="#E8D9AE"/>
+    <path d="M694 366 l30 -5 l0 10 l-30 5 Z" fill="#BB0A10"/>
+    <path d="M696 388 l30 -5 l0 10 l-30 5 Z" fill="#BB0A10"/>
   </g>
 
-  <!-- ============ the compass, on the designed smoked glass ============ -->
-  <g class="mpo-glass">
-    <rect x="676" y="326" width="150" height="150" rx="6" fill="#101010" opacity=".52"/>
-    <circle cx="751" cy="401" r="56" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity=".85"/>
-    <circle cx="751" cy="401" r="46" fill="none" stroke="#FFFFFF" stroke-width="1.2" opacity=".5"/>
-    <g font-family="IBM Plex Mono, monospace" font-size="13" fill="#FFFFFF" text-anchor="middle">
-      <text x="751" y="357">N</text><text x="751" y="455">S</text>
-      <text x="803" y="406">E</text><text x="699" y="406">W</text>
-    </g>
-
-    <!-- the view cone: which way the camera was looking -->
-    <g class="mpo-cone">
-      <path d="M751 401 L826 428 L806 471 Z" fill="#F0524A" opacity=".3"/>
-    </g>
-
-    <!-- the needle. Its own transform-origin, inline, because the shared
-         rule above sets 0 0 and would beat a stylesheet rule on specificity. -->
-    <g class="mpo-needle" style="transform-origin:751px 401px">
-      <path d="M751 357 l9 44 l-9 14 l-9 -14 Z" fill="#F0524A"/>
-      <path d="M751 445 l9 -44 l-9 -14 l-9 14 Z" fill="#FFFFFF" opacity=".75"/>
-      <circle cx="751" cy="401" r="5" fill="#FFFFFF"/>
+  <!-- ============ the inspector, who is not in his own photograph ======== -->
+  <g class="mpo-figure">
+    <ellipse cx="400" cy="548" rx="54" ry="11" fill="#161311" opacity=".18"/>
+    <path d="M378 482 l16 0 l-3 66 l-18 0 Z" fill="#242020"/>
+    <path d="M406 482 l16 0 l5 66 l-18 0 Z" fill="#242020"/>
+    <path d="M372 404 q28 -12 56 0 l8 82 l-72 0 Z" fill="#F0A53A"/>
+    <path d="M392 404 l16 0 l-2 82 l-12 0 Z" fill="#F2ECDF" opacity=".85"/>
+    <path d="M366 444 l68 0 l0 10 l-68 0 Z" fill="#F2ECDF" opacity=".85"/>
+    <circle cx="400" cy="384" r="19" fill="#D7A77B"/>
+    <path d="M378 382 q22 -30 44 0 Z" fill="#F0A53A"/>
+    <path d="M370 382 l60 0 l0 7 l-60 0 Z" fill="#F0A53A"/>
+    <g class="mpo-arm">
+      <path d="M428 414 l34 -22 l10 14 l-34 22 Z" fill="#F0A53A"/>
+      <rect x="456" y="372" width="38" height="26" rx="4" fill="#242020"/>
+      <circle cx="475" cy="385" r="8" fill="#5083E2"/>
     </g>
   </g>
 
-  <!-- ============ the caption block, from its <TAG> template ============ -->
-  <g class="mpo-cap">
-    <rect x="176" y="372" width="310" height="102" rx="5" fill="#101010" opacity=".52"/>
-    <g font-family="IBM Plex Mono, monospace" font-size="15" fill="#FFFFFF">
-      <g class="mpo-c1"><text x="192" y="398">1043+00  Sire West</text></g>
-      <g class="mpo-c2"><text x="192" y="419">Wetland W-14</text></g>
-      <g class="mpo-c3"><text x="192" y="440">32.4417, -101.8203  |  118&#176; SE</text></g>
-      <g class="mpo-c4"><text x="192" y="461">9-16-26  10:42</text></g>
-    </g>
+  <rect class="mpo-flash" x="0" y="0" width="1000" height="580" fill="#FFFFFF"/>
+
+  <g class="mpo-frame">
+    <rect x="110" y="62" width="780" height="452" fill="none" stroke="#161311" stroke-width="2" opacity=".16"/>
   </g>
 
-  <!-- ============ the station mini-map ============ -->
+  <g class="mpo-name" font-family="IBM Plex Mono, monospace" font-size="14" fill="#161311" opacity=".72">
+    <text x="110" y="48">1043+00_Sire_West_IMG_4487.JPG</text>
+  </g>
+
+  <!-- ====== HIS LAYOUT: mini-map, bottom left, .005-.325 x .61-.985 =====
+       Built from the map cropped out of 1710+00_..._IMG_4651_2.jpg and
+       enlarged. The density is the point: lines cross, the station labels sit
+       over the line work, and the cone tints whatever is under it. A tidy
+       version of this would not look like a real alignment. -->
   <g class="mpo-map">
-    <rect x="690" y="92" width="146" height="132" rx="5" fill="#101010" opacity=".52"/>
-    <path d="M704 204 C 730 180 742 146 776 128 S 812 108 824 104"
-          fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity=".85"/>
-    <path d="M752 158 L806 178 L792 206 Z" fill="#F0524A" opacity=".3"/>
-    <circle cx="752" cy="158" r="5.5" fill="#F0524A"/>
-    <g font-family="IBM Plex Mono, monospace" font-size="11" fill="#FFFFFF" opacity=".9">
-      <text x="704" y="112">N &#8593;   1043+00</text>
+    <rect x="114" y="338" width="250" height="169" rx="7" fill="#5F6B3E"/>
+    <g clip-path="url(#mpo-mapclip)">
+      <!-- base imagery, desaturated toward green and scrimmed so lines read -->
+      <rect x="114" y="338" width="250" height="169" fill="#6E7A44"/>
+      <rect x="114" y="452" width="250" height="55" fill="#4F5C2E" opacity=".5"/>
+      <path d="M114 470 h250 M114 486 h250" stroke="#8A9560" stroke-width="1" opacity=".35"/>
+      <text x="118" y="466" font-family="IBM Plex Sans, sans-serif" font-size="5.5"
+            fill="#C9CDB4" opacity=".7">County Road X</text>
+      <text x="250" y="466" font-family="IBM Plex Sans, sans-serif" font-size="5.5"
+            fill="#C9CDB4" opacity=".7">County Road X</text>
+
+      <!-- hydrology: a teal polygon with several parallel strands over it -->
+      <path d="M232 507 C 246 470 258 452 286 438 S 330 416 364 404 L364 440
+               C 330 452 300 466 282 486 S 262 500 254 507 Z"
+            fill="#2E8C8C" opacity=".38"/>
+      <path d="M236 507 C 250 468 262 450 290 436 S 334 414 364 402"
+            fill="none" stroke="#4FC3E8" stroke-width="1.5"/>
+      <path d="M244 507 C 258 470 270 452 298 438 S 340 418 364 408"
+            fill="none" stroke="#7FA8E8" stroke-width="1.3"/>
+      <path d="M252 507 C 266 472 278 454 306 440 S 346 422 364 414"
+            fill="none" stroke="#5CE8E8" stroke-width="1.1"/>
+      <path d="M228 507 C 236 480 232 462 222 444" fill="none" stroke="#2F7FD8" stroke-width="1.3"/>
+
+      <!-- boundary lines, at their own heights, crossing everything -->
+      <path d="M114 400 h250" stroke="#5CE8E8" stroke-width="1.1" opacity=".95"/>
+      <path d="M114 408 h250" stroke="#E8322A" stroke-width="1.1" opacity=".95"/>
+      <path d="M114 440 h250" stroke="#5CE8D0" stroke-width="1"  opacity=".9"/>
+      <path d="M114 452 h250" stroke="#3FE04A" stroke-width="1.2" opacity=".95"/>
+      <path d="M114 462 h250" stroke="#E8322A" stroke-width="1.1" opacity=".9"/>
+      <path d="M114 476 h250" stroke="#3FE04A" stroke-width="1.1" opacity=".9"/>
+      <g fill="#FFFFFF" font-family="IBM Plex Sans, sans-serif" font-size="5">
+        <text x="116" y="464">*</text><text x="352" y="464">*</text>
+      </g>
+      <!-- verticals -->
+      <path d="M214 356 V452" stroke="#3FE04A" stroke-width="1.3"/>
+      <path d="M222 398 V456" stroke="#B57FE8" stroke-width="1.2"/>
+      <path d="M262 398 V498" stroke="#B59A6A" stroke-width="1.2"/>
+      <path d="M266 452 V470" stroke="#3FE04A" stroke-width="1.2"/>
+
+      <!-- the corridor: yellow band, black diagonal hatch, yellow edges -->
+      <rect x="114" y="418" width="250" height="14" fill="url(#mpo-hatch)" opacity=".92"/>
+      <path d="M114 418 h250 M114 432 h250" stroke="#E8E03A" stroke-width="1.6"/>
+
+      <!-- extra workspaces: turquoise diamond lattice, discrete blocks -->
+      <rect x="114" y="432" width="62" height="12" fill="url(#mpo-lattice)" opacity=".85"/>
+      <rect x="114" y="432" width="62" height="12" fill="#5CE8D0" opacity=".16"/>
+      <rect x="326" y="432" width="38" height="12" fill="url(#mpo-lattice)" opacity=".85"/>
+      <rect x="326" y="432" width="38" height="12" fill="#5CE8D0" opacity=".16"/>
+
+      <!-- the alignment through the stations -->
+      <path d="M114 410 L364 406" stroke="#E8322A" stroke-width="1.4" opacity=".95"/>
+
+      <!-- the view cone, tinting whatever is under it -->
+      <g class="mpo-cone" style="transform-origin:232px 412px">
+        <path d="M232 412 L164 396 L172 448 Z" fill="#E8322A" opacity=".5"/>
+      </g>
+
+      <!-- stations, labelled over the line work as his are -->
+      <g class="mpo-sta">
+        <circle cx="190" cy="409" r="2.4" fill="#161311" stroke="#FFFFFF" stroke-width=".7"/>
+        <circle cx="216" cy="409" r="2.4" fill="#FFFFFF" stroke="#161311" stroke-width=".7"/>
+        <circle cx="248" cy="408" r="2.4" fill="#E8322A" stroke="#FFFFFF" stroke-width=".7"/>
+        <circle cx="274" cy="407" r="2.4" fill="#161311" stroke="#FFFFFF" stroke-width=".7"/>
+        <circle cx="232" cy="412" r="4" fill="#E8322A" stroke="#FFFFFF" stroke-width="1.6"/>
+        <g font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="700"
+           fill="#FFFFFF" stroke="#161311" stroke-width="1.8" paint-order="stroke">
+          <text x="146" y="412">1045+00</text>
+          <text x="226" y="402">1043+00</text>
+          <text x="196" y="424">1044+00</text>
+          <text x="282" y="414">1042+00</text>
+        </g>
+      </g>
+    </g>
+
+    <!-- chrome: header strip, scale bar, attribution, border -->
+    <rect x="114" y="338" width="250" height="20" rx="7" fill="#1A1A14" opacity=".55"/>
+    <g font-family="IBM Plex Sans, sans-serif" font-weight="700" fill="#FFFFFF">
+      <text x="122" y="352" font-size="10">N &#8593;</text>
+      <text x="356" y="353" font-size="11" text-anchor="end">1043+00 &#183; 50 ft away</text>
+      <text x="146" y="500" font-size="10">100 ft</text>
+      <text x="358" y="492" font-size="6.5" text-anchor="end" opacity=".9">&#169; Esri</text>
+    </g>
+    <path d="M122 496 h20 M122 492 v8 M142 492 v8" stroke="#FFFFFF" stroke-width="1.4"/>
+    <rect x="114" y="338" width="250" height="169" rx="7" fill="none" stroke="#FFFFFF"
+          stroke-width="2" opacity=".8"/>
+  </g>
+
+  <!-- ====== HIS LAYOUT: compass rose, right, centre .911 x .618 ========== -->
+  <g class="mpo-rose">
+    <circle cx="821" cy="341" r="41" fill="#FFFFFF" opacity=".3"/>
+    <circle cx="821" cy="341" r="41" fill="none" stroke="#FFFFFF" stroke-width="2" opacity=".9"/>
+    <!-- the ring turns; the needle does not. Camera-up, as his are. -->
+    <g class="mpo-ring" style="transform-origin:821px 341px">
+      <g stroke="#FFFFFF" stroke-width="1.4" opacity=".85">
+        <path d="M821 303 v7 M821 372 v7 M783 341 h7 M852 341 h7"/>
+        <path d="M848 314 l-5 5 M794 368 l-5 5 M848 368 l-5 -5 M794 314 l-5 -5" opacity=".6"/>
+      </g>
+      <g font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="700"
+         fill="#E8322A" text-anchor="middle">
+        <text x="821" y="320">N</text><text x="821" y="371">S</text>
+        <text x="845" y="346">E</text><text x="797" y="346">W</text>
+      </g>
+    </g>
+    <path d="M821 310 l7 31 l-7 10 l-7 -10 Z" fill="#E8322A"/>
+    <path d="M821 372 l7 -31 l-7 -10 l-7 10 Z" fill="#FFFFFF" opacity=".8"/>
+    <circle cx="821" cy="341" r="3.5" fill="#FFFFFF"/>
+  </g>
+
+  <!-- ====== HIS LAYOUT: bearing pill, centre .911 x .766 ================= -->
+  <g class="mpo-pill">
+    <rect x="789" y="396" width="64" height="25" rx="7" fill="#101010" opacity=".6"/>
+    <rect x="789" y="396" width="64" height="25" rx="7" fill="none" stroke="#FFFFFF"
+          stroke-width="1.4" opacity=".8"/>
+    <text x="821" y="413" text-anchor="middle" font-family="IBM Plex Sans, sans-serif"
+          font-size="14" font-weight="700" fill="#FFFFFF">118&#176;M</text>
+  </g>
+
+  <!-- ====== HIS LAYOUT: caption, bottom right, .755-.995 x .813-.945 ===== -->
+  <g class="mpo-cap">
+    <rect x="699" y="430" width="187" height="59" rx="7" fill="#12200F" opacity=".72"/>
+    <rect x="699" y="430" width="187" height="59" rx="7" fill="none" stroke="#8FD16A"
+          stroke-width="1.2" opacity=".55"/>
+    <g font-family="IBM Plex Sans, sans-serif" font-size="11" fill="#8FD16A">
+      <g class="mpo-c1">
+        <text x="709" y="447" font-size="13" font-weight="700">1043+00</text>
+        <text x="768" y="447" font-size="13" font-weight="700" fill="#FFFFFF">Sire_West</text>
+      </g>
+      <g class="mpo-c2"><text x="709" y="461">WETLAND_WEST EEA-NE-GA-W13</text></g>
+      <g class="mpo-c3"><text x="709" y="474">40.371902  -97.028415 | 118&#176;M</text></g>
+      <g class="mpo-c4"><text x="709" y="486">2026-09-16</text></g>
     </g>
   </g>
 
   <!-- ============ what is on disk afterwards ============ -->
-  <g font-family="IBM Plex Mono, monospace" font-size="15">
+  <g font-family="IBM Plex Mono, monospace" font-size="13">
     <g class="mpo-f1">
-      <rect x="150" y="506" width="16" height="16" fill="#637F08"/>
-      <text x="176" y="520" fill="#161311">1043+00_Sire West_IMG_4487.JPG</text>
-      <text x="556" y="520" fill="#161311" opacity=".6">untouched</text>
+      <rect x="110" y="528" width="14" height="14" fill="#637F08"/>
+      <text x="132" y="540" fill="#161311">1043+00_Sire_West_IMG_4487.JPG</text>
+      <text x="486" y="540" fill="#161311" opacity=".6">untouched</text>
     </g>
     <g class="mpo-f2">
-      <rect x="150" y="534" width="16" height="16" fill="#2757B6"/>
-      <text x="176" y="548" fill="#161311">Overlays\1043+00_Sire West_IMG_4487.JPG</text>
+      <rect x="110" y="552" width="14" height="14" fill="#2757B6"/>
+      <text x="132" y="564" fill="#161311">Overlays\1043+00_Sire_West_IMG_4487.JPG</text>
     </g>
   </g>
 
@@ -912,7 +1059,7 @@
 </div>
 
 <ol class="mpo-steps">
-  <li class="mpo-s1"><b>01</b> The photo, as it came off the camera</li>
+  <li class="mpo-s1"><b>01</b> A photograph, taken on the right-of-way</li>
   <li class="mpo-s2"><b>02</b> A marked copy is written beside it</li>
 </ol>
 </section>
