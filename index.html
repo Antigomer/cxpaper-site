@@ -11,14 +11,6 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css?v=aaf6597d">
 <style>
-/* The hero's release line appears only once the Releases API actually returns a
-   release; site.js flips data-release-state to "ready". Until a build is
-   published there is nothing true to put here, so the line stays out of the
-   page rather than reading "unavailable". Both [data-release] spans stay in the
-   DOM so fillRelease() still has something to fill. Scoped to p.data so the
-   download page's table, which carries the same attribute, is unaffected. */
-p.data[data-release-state] { display: none; }
-p.data[data-release-state="ready"] { display: block; }
 
 /* The line under the headline. Smaller than the h1 so the two short sentences
    above still carry, but in --ink rather than --muted so it reads as part of
@@ -118,12 +110,6 @@ p.data[data-release-state="ready"] { display: block; }
       while you work.
     </p>
 
-    <div class="btn-row">
-      <a class="btn" href="/license/">Request a license</a>
-    </div>
-    <p class="data" data-release-state="loading" style="color:var(--muted)">
-      Latest published release <span data-release="version">…</span> · <span data-release="date">…</span>
-    </p>
 
     <div class="tabshow" id="tabshow">
       <div class="tabshow-bar" role="tablist" aria-label="What each tab of the program does">
