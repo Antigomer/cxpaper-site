@@ -27,6 +27,11 @@ import urllib.request
 HERE = os.path.dirname(os.path.abspath(__file__))
 WORKER_JS = os.path.join(HERE, "cxpaper-license.js")
 URL_FILE = r"C:\_CLAUDE\cp-worker-url.txt"
+# The desk's password. It used to be scraped out of cxpaper-license.js as an
+# ADMIN_FALLBACK line; that line is gone because the password became a
+# Cloudflare secret, and this file kept looking for it and exiting. Same file
+# mint_batch.py uses, so the two cannot drift apart again.
+ADMIN_FILE = r"C:\_CLAUDE\cp-admin-token.txt"
 
 # Everything this script creates carries this, so it can be found and removed.
 QA_TAG = "QA-TEST-DO-NOT-SHIP"
@@ -59,12 +64,16 @@ def worker_url():
 
 
 def worker_password():
-    text = open(WORKER_JS, encoding="utf-8").read()
-    found = re.search(r'ADMIN_FALLBACK\s*=\s*"([^"]+)"', text)
-    if not found:
-        print("STOPPED: no ADMIN_FALLBACK line in %s." % WORKER_JS)
+    if not os.path.isfile(ADMIN_FILE):
+        print("STOPPED: %s is missing - it holds the license desk's password."
+              % ADMIN_FILE)
+        print("         deploy_worker.py writes it when the desk goes up.")
         sys.exit(1)
-    return found.group(1)
+    value = open(ADMIN_FILE, encoding="utf-8").read().strip()
+    if not value:
+        print("STOPPED: %s is empty." % ADMIN_FILE)
+        sys.exit(1)
+    return value
 
 
 def call(url, path, method="GET", body=None, admin=None, origin=None):

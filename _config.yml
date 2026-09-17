@@ -1,0 +1,24 @@
+# What GitHub Pages publishes from this repository.
+#
+# The repo is the website AND the licence desk's source and deploy scripts.
+# Pages serves everything it is given, so on 2026-09-16 cxpaper.com was handing
+# out worker/cxpaper-license.js (22 KB of the desk's own logic), mint_batch.py,
+# deploy_worker.py and tools/revoked.txt to anyone who asked for them by name.
+#
+# No password or signing seed was ever in any of those - the admin password is
+# an ADMIN_TOKEN secret on Cloudflare and the seed has never been in the repo -
+# so nothing had to be rotated. What was public was the implementation: the
+# rate limits, the admin endpoint paths, the name of the form's honeypot field,
+# the paths these scripts read on Chris's machine, and the list of revoked
+# licence ids.
+#
+# Jekyll already runs on this site (there is no .nojekyll), and none of the
+# pages contain Liquid syntax, so they are copied through untouched. This file
+# only removes things from the output.
+
+exclude:
+  - worker           # the licence desk's source and its deploy scripts
+  - tools            # release/stamp scripts, and the revocation list
+  - claude           # handover notes
+  - _workshop        # draft pages; Jekyll drops leading-underscore names anyway
+  - README.md
