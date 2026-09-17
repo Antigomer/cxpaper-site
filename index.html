@@ -115,7 +115,8 @@
       <div class="tabshow-bar" role="tablist" aria-label="What each tab of the program does">
       <button class="tabshow-tab" role="tab" id="tb-rename" aria-controls="tp-rename"
               aria-selected="true" tabindex="0">Rename</button>
-      <span class="tabshow-tab is-soon" aria-disabled="true">Marco Polocator<i>soon</i></span>
+      <button class="tabshow-tab" role="tab" id="tb-marco" aria-controls="tp-marco"
+              aria-selected="false" tabindex="-1">Marco Polocator</button>
       <span class="tabshow-tab is-soon" aria-disabled="true">Photo KMZ<i>soon</i></span>
       <button class="tabshow-tab" role="tab" id="tb-gis" aria-controls="tp-gis"
               aria-selected="false" tabindex="-1">GIS Tools</button>
@@ -696,6 +697,228 @@
 <!-- ================= END CONSTRUCTION PAPER STORYBOOK ================= -->
       </div>
 
+      <div class="tabshow-panel" role="tabpanel" id="tp-marco" aria-labelledby="tb-marco" hidden>
+<!-- ================= BEGIN MARCO POLOCATOR STORYBOOK ================= -->
+<section class="mpo-scope" aria-label="How Marco Polocator burns a compass, a caption and a mini-map onto a copy of a field photograph">
+<style>
+/* ============================================================
+   Marco Polocator - a photograph comes out knowing where it is.
+   One 20s loop, four beats, everything scoped to .mpo-scope.
+   Transform + opacity only, and every stagger is in the keyframe
+   percentages rather than animation-delay, which shifts phase and
+   desyncs on the second loop.
+   The overlay matches what the program actually draws: compass
+   rose bottom-right, the caption block from its <TAG> template,
+   a station mini-map, all composited at the designed 52% so the
+   photograph still reads through it, with #F0524A on the needle
+   and the view cone.
+   ============================================================ */
+.mpo-scope{
+  --mpo-ink:#161311; --mpo-paper:#F2ECDF; --mpo-ground:#F5F1E8;
+  --mpo-accent:#F0524A; --mpo-corn-t:#2757B6; --mpo-red-t:#AC040C;
+  --mpo-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --mpo-dur:20s;
+  margin:0; overflow:hidden;
+}
+.mpo-stagewrap{position:relative;width:100%;border-radius:3px;overflow:hidden;background:var(--mpo-ground);}
+.mpo-svg{display:block;width:100%;height:auto;}
+
+.mpo-stage{animation-name:mpo-stage;animation-timing-function:linear;}
+@keyframes mpo-stage{0%{opacity:0}2%,95%{opacity:1}99.5%,100%{opacity:0}}
+
+.mpo-scope [class^="mpo-"]{
+  animation-duration:var(--mpo-dur);
+  animation-iteration-count:infinite;
+  animation-fill-mode:both;
+  animation-timing-function:cubic-bezier(.32,.72,.28,1);
+  transform-box:view-box; transform-origin:0 0;
+}
+
+/* ---- BEAT 1: the photograph, as it came off the camera ---- */
+.mpo-photo{animation-name:mpo-photo;}
+@keyframes mpo-photo{0%,2%{opacity:0;transform:translateY(-26px) scale(.97)}
+                     10%,100%{opacity:1;transform:none}}
+.mpo-name{opacity:0;animation-name:mpo-name;}
+@keyframes mpo-name{0%,6%{opacity:0}11%,100%{opacity:1}}
+
+/* ---- BEAT 2: the compass, and the needle finding the bearing ----
+   The photograph carries GPSImgDirection; the needle swings to it rather
+   than appearing already pointed, because the swing is the thing being
+   explained. */
+.mpo-glass{opacity:0;animation-name:mpo-glass;}
+@keyframes mpo-glass{0%,30%{opacity:0;transform:scale(.86)}37%,100%{opacity:1;transform:none}}
+.mpo-needle{animation-name:mpo-needle;}
+@keyframes mpo-needle{
+  0%,36%  {transform:rotate(-58deg)}
+  44%     {transform:rotate(132deg)}
+  47%     {transform:rotate(112deg)}
+  50%,100%{transform:rotate(118deg)}
+}
+.mpo-cone{opacity:0;animation-name:mpo-cone;}
+@keyframes mpo-cone{0%,44%{opacity:0}52%,100%{opacity:1}}
+
+/* ---- BEAT 3: the caption block, a line at a time ---- */
+.mpo-cap{opacity:0;animation-name:mpo-cap;}
+@keyframes mpo-cap{0%,52%{opacity:0;transform:translateY(10px)}58%,100%{opacity:1;transform:none}}
+.mpo-c1{opacity:0;animation-name:mpo-c1;}
+@keyframes mpo-c1{0%,56%{opacity:0}59%,100%{opacity:1}}
+.mpo-c2{opacity:0;animation-name:mpo-c2;}
+@keyframes mpo-c2{0%,59%{opacity:0}62%,100%{opacity:1}}
+.mpo-c3{opacity:0;animation-name:mpo-c3;}
+@keyframes mpo-c3{0%,62%{opacity:0}65%,100%{opacity:1}}
+.mpo-c4{opacity:0;animation-name:mpo-c4;}
+@keyframes mpo-c4{0%,65%{opacity:0}68%,100%{opacity:1}}
+
+/* ---- BEAT 3b: the station mini-map ---- */
+.mpo-map{opacity:0;animation-name:mpo-map;}
+@keyframes mpo-map{0%,68%{opacity:0;transform:scale(.88)}75%,100%{opacity:1;transform:none}}
+
+/* ---- BEAT 4: two files. The original is not one of them. ---- */
+.mpo-f1{opacity:0;animation-name:mpo-f1;}
+@keyframes mpo-f1{0%,82%{opacity:0;transform:translateX(-10px)}87%,100%{opacity:1;transform:none}}
+.mpo-f2{opacity:0;animation-name:mpo-f2;}
+@keyframes mpo-f2{0%,86%{opacity:0;transform:translateX(-10px)}91%,100%{opacity:1;transform:none}}
+
+/* ---- captions under the stage ---- */
+.mpo-steps{display:flex;gap:.5rem 1.6rem;flex-wrap:wrap;list-style:none;margin:.9rem 0 0;padding:0;
+  font-family:var(--mpo-mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;
+  color:rgba(22,19,17,.62);}
+.mpo-steps li{display:flex;align-items:baseline;gap:.45rem;opacity:.34;}
+.mpo-steps b{font-weight:400;color:var(--mpo-red-t);}
+.mpo-scope .mpo-steps li{animation-timing-function:linear;}
+.mpo-s1{animation-name:mpo-s1}@keyframes mpo-s1{0%,28%{opacity:1}33%,100%{opacity:.34}}
+.mpo-s2{animation-name:mpo-s2}@keyframes mpo-s2{0%,28%{opacity:.34}33%,100%{opacity:1}}
+@media (max-width:40rem){ .mpo-steps{font-size:10px;gap:.35rem .9rem;} }
+
+/* ---- reduced motion: the finished photograph, everything burned on,
+       both files listed. No swing, because nothing moved. ---- */
+@media (prefers-reduced-motion:reduce){
+  .mpo-scope *{animation:none !important;transition:none !important;}
+  .mpo-stage{opacity:1;}
+  .mpo-scope [class^="mpo-"]{opacity:1;transform:none;}
+  .mpo-scope .mpo-needle{transform:rotate(118deg);}
+  .mpo-scope .mpo-steps li{opacity:1;}
+}
+
+/* ---- parked by site.js while scrolled off screen ---- */
+.mpo-scope.is-parked *{animation-play-state:paused !important;}
+</style>
+
+<div class="mpo-stagewrap">
+<svg class="mpo-svg" viewBox="0 0 1000 580" preserveAspectRatio="xMidYMid meet" role="img"
+     aria-labelledby="mpo-t mpo-d" focusable="false">
+<title id="mpo-t">A field photograph comes out knowing where it was taken</title>
+<desc id="mpo-d">A photograph of a pipeline right-of-way appears. A compass rose is drawn onto its bottom corner and the needle swings round to the direction the camera was pointed, with a view cone fanning out from it. A caption block writes itself line by line - station and project, the feature, the coordinates and bearing, the date and time - and a small station mini-map appears. Two files are listed at the end: the original, untouched, and a marked copy written into an Overlays folder beside it.</desc>
+
+<defs>
+  <clipPath id="mpo-frame"><rect x="150" y="70" width="700" height="420"/></clipPath>
+</defs>
+
+<rect x="0" y="0" width="1000" height="580" fill="#F5F1E8"/>
+
+<g class="mpo-stage">
+
+  <g class="mpo-name" font-family="IBM Plex Mono, monospace" font-size="15" fill="#161311" opacity=".72">
+    <text x="150" y="52">1043+00_Sire West_IMG_4487.JPG</text>
+  </g>
+
+  <!-- ============ the photograph ============ -->
+  <g class="mpo-photo" clip-path="url(#mpo-frame)">
+    <rect x="150" y="70" width="700" height="420" fill="#CFE0F8"/>
+    <!-- treeline -->
+    <path d="M150 232 q40 -26 82 -6 q44 -30 92 -4 q46 -26 96 -2 q50 -28 100 -4
+             q48 -24 96 -2 q42 -20 84 -4 L850 224 L850 272 L150 272 Z" fill="#4B6006"/>
+    <rect x="150" y="262" width="700" height="34" fill="#637F08"/>
+    <!-- graded right-of-way -->
+    <path d="M150 296 L850 296 L850 358 L150 386 Z" fill="#B9A67E"/>
+    <path d="M150 386 L850 358 L850 402 L150 438 Z" fill="#C9B894"/>
+    <!-- the trench and the pipe in it -->
+    <path d="M150 350 L850 326 L850 344 L150 372 Z" fill="#6B5B3E"/>
+    <path d="M150 358 L850 332 L850 340 L150 366 Z" fill="#242020"/>
+    <!-- foreground -->
+    <rect x="150" y="402" width="700" height="88" fill="#637F08"/>
+    <path d="M150 402 q60 -12 120 2 q64 14 128 -2 q62 -14 126 2 q64 14 126 -2
+             q60 -12 200 2 l0 16 l-700 0 Z" fill="#4B6006"/>
+    <!-- a station stake -->
+    <path d="M330 300 l14 0 l4 96 l-22 0 Z" fill="#E8D9AE"/>
+    <path d="M326 310 l26 -4 l0 9 l-26 4 Z" fill="#BB0A10"/>
+    <path d="M326 326 l26 -4 l0 9 l-26 4 Z" fill="#BB0A10"/>
+    <!-- sun -->
+    <circle cx="742" cy="130" r="23" fill="#F0E2B8"/>
+  </g>
+
+  <!-- ============ the compass, on the designed smoked glass ============ -->
+  <g class="mpo-glass">
+    <rect x="676" y="326" width="150" height="150" rx="6" fill="#101010" opacity=".52"/>
+    <circle cx="751" cy="401" r="56" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity=".85"/>
+    <circle cx="751" cy="401" r="46" fill="none" stroke="#FFFFFF" stroke-width="1.2" opacity=".5"/>
+    <g font-family="IBM Plex Mono, monospace" font-size="13" fill="#FFFFFF" text-anchor="middle">
+      <text x="751" y="357">N</text><text x="751" y="455">S</text>
+      <text x="803" y="406">E</text><text x="699" y="406">W</text>
+    </g>
+
+    <!-- the view cone: which way the camera was looking -->
+    <g class="mpo-cone">
+      <path d="M751 401 L826 428 L806 471 Z" fill="#F0524A" opacity=".3"/>
+    </g>
+
+    <!-- the needle. Its own transform-origin, inline, because the shared
+         rule above sets 0 0 and would beat a stylesheet rule on specificity. -->
+    <g class="mpo-needle" style="transform-origin:751px 401px">
+      <path d="M751 357 l9 44 l-9 14 l-9 -14 Z" fill="#F0524A"/>
+      <path d="M751 445 l9 -44 l-9 -14 l-9 14 Z" fill="#FFFFFF" opacity=".75"/>
+      <circle cx="751" cy="401" r="5" fill="#FFFFFF"/>
+    </g>
+  </g>
+
+  <!-- ============ the caption block, from its <TAG> template ============ -->
+  <g class="mpo-cap">
+    <rect x="176" y="372" width="310" height="102" rx="5" fill="#101010" opacity=".52"/>
+    <g font-family="IBM Plex Mono, monospace" font-size="15" fill="#FFFFFF">
+      <g class="mpo-c1"><text x="192" y="398">1043+00  Sire West</text></g>
+      <g class="mpo-c2"><text x="192" y="419">Wetland W-14</text></g>
+      <g class="mpo-c3"><text x="192" y="440">32.4417, -101.8203  |  118&#176; SE</text></g>
+      <g class="mpo-c4"><text x="192" y="461">9-16-26  10:42</text></g>
+    </g>
+  </g>
+
+  <!-- ============ the station mini-map ============ -->
+  <g class="mpo-map">
+    <rect x="690" y="92" width="146" height="132" rx="5" fill="#101010" opacity=".52"/>
+    <path d="M704 204 C 730 180 742 146 776 128 S 812 108 824 104"
+          fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity=".85"/>
+    <path d="M752 158 L806 178 L792 206 Z" fill="#F0524A" opacity=".3"/>
+    <circle cx="752" cy="158" r="5.5" fill="#F0524A"/>
+    <g font-family="IBM Plex Mono, monospace" font-size="11" fill="#FFFFFF" opacity=".9">
+      <text x="704" y="112">N &#8593;   1043+00</text>
+    </g>
+  </g>
+
+  <!-- ============ what is on disk afterwards ============ -->
+  <g font-family="IBM Plex Mono, monospace" font-size="15">
+    <g class="mpo-f1">
+      <rect x="150" y="506" width="16" height="16" fill="#637F08"/>
+      <text x="176" y="520" fill="#161311">1043+00_Sire West_IMG_4487.JPG</text>
+      <text x="556" y="520" fill="#161311" opacity=".6">untouched</text>
+    </g>
+    <g class="mpo-f2">
+      <rect x="150" y="534" width="16" height="16" fill="#2757B6"/>
+      <text x="176" y="548" fill="#161311">Overlays\1043+00_Sire West_IMG_4487.JPG</text>
+    </g>
+  </g>
+
+</g>
+</svg>
+</div>
+
+<ol class="mpo-steps">
+  <li class="mpo-s1"><b>01</b> The photo, as it came off the camera</li>
+  <li class="mpo-s2"><b>02</b> A marked copy is written beside it</li>
+</ol>
+</section>
+<!-- ================= END MARCO POLOCATOR STORYBOOK ================= -->
+      </div>
+
       <div class="tabshow-panel" role="tabpanel" id="tp-gis" aria-labelledby="tb-gis" hidden>
 <!-- ================= BEGIN GIS TOOLS STORYBOOK ================= -->
 <section class="gst-scope" aria-label="How Construction Paper turns the day's scatter sheet into a Google Earth KMZ, where clicking a crew tells you what they are doing and whether they will cut a resource">
@@ -1116,6 +1339,6 @@
   </div>
 </footer>
 
-<script src="assets/site.js?v=876988b9"></script>
+<script src="assets/site.js?v=b9a3126a"></script>
 </body>
 </html>

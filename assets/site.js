@@ -158,7 +158,7 @@ var CONFIG = {
     // Was one storybook, is now one per tab of the program. Each gets its own
     // observer entry; a panel that is hidden is not animating at all, so this
     // only ever has real work to do for the tab on show.
-    var scopes = document.querySelectorAll(".cps-scope, .gst-scope");
+    var scopes = document.querySelectorAll(".cps-scope, .gst-scope, .mpo-scope");
     if (!scopes.length || !("IntersectionObserver" in window)) return;
     var io = new IntersectionObserver(function (entries) {
       for (var i = 0; i < entries.length; i++) {
