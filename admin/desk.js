@@ -25,7 +25,13 @@
   var MUTED = "rgba(22,19,17,0.62)";
   var RULE = "rgba(22,19,17,0.14)";
 
-  var state = { days: 30, data: null, reports: null };
+  // `reports` is what the usage half of the desk said; `reportsRead` is
+  // whether it said anything at all. The two are not the same thing and the
+  // page must not treat them as one: a desk that answered "nothing yet" is an
+  // honest zero, a desk that did not answer is a fault, and before this was
+  // split the page announced "no copy has reported its usage yet" in exactly
+  // the case where it had no idea.
+  var state = { days: 30, data: null, reports: null, reportsRead: false };
 
   function $(s, r) { return (r || document).querySelector(s); }
   function el(t, a, kids) {
@@ -111,10 +117,31 @@
     });
   }
 
+  // What to say instead of a chart when every day in the window is a zero.
+  // A flat line along the bottom with an axis of 0 and 1 is not a reading of
+  // anything - it is the shape a broken page makes - so the figure says in
+  // words what it would otherwise draw badly.
+  function nothingToDraw() {
+    var total = ((state.data || {}).claims || []).length;
+    if (!total) {
+      return "No license has been asked for through the website yet, so " +
+             "there is nothing to draw. This fills in on the first request.";
+    }
+    return "Nothing was asked for in this window. " +
+           (total === 1 ? "The one license so far is" : "All " + total +
+            " licenses so far are") + " further back — try All.";
+  }
+
   function drawLines(rows) {
     var host = $("#plot-time");
     host.innerHTML = "";
-    if (!rows.length) { host.innerHTML = "<p class='why'>Nothing in this window yet.</p>"; return; }
+    var any = rows.some(function (r) { return r.asked || r.started; });
+    if (!rows.length || !any) {
+      host.innerHTML = "<p class='why'>" + nothingToDraw() + "</p>";
+      $("#table-time").innerHTML =
+        "<p class='why'>Nothing on any day in this window.</p>";
+      return;
+    }
 
     var W = Math.max(560, Math.min(980, rows.length * 26));
     var H = 260, L = 38, R = 72, T = 16, B = 34;
@@ -267,13 +294,38 @@
     var startedIn = claims.filter(function (c) { return c.activated_at && c.activated_at >= since; });
     var period = state.days ? ("the last " + state.days + " days") : "all time";
 
+    var activated = claims.filter(function (c) { return c.machine; }).length;
+
+    // Three states, and the page owes a different sentence to each: nothing
+    // asked for yet, keys out but none opened, copies actually running. The
+    // first two are zeros that are CORRECT - Chris, 2026-09-20: "I don't want
+    // anything to show up until we actually go live" - so they are stated
+    // plainly and never dressed up as a fault.
     if (!claims.length) {
-      lines.push("Nobody has asked for a license yet.");
+      lines.push("Nobody has asked for a license through the website yet, " +
+        "so there is nothing here to show. Nothing is broken — these " +
+        "stay at zero until the site goes live.");
+    } else if (!activated) {
+      lines.push("<strong>" + askedIn.length + "</strong> " +
+        (askedIn.length === 1 ? "person has" : "people have") +
+        " asked for a license in " + period + ", and nobody has opened the " +
+        "program yet. Until somebody does, everything about use stays at zero.");
     } else {
       lines.push("<strong>" + askedIn.length + "</strong> " +
         (askedIn.length === 1 ? "person has" : "people have") +
         " asked for a license in " + period + ", and <strong>" +
         startedIn.length + "</strong> started the program.");
+    }
+
+    // The fact that makes an honest zero look like a fault: a key Chris made
+    // himself never passed through the form, so the desk has no claim record
+    // for it and refuses its reports. Said while the numbers are still at
+    // zero, which is when it is needed, and dropped once they are not.
+    if (!activated) {
+      lines.push("Only keys the website hands out are counted. Keys made by " +
+        "hand — Chris's own copy included — never came through the " +
+        "form, so the desk has no record of them and they are not in these " +
+        "numbers.");
     }
 
     // The one number worth acting on: asked days ago, never opened it.
@@ -299,9 +351,21 @@
         projects[top[0]] + ", are on <strong>" + esc(top[0]) + "</strong>.");
     }
 
-    if (!state.reports) {
-      lines.push("No copy has reported its usage yet, so there is nothing to say " +
-        "about which tools are earning their place.");
+    // Only say something about usage when the desk actually answered about
+    // it. If it did not, the banner above has already said so, and repeating
+    // a guess here as though it were a finding is how a zero starts lying.
+    if (state.reportsRead && !(state.reports && state.reports.reports)) {
+      if (!activated) {
+        // Nothing has been opened, so nothing can have reported. Saying it
+        // again after the first paragraph would be noise.
+        if (claims.length) {
+          lines.push("No copy has reported its usage either, for the same " +
+            "reason. The tools figure appears after the first one is opened.");
+        }
+      } else {
+        lines.push("Copies are in use but none has reported its usage yet, " +
+          "so there is nothing to say about which tools are earning their place.");
+      }
     }
 
     $("#reading-body").innerHTML = lines.map(function (l) { return "<p>" + l + "</p>"; }).join("");
@@ -328,6 +392,15 @@
     }).join("");
 
     var b = [];
+    // A half-loaded dashboard that says nothing is worse than one that says
+    // so. This is the one genuine fault the page can meet after it opens:
+    // the data came back, the usage did not.
+    if (!state.reportsRead) {
+      b.push("<div class='banner'><p><strong>The usage figures did not " +
+        "load.</strong> The desk did not answer when this page asked for " +
+        "them, so the tools figure is missing. That is this page failing to " +
+        "read them, not copies failing to report. Reload to try again.</p></div>");
+    }
     if (data.keys_in_stock != null && data.keys_in_stock < 20) {
       b.push("<div class='banner" + (data.keys_in_stock === 0 ? " bad" : "") + "'><p>" +
         (data.keys_in_stock === 0
@@ -348,7 +421,8 @@
     var out = ["<tr><th>Key</th><th>Name</th><th>Project</th><th>Phone</th><th>Email</th>" +
                "<th>Asked</th><th>Started</th><th>Last heard</th><th>Computer</th></tr>"];
     if (!claims.length) {
-      out.push("<tr><td colspan='9'>Nobody yet.</td></tr>");
+      out.push("<tr><td colspan='9'>Nobody has asked through the website " +
+        "yet. Only requests made on this site appear here.</td></tr>");
     }
     claims.forEach(function (c) {
       out.push("<tr>" +
@@ -412,20 +486,39 @@
     state$.className = "form-state";
 
     return fetch(API + "/admin/data", { headers: { "X-CP-Admin": password } })
+      // A fetch that never arrives rejects with the browser's own wording -
+      // "Failed to fetch" - which landed beside the password box and read as
+      // a rejected password. Not reaching the desk and being turned away by
+      // it are different things and now say so.
+      .catch(function () {
+        throw new Error("Could not reach the license desk. It is either down " +
+          "or this computer is offline. Nothing to do with the password.");
+      })
       .then(function (r) {
         if (r.status === 401) throw new Error("That password was not accepted.");
+        if (r.status === 503) {
+          throw new Error("The license desk has no password set yet. " +
+            "Run worker\\deploy_worker.py, then try again.");
+        }
         if (!r.ok) throw new Error("The license desk answered " + r.status + ".");
         return r.json();
       })
       .then(function (doc) {
         state.data = doc;
         try { sessionStorage.setItem("cp-desk", password); } catch (e) { /* private window */ }
+        // Whether this half answered is recorded separately from what it
+        // said, so "nothing reported" and "nothing heard" stay apart.
         return fetch(API + "/admin/reports", { headers: { "X-CP-Admin": password } })
-          .then(function (r) { return r.ok ? r.json() : null; })
-          .catch(function () { return null; });
+          .then(function (r) {
+            if (!r.ok) throw new Error("reports " + r.status);
+            return r.json();
+          })
+          .then(function (doc2) { return { read: true, doc: doc2 }; })
+          .catch(function () { return { read: false, doc: null }; });
       })
-      .then(function (reports) {
-        state.reports = reports;
+      .then(function (got) {
+        state.reports = got.doc;
+        state.reportsRead = got.read;
         $("#desk-gate").hidden = true;
         $("#desk").hidden = false;
         render();
