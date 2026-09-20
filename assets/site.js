@@ -80,13 +80,15 @@ var CONFIG = {
           if (asset) {
             a.setAttribute("href", asset.browser_download_url);
             a.removeAttribute("aria-disabled");
-            // The button now points straight at the exe, so say so: a label
-            // that still reads "on GitHub" promises a page and delivers a
-            // 30 MB download. It is the SECOND button now - requesting a
-            // license comes first - so it names who it is for, because the
-            // file is useless to anybody without a key.
-            a.textContent = "Already have a key? Download " + asset.name +
-              " (" + bytes(asset.size) + ")";
+            // The button points straight at the exe, so say so: a label that
+            // still reads "on GitHub" promises a page and delivers a 30 MB
+            // download. Only the button that opts in gets relabelled - the one
+            // in the key panel is read seconds after a key was issued, and
+            // "Already have a key?" there would be asking a question the page
+            // has just answered.
+            if (a.hasAttribute("data-release-label")) {
+              a.textContent = "Download " + asset.name + " (" + bytes(asset.size) + ")";
+            }
           } else {
             a.setAttribute("href", rel.html_url || "#");
           }
