@@ -117,7 +117,8 @@
               aria-selected="true" tabindex="0">Rename</button>
       <button class="tabshow-tab" role="tab" id="tb-marco" aria-controls="tp-marco"
               aria-selected="false" tabindex="-1">Marco Polocator</button>
-      <span class="tabshow-tab is-soon" aria-disabled="true">Photo KMZ<i>soon</i></span>
+      <button class="tabshow-tab" role="tab" id="tb-kmz" aria-controls="tp-kmz"
+              aria-selected="false" tabindex="-1">Photo KMZ</button>
       <button class="tabshow-tab" role="tab" id="tb-gis" aria-controls="tp-gis"
               aria-selected="false" tabindex="-1">GIS Tools</button>
       </div>
@@ -1066,6 +1067,262 @@
 <!-- ================= END MARCO POLOCATOR STORYBOOK ================= -->
       </div>
 
+      <div class="tabshow-panel" role="tabpanel" id="tp-kmz" aria-labelledby="tb-kmz" hidden>
+<!-- ================= BEGIN PHOTO KMZ STORYBOOK ================= -->
+<section class="pkz-scope" aria-label="How a folder of photographs becomes a Google Earth file where every pin shows which way the camera was pointed">
+<style>
+/* ============================================================
+   Photo KMZ. A folder of photographs goes in; one Google Earth
+   file comes out, named after the folder, with a pin for every
+   photograph showing which way the camera was pointed.
+
+   DRAWN FROM A REAL KMZ the Photo KMZ session built for this,
+   not from the code and not from Chris's own files - his 96 are
+   the daily automation's output, a different writer entirely
+   (his say xmlns .../kml/2.1, this tab writes .../kml/2.2).
+
+   The marker is not a camera. I rendered it with the program's
+   own render_camera_icon at his settings - cone, amber, 64 px,
+   60 degrees, 35% cone - and it is a dot with a white ring and a
+   cone swung to the heading. With no heading, the dot alone: the
+   cone is the only thing that goes missing. The icons in a real
+   KMZ are named for the angle (mk_amber_259.png), which is why
+   photographs shot the same way share one.
+
+   The balloon's labels are the program's own, verbatim: File,
+   Station, Taken, Position, Direction, Camera, Folder, with the
+   direction written 118 deg M. Every VALUE here is invented -
+   station, spread, coordinates, date, camera and folder are all
+   real in the sample and none of them may go on a public page.
+
+   One 20s loop, stagger in the keyframe percentages.
+   ============================================================ */
+.pkz-scope{
+  --pkz-ink:#161311; --pkz-ground:#F5F1E8; --pkz-paper:#F2ECDF;
+  --pkz-amber:#F0A53A; --pkz-amber-d:#A9701B; --pkz-red-t:#AC040C;
+  --pkz-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --pkz-dur:20s;
+  margin:0; overflow:hidden;
+}
+.pkz-stagewrap{position:relative;width:100%;border-radius:3px;overflow:hidden;background:var(--pkz-ground);}
+.pkz-svg{display:block;width:100%;height:auto;}
+
+.pkz-stage{animation-name:pkz-stage;animation-timing-function:linear;}
+@keyframes pkz-stage{0%{opacity:0}2%,95%{opacity:1}99.5%,100%{opacity:0}}
+
+.pkz-scope [class^="pkz-"]{
+  animation-duration:var(--pkz-dur);
+  animation-iteration-count:infinite;
+  animation-fill-mode:both;
+  animation-timing-function:cubic-bezier(.32,.72,.28,1);
+  transform-box:view-box; transform-origin:0 0;
+}
+
+/* ---- BEAT 1: the folder of photographs ---- */
+.pkz-folder{opacity:0;animation-name:pkz-folder;}
+@keyframes pkz-folder{0%,2%{opacity:0;transform:translateY(-12px)}8%,100%{opacity:1;transform:none}}
+.pkz-t1{opacity:0;animation-name:pkz-t1;}@keyframes pkz-t1{0%,6%{opacity:0;transform:translateY(10px)}11%,100%{opacity:1;transform:none}}
+.pkz-t2{opacity:0;animation-name:pkz-t2;}@keyframes pkz-t2{0%,8%{opacity:0;transform:translateY(10px)}13%,100%{opacity:1;transform:none}}
+.pkz-t3{opacity:0;animation-name:pkz-t3;}@keyframes pkz-t3{0%,10%{opacity:0;transform:translateY(10px)}15%,100%{opacity:1;transform:none}}
+.pkz-t4{opacity:0;animation-name:pkz-t4;}@keyframes pkz-t4{0%,12%{opacity:0;transform:translateY(10px)}17%,100%{opacity:1;transform:none}}
+.pkz-t5{opacity:0;animation-name:pkz-t5;}@keyframes pkz-t5{0%,14%{opacity:0;transform:translateY(10px)}19%,100%{opacity:1;transform:none}}
+.pkz-t6{opacity:0;animation-name:pkz-t6;}@keyframes pkz-t6{0%,16%{opacity:0;transform:translateY(10px)}21%,100%{opacity:1;transform:none}}
+
+/* ---- BEAT 2: the ground, then a pin per photograph ---- */
+.pkz-map{opacity:0;animation-name:pkz-map;}
+@keyframes pkz-map{0%,24%{opacity:0}31%,100%{opacity:1}}
+.pkz-line{stroke-dasharray:100;stroke-dashoffset:100;fill:none;animation-name:pkz-line;
+  animation-timing-function:cubic-bezier(.4,0,.2,1);}
+@keyframes pkz-line{0%,28%{stroke-dashoffset:100}40%,100%{stroke-dashoffset:0}}
+
+/* each pin drops onto where its photograph was taken. The cone comes with it:
+   in a real KMZ it is rendered into the icon, so it cannot arrive separately. */
+.pkz-p1{opacity:0;animation-name:pkz-p1;animation-timing-function:cubic-bezier(.2,1.5,.4,1);}
+@keyframes pkz-p1{0%,36%{opacity:0;transform:translateY(-26px) scale(.5)}41%,100%{opacity:1;transform:none}}
+.pkz-p2{opacity:0;animation-name:pkz-p2;animation-timing-function:cubic-bezier(.2,1.5,.4,1);}
+@keyframes pkz-p2{0%,39%{opacity:0;transform:translateY(-26px) scale(.5)}44%,100%{opacity:1;transform:none}}
+.pkz-p3{opacity:0;animation-name:pkz-p3;animation-timing-function:cubic-bezier(.2,1.5,.4,1);}
+@keyframes pkz-p3{0%,42%{opacity:0;transform:translateY(-26px) scale(.5)}47%,100%{opacity:1;transform:none}}
+.pkz-p4{opacity:0;animation-name:pkz-p4;animation-timing-function:cubic-bezier(.2,1.5,.4,1);}
+@keyframes pkz-p4{0%,45%{opacity:0;transform:translateY(-26px) scale(.5)}50%,100%{opacity:1;transform:none}}
+.pkz-p5{opacity:0;animation-name:pkz-p5;animation-timing-function:cubic-bezier(.2,1.5,.4,1);}
+@keyframes pkz-p5{0%,48%{opacity:0;transform:translateY(-26px) scale(.5)}53%,100%{opacity:1;transform:none}}
+/* this one had no heading in its photograph, so it is the dot alone */
+.pkz-p6{opacity:0;animation-name:pkz-p6;animation-timing-function:cubic-bezier(.2,1.5,.4,1);}
+@keyframes pkz-p6{0%,51%{opacity:0;transform:translateY(-26px) scale(.5)}56%,100%{opacity:1;transform:none}}
+.pkz-nohead{opacity:0;animation-name:pkz-nohead;}
+@keyframes pkz-nohead{0%,58%{opacity:0}64%,100%{opacity:1}}
+
+/* ---- BEAT 3: the click, and the balloon ---- */
+.pkz-cur{opacity:0;animation-name:pkz-cur;}
+@keyframes pkz-cur{
+  0%,60%{opacity:0;transform:translate(96px,74px)}
+  63%{opacity:1;transform:translate(96px,74px)}
+  69%{opacity:1;transform:none}
+  92%{opacity:1;transform:none}
+  95%,100%{opacity:0;transform:none}
+}
+.pkz-ring{opacity:0;animation-name:pkz-ring;transform-origin:648px 300px;}
+@keyframes pkz-ring{0%,69%{opacity:0;transform:scale(.2)}71%{opacity:.9;transform:scale(1)}
+                    75%,100%{opacity:0;transform:scale(1.9)}}
+.pkz-balloon{opacity:0;animation-name:pkz-balloon;transform-origin:648px 296px;
+  animation-timing-function:cubic-bezier(.2,1.2,.35,1);}
+@keyframes pkz-balloon{
+  0%,70%  {opacity:0;transform:scale(.05)}
+  71%     {opacity:1;transform:scale(.05)}
+  76%     {opacity:1;transform:scale(1.04)}
+  79%,100%{opacity:1;transform:scale(1)}
+}
+.pkz-r1{opacity:0;animation-name:pkz-r1;}@keyframes pkz-r1{0%,77%{opacity:0}79%,100%{opacity:1}}
+.pkz-r2{opacity:0;animation-name:pkz-r2;}@keyframes pkz-r2{0%,78%{opacity:0}80%,100%{opacity:1}}
+.pkz-r3{opacity:0;animation-name:pkz-r3;}@keyframes pkz-r3{0%,79%{opacity:0}81%,100%{opacity:1}}
+.pkz-r4{opacity:0;animation-name:pkz-r4;}@keyframes pkz-r4{0%,80%{opacity:0}82%,100%{opacity:1}}
+.pkz-r5{opacity:0;animation-name:pkz-r5;}@keyframes pkz-r5{0%,81%{opacity:0}83%,100%{opacity:1}}
+.pkz-r6{opacity:0;animation-name:pkz-r6;}@keyframes pkz-r6{0%,82%{opacity:0}84%,100%{opacity:1}}
+.pkz-r7{opacity:0;animation-name:pkz-r7;}@keyframes pkz-r7{0%,83%{opacity:0}85%,100%{opacity:1}}
+
+/* ---- BEAT 4: the file that comes out ---- */
+.pkz-out{opacity:0;animation-name:pkz-out;}
+@keyframes pkz-out{0%,87%{opacity:0;transform:translateY(14px)}92%,100%{opacity:1;transform:none}}
+
+/* ---- captions under the stage ---- */
+.pkz-steps{display:flex;gap:.5rem 1.6rem;flex-wrap:wrap;list-style:none;margin:.9rem 0 0;padding:0;
+  font-family:var(--pkz-mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;
+  color:rgba(22,19,17,.62);}
+.pkz-steps li{display:flex;align-items:baseline;gap:.45rem;opacity:.34;}
+.pkz-steps b{font-weight:400;color:var(--pkz-red-t);}
+.pkz-scope .pkz-steps li{animation-timing-function:linear;}
+.pkz-s1{animation-name:pkz-s1}@keyframes pkz-s1{0%,22%{opacity:1}27%,100%{opacity:.34}}
+.pkz-s2{animation-name:pkz-s2}@keyframes pkz-s2{0%,22%{opacity:.34}27%,100%{opacity:1}}
+@media (max-width:40rem){ .pkz-steps{font-size:10px;gap:.35rem .9rem;} }
+
+/* ---- reduced motion: the finished map, a balloon open on one pin ---- */
+@media (prefers-reduced-motion:reduce){
+  .pkz-scope *{animation:none !important;transition:none !important;}
+  .pkz-stage{opacity:1;}
+  .pkz-scope [class^="pkz-"]{opacity:1;transform:none;}
+  .pkz-line{stroke-dashoffset:0;}
+  .pkz-scope .pkz-cur,.pkz-scope .pkz-ring{opacity:0;}
+  .pkz-scope .pkz-steps li{opacity:1;}
+}
+
+/* ---- parked by site.js while scrolled off screen ---- */
+.pkz-scope.is-parked *{animation-play-state:paused !important;}
+</style>
+
+<div class="pkz-stagewrap">
+<svg class="pkz-svg" viewBox="0 0 1000 580" preserveAspectRatio="xMidYMid meet" role="img"
+     aria-labelledby="pkz-t pkz-d" focusable="false">
+<title id="pkz-t">A folder of photographs becomes a Google Earth file</title>
+<desc id="pkz-d">A folder of field photographs is shown on the left. On the right a map draws itself with the corridor running through it, and a pin drops onto the spot each photograph was taken. Each pin carries a cone showing which way the camera was pointed; one photograph had no heading recorded, so its pin is a plain dot with no cone. A pointer clicks a pin and a balloon opens showing the photograph with its file name, station, when it was taken, position, direction, camera and folder. The day leaves as one Google Earth file named after the folder.</desc>
+
+<defs>
+  <clipPath id="pkz-mapclip"><rect x="352" y="96" width="608" height="380" rx="4"/></clipPath>
+  <g id="pkz-cone">
+    <path d="M0 0 L-27 -46 A53 53 0 0 1 27 -46 Z" fill="#F0A53A" fill-opacity=".35"
+          stroke="#A9701B" stroke-width="2.4" stroke-linejoin="round"/>
+    <path d="M0 0 V-52" stroke="#A9701B" stroke-width="1.6" opacity=".7"/>
+  </g>
+  <g id="pkz-dot">
+    <circle cx="0" cy="0" r="9.5" fill="#FFFFFF"/>
+    <circle cx="0" cy="0" r="6.5" fill="#F0A53A" stroke="#A9701B" stroke-width="2"/>
+  </g>
+</defs>
+
+<rect x="0" y="0" width="1000" height="580" fill="#F5F1E8"/>
+
+<g class="pkz-stage">
+
+  <!-- ============ the folder of photographs ============ -->
+  <g class="pkz-folder" font-family="IBM Plex Mono, monospace" font-size="15">
+    <path d="M40 96 h96 l14 18 h150 v24 H40 Z" fill="#161311"/>
+    <rect x="40" y="132" width="264" height="330" rx="3" fill="#F2ECDF" stroke="#161311" stroke-width="2.5"/>
+    <text x="52" y="122" fill="#F2ECDF" font-size="14">9-16-26</text>
+    <text x="52" y="486" fill="#161311" opacity=".62" font-size="13">22 photographs</text>
+  </g>
+
+  <!-- six drawn frames, standing in for the day's photographs -->
+  <g class="pkz-t1"><rect x="56" y="148" width="116" height="66" fill="#8FA9C8"/><rect x="56" y="186" width="116" height="28" fill="#7E8C3A"/><path d="M56 186 h116 v7 h-116z" fill="#8A6F4C"/></g>
+  <g class="pkz-t2"><rect x="180" y="148" width="116" height="66" fill="#A9C0DA"/><rect x="180" y="180" width="116" height="34" fill="#8A6F4C"/><path d="M180 194 h116 v9 h-116z" fill="#2A2320"/></g>
+  <g class="pkz-t3"><rect x="56" y="226" width="116" height="66" fill="#96AECB"/><rect x="56" y="192" width="0" height="0"/><rect x="56" y="262" width="116" height="30" fill="#5B4529"/><path d="M56 256 q30 -22 62 0 z" fill="#3F5A16"/></g>
+  <g class="pkz-t4"><rect x="180" y="226" width="116" height="66" fill="#B6CBE0"/><rect x="180" y="258" width="116" height="34" fill="#7E8C3A"/><path d="M212 258 h52 v-18 h-52z" fill="#E8D9AE"/></g>
+  <g class="pkz-t5"><rect x="56" y="304" width="116" height="66" fill="#8FA9C8"/><rect x="56" y="340" width="116" height="30" fill="#8A6F4C"/><path d="M56 348 h116 v8 h-116z" fill="#2A2320"/></g>
+  <g class="pkz-t6"><rect x="180" y="304" width="116" height="66" fill="#A9C0DA"/><rect x="180" y="336" width="116" height="34" fill="#7E8C3A"/><path d="M180 352 q40 -18 80 0 z" fill="#3F5A16"/></g>
+
+  <!-- ============ the map, and a pin per photograph ============ -->
+  <g class="pkz-map">
+    <rect x="352" y="96" width="608" height="380" rx="4" fill="#6E7A44"/>
+    <g clip-path="url(#pkz-mapclip)">
+      <rect x="352" y="300" width="608" height="176" fill="#5A6638" opacity=".5"/>
+      <path d="M352 268 h608 M352 392 h608" stroke="#8A9560" stroke-width="1.2" opacity=".4"/>
+      <path class="pkz-line" pathLength="100" d="M372 452 C 470 420 520 340 622 308 S 812 220 944 150"
+            stroke="#161311" stroke-width="5" stroke-linecap="round"/>
+      <path class="pkz-line" pathLength="100" d="M352 330 h608" stroke="#E8E03A"
+            stroke-width="2" opacity=".55"/>
+    </g>
+    <rect x="352" y="96" width="608" height="380" rx="4" fill="none" stroke="#161311"
+          stroke-width="2" opacity=".35"/>
+  </g>
+
+  <!-- pins. The number in a real icon file IS the heading - mk_amber_259.png -
+       so photographs shot the same way share one icon. -->
+  <g class="pkz-p1" style="transform-origin:404px 438px"><g transform="translate(404,438) rotate(312)"><use href="#pkz-cone"/></g><g transform="translate(404,438)"><use href="#pkz-dot"/></g></g>
+  <g class="pkz-p2" style="transform-origin:492px 396px"><g transform="translate(492,396) rotate(2)"><use href="#pkz-cone"/></g><g transform="translate(492,396)"><use href="#pkz-dot"/></g></g>
+  <g class="pkz-p3" style="transform-origin:594px 330px"><g transform="translate(594,330) rotate(75)"><use href="#pkz-cone"/></g><g transform="translate(594,330)"><use href="#pkz-dot"/></g></g>
+  <g class="pkz-p4" style="transform-origin:648px 300px"><g transform="translate(648,300) rotate(118)"><use href="#pkz-cone"/></g><g transform="translate(648,300)"><use href="#pkz-dot"/></g></g>
+  <g class="pkz-p5" style="transform-origin:790px 232px"><g transform="translate(790,232) rotate(259)"><use href="#pkz-cone"/></g><g transform="translate(790,232)"><use href="#pkz-dot"/></g></g>
+  <!-- no heading in this photograph: the dot alone, the cone is what is missing -->
+  <g class="pkz-p6" style="transform-origin:898px 176px"><g transform="translate(898,176)"><use href="#pkz-dot"/></g></g>
+  <g class="pkz-nohead" font-family="IBM Plex Sans, sans-serif" font-size="13" fill="#FFFFFF">
+    <text x="916" y="181" stroke="#161311" stroke-width="2.6" paint-order="stroke">no heading recorded</text>
+  </g>
+
+  <!-- ============ the balloon the click opens ============ -->
+  <g class="pkz-balloon" style="transform-origin:648px 296px">
+    <path d="M640 268 L648 296 L656 268 Z" fill="#FFFFFF" stroke="#999999" stroke-width="1.2"/>
+    <rect x="378" y="106" width="304" height="164" rx="4" fill="#FFFFFF" stroke="#999999" stroke-width="1.2"/>
+    <rect x="390" y="116" width="128" height="72" fill="#8FA9C8" stroke="#999999" stroke-width="1.2"/>
+    <rect x="390" y="158" width="128" height="30" fill="#8A6F4C"/>
+    <path d="M390 170 h128 v8 h-128z" fill="#2A2320"/>
+    <g font-family="Arial, Helvetica, sans-serif" font-size="9.5">
+      <g class="pkz-r1"><text x="530" y="124" fill="#606060" font-weight="700">File</text><text x="574" y="124" fill="#202020">2208+00_Demo_West_IMG_0142.JPEG</text></g>
+      <g class="pkz-r2"><text x="530" y="140" fill="#606060" font-weight="700">Station</text><text x="574" y="140" fill="#202020">2208+00  Demo_West</text></g>
+      <g class="pkz-r3"><text x="530" y="156" fill="#606060" font-weight="700">Taken</text><text x="574" y="156" fill="#202020">2026-09-16 10:42:18</text></g>
+      <g class="pkz-r4"><text x="530" y="172" fill="#606060" font-weight="700">Position</text><text x="574" y="172" fill="#202020">40.371902, -97.028415</text></g>
+      <g class="pkz-r5"><text x="390" y="206" fill="#606060" font-weight="700">Direction</text><text x="446" y="206" fill="#202020">118&#176;M</text></g>
+      <g class="pkz-r6"><text x="390" y="224" fill="#606060" font-weight="700">Camera</text><text x="446" y="224" fill="#202020">Apple iPhone</text></g>
+      <g class="pkz-r7"><text x="390" y="242" fill="#606060" font-weight="700">Folder</text><text x="446" y="242" fill="#202020">9-16-26</text></g>
+    </g>
+  </g>
+
+  <!-- the click itself -->
+  <g class="pkz-ring" fill="none" stroke="#FFFFFF" stroke-width="3">
+    <circle cx="648" cy="300" r="20"/>
+  </g>
+  <g class="pkz-cur">
+    <path d="M654 312 L654 342 L662 335 L668 348 L674 345 L668 332 L678 331 Z"
+          fill="#F2ECDF" stroke="#161311" stroke-width="2.5" stroke-linejoin="round"/>
+  </g>
+
+  <!-- ============ what comes out ============ -->
+  <g class="pkz-out" font-family="IBM Plex Mono, monospace" font-size="16">
+    <rect x="40" y="502" width="264" height="44" fill="#F2ECDF" stroke="#161311" stroke-width="3"/>
+    <rect x="40" y="502" width="9" height="44" fill="#637F08"/>
+    <text x="64" y="530" fill="#161311">9-16-26.kmz</text>
+  </g>
+
+</g>
+</svg>
+</div>
+
+<ol class="pkz-steps">
+  <li class="pkz-s1"><b>01</b> A folder of photographs</li>
+  <li class="pkz-s2"><b>02</b> One Google Earth file, named after it</li>
+</ol>
+</section>
+<!-- ================= END PHOTO KMZ STORYBOOK ================= -->
+      </div>
+
       <div class="tabshow-panel" role="tabpanel" id="tp-gis" aria-labelledby="tb-gis" hidden>
 <!-- ================= BEGIN GIS TOOLS STORYBOOK ================= -->
 <section class="gst-scope" aria-label="How Construction Paper turns the day's scatter sheet into a Google Earth KMZ, where clicking a crew tells you what they are doing and whether they will cut a resource">
@@ -1486,6 +1743,6 @@
   </div>
 </footer>
 
-<script src="assets/site.js?v=c9d03282"></script>
+<script src="assets/site.js?v=bb6d04d0"></script>
 </body>
 </html>
