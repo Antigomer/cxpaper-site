@@ -4,12 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Request a license — Construction Paper</title>
-<meta name="description" content="Request a license for Construction Paper and get your key on the page, then download the program, check it against its SHA-256 and run it.">
+<meta name="description" content="Request a license for Construction Paper. Four answers, your key comes back on the page, and the program is on the same page to download.">
 <link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=aaf6597d">
+<style>
+/* The technical half of "The file", folded away. Chris on the old version:
+   "It's super technical. Why is it there?" - so it is still there, for the
+   person who wants it, behind one line that says what it is. */
+.deep { margin: 2rem 0 0; border-top: 1px solid var(--rule); padding-top: 1rem; }
+.deep > summary {
+  cursor: pointer; font-family: var(--mono); font-size: 13px;
+  letter-spacing: 0.02em; color: var(--muted); padding: 0.35rem 0;
+}
+.deep > summary:hover { color: var(--ink); }
+.deep[open] > summary { color: var(--ink); margin-bottom: 0.5rem; }
+.deep h3 { font-size: 1rem; margin: 1.75rem 0 0.5rem; }
+</style>
 <link rel="canonical" href="https://cxpaper.com/license/">
 </head>
 <body>
@@ -110,12 +123,12 @@
       <li>Copy the key this page gives you.</li>
       <li>Download the file and put it in a folder of its own &mdash; it keeps its
       settings, layers, profiles and tile cache beside itself.</li>
-      <li>The browser may block it first as a file that is not commonly
-      downloaded; choose <strong>Keep</strong>. On launch, Windows shows
-      <em>Windows protected your PC</em>; choose <strong>More info</strong>,
-      then <strong>Run anyway</strong>. Both warnings mean the same thing: the
-      executable is not code-signed, so Windows has never seen it before. The
-      SHA-256 below is how you verify it instead.</li>
+      <li>Windows will try to stop you twice, and both times it is the same
+      complaint &mdash; it has never seen this program before. Your browser may
+      call it uncommon: choose <strong>Keep</strong>. Then Windows says
+      <em>Windows protected your PC</em>: choose <strong>More info</strong>,
+      then <strong>Run anyway</strong>. If you would rather check the file
+      yourself first, there is a way to at the bottom of this page.</li>
       <li>It asks for a license. Click <strong>Paste license key</strong> and
       paste what you copied. If you were sent an <code>.igl</code> file
       instead, choose <strong>Import license file</strong> and pick it.</li>
@@ -134,10 +147,9 @@
 
     <h2 id="the-file">The file</h2>
     <p>
-      One executable, no installer. Settings, layers, profiles, license and
-      tile cache all live in the folder you run it from. The rows below are
-      read from the published release each time this page loads, so nothing
-      here is copied by hand.
+      One program. There is no installer &mdash; put it in a folder of its own and
+      it keeps everything it needs beside itself, so it leaves the rest of the
+      machine alone.
     </p>
 
     <div class="btn-row">
@@ -149,58 +161,56 @@
       end up with both. It will not open until a license is pasted into it, and
       the form at the top of this page gives you one on the spot.
     </p>
-    <p>
-      Builds are published to <code>antigomer/cxpaper-releases</code>. If the
-      rows do not fill in, either no build has been published yet or GitHub did
-      not answer &mdash; this page cannot tell those apart.
-    </p>
 
     <table class="kv" data-release-state="loading">
-      <tr><th>File</th><td class="wrapish" data-release="filename">&hellip;</td></tr>
       <tr><th>Version</th><td data-release="version">&hellip;</td></tr>
-      <tr><th>Released</th><td data-release="date">&hellip;</td></tr>
+      <tr><th>Put out</th><td data-release="date">&hellip;</td></tr>
       <tr><th>Size</th><td data-release="size">&hellip;</td></tr>
-      <tr><th>SHA-256</th><td class="wrapish" data-release="hash">&hellip;</td></tr>
     </table>
     <noscript>
-      <p>Those rows are filled in from GitHub by JavaScript. With it turned
-      off they stay as dots; the release page itself lists the file, its size
-      and its SHA-256.</p>
+      <p>Those rows come from the release page and need JavaScript to fill in.
+      With it off they stay as dots &mdash; the release page itself lists the same
+      thing.</p>
     </noscript>
 
-    <h2>Check what you downloaded</h2>
-    <p>In PowerShell, from the folder you saved it in:</p>
-<pre><code>Get-FileHash .\ConstructionPaper.exe -Algorithm SHA256</code></pre>
     <p>
-      The <code>Hash</code> it prints should match the SHA-256 above, ignoring
-      case. If it does not, delete the file and download it again. That hash
-      is the one written into the release notes when the build was published;
-      this page does not compute it from the file.
+      It is built and tested on 64-bit Windows 11. Nobody has tried it on
+      Windows 10 yet; if you do, tell me how it went &mdash;
+      <a href="mailto:chris@chrisputnam.me">chris@chrisputnam.me</a>.
     </p>
     <p>
-      The size above is counted the way Windows Explorer counts it, in units
-      of 1,024 bytes. GitHub's release listing uses units of 1,000, so the two
-      give different numbers for the same file.
-    </p>
-    <p>
-      Every build is made and tested on 64-bit Windows 11. Windows 10 has not
-      been tested; if you try it there, email
-      <a href="mailto:chris@chrisputnam.me">chris@chrisputnam.me</a> and say
-      how it went.
-    </p>
-    <p>
-      Renaming photos needs nothing else installed. Reading GPS out of video
-      files needs <code>ffmpeg</code> on the machine &mdash; it is not bundled with
-      the executable, and without it videos are left alone.
+      Photographs need nothing else installed. Video is the one exception: to
+      read the GPS out of a video the machine needs <code>ffmpeg</code> on it.
+      Without it your videos are left alone rather than mangled.
     </p>
 
-    <h2>Release notes</h2>
-    <p>
-      The notes below come from the newest release. If the block reports that
-      the Releases API could not be reached, that is the same condition as the
-      rows above &mdash; it does not mean there is a build waiting somewhere else.
-    </p>
-    <pre class="wrap"><code data-release="notes">&hellip;</code></pre>
+    <details class="deep">
+      <summary>Checking the file is the one I put out, and what changed in it</summary>
+      <p>
+        The program is not code-signed, so Windows has never seen it before and
+        will say so. If you would rather check the file yourself than take
+        Windows' word for it, every release carries a fingerprint &mdash; a long
+        string that changes if so much as one byte of the file does.
+      </p>
+      <table class="kv" data-release-state="loading">
+        <tr><th>File</th><td class="wrapish" data-release="filename">&hellip;</td></tr>
+        <tr><th>Fingerprint</th><td class="wrapish" data-release="hash">&hellip;</td></tr>
+      </table>
+      <p>In PowerShell, in the folder you saved it in:</p>
+<pre><code>Get-FileHash .\ConstructionPaper.exe -Algorithm SHA256</code></pre>
+      <p>
+        What it prints should match the fingerprint above, upper or lower case
+        does not matter. If it does not match, delete the file and download it
+        again.
+      </p>
+      <p>
+        One oddity worth knowing if you compare: the size above is counted the
+        way Windows Explorer counts it. The release page counts it the other
+        way, so the same file shows two different numbers.
+      </p>
+      <h3>What changed in this one</h3>
+      <pre class="wrap"><code data-release="notes">&hellip;</code></pre>
+    </details>
 
   </div>
 </main>
