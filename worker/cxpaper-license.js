@@ -523,6 +523,288 @@ async function handleAdminReports(request, env) {
   });
 }
 
+/* ---- the DIR relay ------------------------------------------------------
+ *
+ * POST /v1/dir/detect     one field photo -> which classes are in it
+ * POST /v1/dir/validate   a finished DIR slot -> findings about its caption
+ *
+ * WHY IT IS HERE AND NOT SOMEWHERE ELSE. Construction Paper's whole point is
+ * that a customer needs no API key: the relay holds the one key, checks the
+ * licence, meters, and forwards. Until 2026-09-21 the relay did not exist -
+ * the site README said so under "Deliberately not built" - so `make_backend`
+ * fell through to the Anthropic SDK, which the exe does not carry. Vision has
+ * therefore never worked for anybody. Chris: "construction paper doesn't use
+ * the API. That's the whole point."
+ *
+ * NOTHING ABOUT A PHOTOGRAPH IS STORED. The image arrives, goes to the model,
+ * and the reply goes back. What is kept is a per-licence counter and nothing
+ * else - no image, no station, no caption, no folder name.
+ *
+ * NO KEY, NO SERVICE, NO FALLBACK. If ANTHROPIC_API_KEY is unset these routes
+ * answer 503, exactly as the admin routes do without ADMIN_TOKEN. A fallback
+ * constant in this file would be an API key in a public repository.
+ */
+
+const DIR_MAX_DETECTS_PER_DAY = 400;   // ~12 working days of his 32-photo days
+const DIR_MAX_BODY_BYTES = 12 * 1024 * 1024;
+const DIR_MAX_EXAMPLES = 8;
+const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
+const ANTHROPIC_VERSION = "2023-06-01";
+const ANTHROPIC_BETA = "server-side-fallback-2026-07-01";
+const DIR_MODELS = ["claude-opus-5", "claude-sonnet-5", "claude-haiku-4-5-20251001"];
+const DIR_MEDIA = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+/* THE PROMPT IS BUILT HERE, AND THAT IS A LIABILITY THIS FILE HAS TO CARRY.
+ *
+ * The relay builds the prompt so it controls what it is paying for - a
+ * caller-supplied prompt would be a blank cheque. The cost is that these
+ * words now exist twice: here, and in `dir_writer.vision.detect.prompt_text`
+ * on the direct path. Two copies of a rule is how they come to disagree.
+ *
+ * So `dir_writer_test` reads THIS FILE and fails if either block below stops
+ * matching what prompt_text produces. Change one and the gate makes you
+ * change the other. Do not reword either in isolation. */
+const DIR_PROMPT_HEAD =
+  "You are looking at one field photo from a pipeline construction " +
+  "right-of-way, taken by the environmental inspector. List which of the " +
+  "following object classes are visibly present. Report only what is in " +
+  "the picture; if a class is not visible, leave it out. Confidence is " +
+  "your own estimate from 0 to 1.";
+
+const DIR_PROMPT_TAIL = [
+  "ONE ENTRY PER OBJECT, not one entry per kind. Two survey stakes standing in the frame are TWO entries. This matters: on a pipeline right-of-way a stake stands on EACH side of the corridor, and the pair is what defines the boundary - reporting one is half an answer.",
+  "For every entry give `where`: `left`, `top`, `right`, `bottom` for a box round that one object, and `ground_x`, `ground_y` for the point where it MEETS THE GROUND. All six are fractions of the picture's width and height, measured from the top left corner.",
+  "The ground point is the useful one, so take care over it. For a survey stake it is the BOTTOM of the lath, where the wood enters the soil - not the coloured flagging at the top. The bottom is the surveyed position; the top merely leans.",
+  "`top_x` and `top_y` are the OTHER end of the object - for a survey stake the tip of the lath, where the flagging is tied. That point and the ground point together are the stake's AXIS, and the axis is what says whether it is standing or lying down. Give both even when the object is not a stake: use the highest point of it.",
+  "A SURVEY STAKE MUST BE STANDING. A lath lying flat on the ground has been knocked down, and a stake that is down marks nothing at all - its position is meaningless, because it is no longer where the surveyor put it. Do NOT report a fallen lath as a survey_stake, and never stand one back up by giving it a ground point as though it were upright. If the only lath in the picture is lying down, then there is no survey stake in that picture.",
+  "Where the flagging colour is visible, say so in `evidence`. Colour separates a boundary stake from a centreline stake on any one job, though the colours themselves differ from job to job.",
+  "Then give `scene`: one plain sentence saying what the photo shows, and `activity`: the single best word for the work in progress from this list: excavation, tie_in, lower_in, backfill, topsoil, restoration, riprap, ecd, dewatering, wet, mats, none."
+];
+
+function dirPrompt(classes) {
+  const lines = [DIR_PROMPT_HEAD, "", "Classes:"];
+  for (const c of classes) {
+    // `label` is sent from build 14 on. Older copies send id and cues only,
+    // and for those the id stands in - a prompt slightly thinner than the
+    // direct path's, which is better than refusing a customer's request.
+    lines.push("- " + c.id + " (" + (c.label || c.id) + "): " + (c.cues || ""));
+  }
+  for (const p of DIR_PROMPT_TAIL) lines.push("", p);
+  return lines.join("\n");
+}
+
+function dirSchema(classIds) {
+  const frac = (d) => (d ? { type: "number", description: d } : { type: "number" });
+  return {
+    type: "object",
+    properties: {
+      detections: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            class: { type: "string", enum: classIds },
+            confidence: { type: "number", description: "how sure you are, from 0.0 to 1.0" },
+            evidence: { type: "string" },
+            where: {
+              type: "object",
+              description: "where this one object sits in the picture, as fractions of the width and height measured from the top left corner",
+              properties: {
+                left: frac(), top: frac(), right: frac(), bottom: frac(),
+                ground_x: frac("across the picture, where this object meets the ground"),
+                ground_y: frac("down the picture, where this object meets the ground"),
+                top_x: frac("across the picture, the far end or top of this object - for a survey stake, the tip of the lath"),
+                top_y: frac("down the picture, the far end or top of this object")
+              },
+              required: ["left", "top", "right", "bottom", "ground_x", "ground_y", "top_x", "top_y"],
+              additionalProperties: false
+            }
+          },
+          required: ["class", "confidence", "evidence", "where"],
+          additionalProperties: false
+        }
+      },
+      scene: { type: "string" },
+      activity: { type: "string" }
+    },
+    required: ["detections", "scene", "activity"],
+    additionalProperties: false
+  };
+}
+
+const DIR_FINDINGS_SCHEMA = {
+  type: "object",
+  properties: {
+    findings: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          slot: { type: "string" },
+          level: { type: "string", enum: ["error", "warn", "confirm", "ok"] },
+          message: { type: "string" },
+          suggested_caption: { type: "string" }
+        },
+        required: ["slot", "level", "message", "suggested_caption"],
+        additionalProperties: false
+      }
+    }
+  },
+  required: ["findings"],
+  additionalProperties: false
+};
+
+/* The licence has to be one this desk issued. Same rule as /activate: an id
+ * nobody has claimed gets nothing, because the id travels in the open. */
+async function dirLicenceOk(env, id) {
+  if (!id) return false;
+  return !!(await env.CP.get("claim:" + id));
+}
+
+async function overDirRate(env, id) {
+  const key = "drate:" + id + ":" + new Date().toISOString().slice(0, 10);
+  const seen = parseInt((await env.CP.get(key)) || "0", 10);
+  if (seen >= DIR_MAX_DETECTS_PER_DAY) return true;
+  await env.CP.put(key, String(seen + 1), { expirationTtl: 172800 });
+  return false;
+}
+
+function dirImageBlock(media_type, data) {
+  return { type: "image", source: { type: "base64", media_type, data } };
+}
+
+/* Ask the model, and hand back parsed JSON or null. Anthropic's own words
+ * travel out on a failure: a relay that says "upstream error" and swallows
+ * the reason makes every fault look the same from the field. */
+async function askAnthropic(env, model, content, schema, effort, maxTokens) {
+  const res = await fetch(ANTHROPIC_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": env.ANTHROPIC_API_KEY,
+      "anthropic-version": ANTHROPIC_VERSION,
+      "anthropic-beta": ANTHROPIC_BETA
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: maxTokens,
+      fallbacks: "default",
+      output_config: { effort, format: { type: "json_schema", schema } },
+      messages: [{ role: "user", content }]
+    })
+  });
+  const text = await res.text();
+  if (!res.ok) {
+    let said = "HTTP " + res.status;
+    try {
+      const doc = JSON.parse(text);
+      if (doc && doc.error && doc.error.message) said = doc.error.message;
+    } catch (e) { /* the status is all there is */ }
+    return { error: said, status: res.status };
+  }
+  let doc;
+  try { doc = JSON.parse(text); } catch (e) { return { error: "upstream sent no JSON", status: 502 }; }
+  if (doc.stop_reason === "refusal") return { value: null };
+  const block = (doc.content || []).find((b) => b.type === "text");
+  if (!block) return { value: null };
+  try { return { value: JSON.parse(block.text) }; } catch (e) { return { value: null }; }
+}
+
+async function handleDirDetect(request, env) {
+  if (!env.ANTHROPIC_API_KEY) {
+    return reply(request, 503, { error: "The vision relay is not configured yet." });
+  }
+  const id = clean(request.headers.get("X-CP-License") || "", 40).toUpperCase();
+  if (!(await dirLicenceOk(env, id))) {
+    return reply(request, 403, { error: "This license desk has no record of that key." });
+  }
+  if (await overDirRate(env, id)) {
+    return reply(request, 429, { error: "Daily photo limit reached for this license." });
+  }
+
+  let body;
+  try { body = await readObject(request); }
+  catch (e) { return reply(request, 400, { error: "bad request" }); }
+
+  const img = body.image || {};
+  if (!img.data || DIR_MEDIA.indexOf(img.media_type) < 0) {
+    return reply(request, 400, { error: "bad image" });
+  }
+  if (img.data.length > DIR_MAX_BODY_BYTES) {
+    return reply(request, 413, { error: "image too large" });
+  }
+  const classes = Array.isArray(body.classes) ? body.classes.filter((c) => c && c.id) : [];
+  if (!classes.length) return reply(request, 400, { error: "no classes" });
+  const model = DIR_MODELS.indexOf(body.model) >= 0 ? body.model : DIR_MODELS[0];
+
+  /* THE ORDER IS THE WHOLE THING, AND GETTING IT HALF RIGHT IS WORSE THAN
+   * NOT DOING IT. Marks give a position; a position is a fraction; a
+   * fraction means nothing until the model is told which photograph it is a
+   * fraction OF. Measured 2026-09-20 on the direct path: four marks with the
+   * frame named only in words scored 34 of 48, against 47 of 48 with no
+   * marks at all - every coordinate came back at about 0.765 of true,
+   * because the examples and the target are different pixel sizes. So:
+   * examples first, each caption then its picture, then `frame`, then the
+   * photograph being asked about. Reading `marks` and skipping `frame` is
+   * the 34-of-48 configuration. */
+  const content = [{ type: "text", text: dirPrompt(classes) }];
+  const examples = Array.isArray(body.examples) ? body.examples.slice(0, DIR_MAX_EXAMPLES) : [];
+  for (let i = 0; i < examples.length; i++) {
+    const ex = examples[i] || {};
+    if (!ex.data || DIR_MEDIA.indexOf(ex.media_type) < 0) continue;
+    const marks = Array.isArray(ex.marks) ? ex.marks : [];
+    const text = marks.length
+      ? "Example " + (i + 1) + " - the inspector MARKED these in the next photo, and he is the authority: " + marks.join("; ")
+      : "Example " + (i + 1) + " - the inspector confirmed these objects in the next photo: " +
+        ((ex.classes || []).join(", ") || "none") + ". (" + (ex.note || "") + ")";
+    content.push({ type: "text", text });
+    content.push(dirImageBlock(ex.media_type, ex.data));
+  }
+  if (content.length > 1 && body.frame) {
+    content.push({ type: "text", text: String(body.frame) });
+  }
+  content.push(dirImageBlock(img.media_type, img.data));
+
+  const out = await askAnthropic(
+    env, model, content, dirSchema(classes.map((c) => c.id)), "medium", 4000);
+  if (out.error) return reply(request, 502, { error: out.error });
+  return reply(request, 200, out.value || {
+    detections: [], scene: "", activity: "none", error: "no usable reply"
+  });
+}
+
+async function handleDirValidate(request, env) {
+  if (!env.ANTHROPIC_API_KEY) {
+    return reply(request, 503, { error: "The vision relay is not configured yet." });
+  }
+  const id = clean(request.headers.get("X-CP-License") || "", 40).toUpperCase();
+  if (!(await dirLicenceOk(env, id))) {
+    return reply(request, 403, { error: "This license desk has no record of that key." });
+  }
+  if (await overDirRate(env, id)) {
+    return reply(request, 429, { error: "Daily limit reached for this license." });
+  }
+
+  let body;
+  try { body = await readObject(request); }
+  catch (e) { return reply(request, 400, { error: "bad request" }); }
+
+  const img = body.image || {};
+  const model = DIR_MODELS.indexOf(body.model) >= 0 ? body.model : DIR_MODELS[0];
+  const content = [];
+  if (img.data && DIR_MEDIA.indexOf(img.media_type) >= 0) {
+    content.push(dirImageBlock(img.media_type, img.data));
+  }
+  // The client composes this sentence; the relay does not second-guess a
+  // caption check it cannot see the report for.
+  content.push({ type: "text", text: String(body.prompt || "") });
+  if (!body.prompt) return reply(request, 400, { error: "no prompt" });
+
+  const out = await askAnthropic(env, model, content, DIR_FINDINGS_SCHEMA, "high", 4000);
+  if (out.error) return reply(request, 502, { error: out.error });
+  return reply(request, 200, { findings: (out.value || {}).findings || [] });
+}
+
 /* ---- the door ----------------------------------------------------------- */
 
 export default {
@@ -538,6 +820,8 @@ export default {
       if (request.method === "POST" && path === "/request") return handleRequest(request, env);
       if (request.method === "POST" && path === "/activate") return handleActivate(request, env);
       if (request.method === "POST" && path === "/report") return handleReport(request, env);
+      if (request.method === "POST" && path === "/v1/dir/detect") return handleDirDetect(request, env);
+      if (request.method === "POST" && path === "/v1/dir/validate") return handleDirValidate(request, env);
       if (request.method === "POST" && path === "/admin/stock") return handleStock(request, env);
       if (request.method === "GET" && path === "/admin/data") return handleAdminData(request, env);
       if (request.method === "GET" && path === "/admin/reports") return handleAdminReports(request, env);
