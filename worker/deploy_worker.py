@@ -30,7 +30,6 @@ import urllib.request
 
 TOKEN_FILE = r"C:\_CLAUDE\cf-token.txt"
 ADMIN_FILE = r"C:\_CLAUDE\cp-admin-token.txt"
-ANTHROPIC_FILE = r"C:\_CLAUDE\anthropic-key.txt"
 SCRIPT_NAME = "cxpaper-license"
 KV_TITLE = "cxpaper-license"
 COMPAT_DATE = "2025-01-01"
@@ -266,33 +265,6 @@ def admin_token(auth, account):
           % ("created" if made else "reused", ADMIN_FILE))
 
 
-def anthropic_key(auth, account):
-    """The one API key the DIR relay forwards with. Chris puts it in
-    ANTHROPIC_FILE; it is never typed into a chat, never written into
-    cxpaper-license.js, and never printed here.
-
-    UNLIKE THE ADMIN PASSWORD, THIS IS NOT INVENTED WHEN MISSING. A random
-    string would deploy happily and then fail against Anthropic on the first
-    real photograph, in the field, with a message about authentication that
-    means nothing to an inspector. No file means the secret is left alone and
-    the two /v1/dir routes answer 503 - which is what they already say when
-    the relay is not configured.
-    """
-    if not os.path.isfile(ANTHROPIC_FILE):
-        print("  vision relay NOT configured - no %s" % ANTHROPIC_FILE)
-        print("    (the /v1/dir routes will answer 503 until there is one;")
-        print("     put the Anthropic API key in that file and run this again)")
-        return
-    value = open(ANTHROPIC_FILE, encoding="utf-8").read().strip()
-    if not value:
-        print("  vision relay NOT configured - %s is empty" % ANTHROPIC_FILE)
-        return
-    call(auth, "PUT", "/accounts/%s/workers/scripts/%s/secrets" % (account, SCRIPT_NAME),
-         {"name": "ANTHROPIC_API_KEY", "text": value, "type": "secret_text"})
-    print("  vision relay key set from %s (%d characters, not shown)"
-          % (ANTHROPIC_FILE, len(value)))
-
-
 def public_address(auth, account):
     call(auth, "POST", "/accounts/%s/workers/scripts/%s/subdomain" % (account, SCRIPT_NAME),
          {"enabled": True, "previews_enabled": False})
@@ -311,7 +283,6 @@ def main():
     ns_id = kv_namespace(auth, account)
     upload(auth, account, ns_id)
     admin_token(auth, account)
-    anthropic_key(auth, account)
     url = public_address(auth, account)
 
     print("")
