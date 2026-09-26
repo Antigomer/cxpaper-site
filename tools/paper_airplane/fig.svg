@@ -1,0 +1,79 @@
+<!-- ============ THE INSPECTOR ============ -->
+  <g class="pap-a-fig">
+    <g transform="translate(300,510) scale(1.05)">
+      <g class="pap-a-dip">
+        <ellipse cx="6" cy="2" rx="38" ry="9" fill="#161311" opacity=".16"/>
+        <!-- boots -->
+        <path d="M-24 -12 L-4 -12 L-4 -1 L-31 0 Z" fill="#161311"/>
+        <path d="M6 -12 L26 -12 L33 0 L6 -1 Z" fill="#161311"/>
+        <!-- trousers -->
+        <path d="M-23 -70 L23 -71 L28 -10 L5 -10 L1 -44 L-4 -10 L-26 -10 Z" fill="#242020"/>
+        <!-- left arm, at his side -->
+        <path d="M-26 -128 L-41 -124 L-35 -84 L-24 -87 Z" fill="#5083E2"/>
+        <circle cx="-33" cy="-83" r="6.5" fill="#E8C79A"/>
+        <!-- hi-vis vest -->
+        <path d="M-27 -133 L27 -134 L33 -63 L-31 -62 Z" fill="#F0A53A"/>
+        <path d="M-28 -110 L29 -111 L30 -101 L-28 -100 Z" fill="#F2ECDF" opacity=".92"/>
+        <path d="M-29 -92 L31 -93 L32 -83 L-29 -82 Z" fill="#F2ECDF" opacity=".92"/>
+        <path d="M-3 -134 L4 -134 L5 -63 L-4 -63 Z" fill="#D08A22"/>
+        <!-- head, watching it go -->
+        <circle cx="0" cy="-151" r="18" fill="#E8C79A"/>
+        <g class="pap-a-eyes">
+          <circle cx="-6" cy="-154" r="2.3" fill="#161311"/>
+          <circle cx="6" cy="-154" r="2.3" fill="#161311"/>
+        </g>
+        <path d="M-7 -144 q7 6 14 0" fill="none" stroke="#161311" stroke-width="2.2" stroke-linecap="round"/>
+        <!-- hard hat -->
+        <path d="M-23 -160 a23 21 0 0 1 46 0 Z" fill="#F0A53A"/>
+        <path d="M-32 -161 L31 -163 L32 -154 L-32 -152 Z" fill="#F0A53A"/>
+        <path d="M-3 -180 L4 -180 L4 -160 L-3 -160 Z" fill="#D08A22"/>
+        <!-- throwing arm, turning at the shoulder, with the camera in hand -->
+        <g class="pap-a-arm" style="transform-origin:33px -126px">
+          <path d="M26 -128 L41 -124 L35 -84 L24 -87 Z" fill="#5083E2"/>
+          <g class="pap-a-held" transform="translate(33,-76)">
+            <rect x="-19" y="-13" width="38" height="26" rx="4" fill="#242020"/>
+            <rect x="-12" y="-17" width="10" height="5" rx="1" fill="#242020"/>
+            <circle cx="0" cy="0" r="8.5" fill="#161311"/>
+            <circle cx="0" cy="0" r="6" fill="#5083E2"/>
+            <circle cx="-2" cy="-2" r="1.8" fill="#CFE0F8"/>
+          </g>
+          <circle cx="33" cy="-83" r="6.5" fill="#E8C79A"/>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- ============ the camera in the air, and the drone it becomes ============ -->
+  <g class="pap-a-toss">
+    <!-- what it is filming, once it is filming -->
+    <path class="pap-a-cone" d="M0 10 L-40 330 L170 330 Z" fill="#F7F2E6" fill-opacity=".28"/>
+    <g class="pap-a-unfold" style="transform-origin:0px -24px">
+      <path d="M-16 -16 L-24 -2 M16 -16 L24 -2" fill="none" stroke="#161311" stroke-width="3.2" stroke-linecap="round"/>
+      <path d="M-26 -27 L-74 -33 M26 -27 L74 -33" fill="none" stroke="#161311" stroke-width="6" stroke-linecap="round"/>
+      <rect x="-79" y="-44" width="10" height="12" rx="2" fill="#242020"/>
+      <rect x="69" y="-44" width="10" height="12" rx="2" fill="#242020"/>
+      <path d="M-30 -18 L30 -18 L26 -36 L-26 -36 Z" fill="#242020"/>
+      <path d="M-24 -36 L24 -36 L18 -42 L-18 -42 Z" fill="#3A332E"/>
+      <path d="M-28 -29 L28 -29 L27 -25 L-29 -25 Z" fill="#F0A53A"/>
+      <rect x="-3" y="-19" width="6" height="7" fill="#161311"/>
+      <ellipse cx="-74" cy="-46" rx="30" ry="3.4" fill="#161311" opacity=".2"/>
+      <ellipse cx="74" cy="-46" rx="30" ry="3.4" fill="#161311" opacity=".2"/>
+      <path class="pap-flutter" d="M-102 -46 H-46" stroke="#161311" stroke-width="2.6" stroke-linecap="round"/>
+      <path class="pap-flutter" d="M46 -46 H102" stroke="#161311" stroke-width="2.6" stroke-linecap="round" style="animation-delay:-.05s"/>
+    </g>
+    <!-- the camera: the same one he threw, now the drone's -->
+    <rect x="-19" y="-13" width="38" height="26" rx="4" fill="#242020"/>
+    <rect x="-12" y="-17" width="10" height="5" rx="1" fill="#242020"/>
+    <circle cx="0" cy="0" r="8.5" fill="#161311"/>
+    <circle cx="0" cy="0" r="6" fill="#5083E2"/>
+    <circle cx="-2" cy="-2" r="1.8" fill="#CFE0F8"/>
+    <g class="pap-a-recon">
+      <circle class="pap-blink" cx="30" cy="4" r="4.5" fill="#BB0A10"/>
+      <text x="39" y="9" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="700" fill="#AC040C">REC</text>
+    </g>
+  </g>
+  <g class="pap-a-pop" style="transform-origin:590px 130px">
+    <g transform="translate(107,-190)">
+      <path d="M483 296 l7 17 l18-6 l-11 15 l17 9 l-19 3 l3 19 l-15-12 l-12 15 l-1-19 l-19 1 l14-12 l-14-13 l19 2 l-1-19 z" fill="#F7F2E6"/>
+    </g>
+  </g>

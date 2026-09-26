@@ -14,6 +14,8 @@ GitHub Pages from this repository. No server, no monthly bill, nothing to patch.
     tools/publish_status.py   re-sign status.json from tools/revoked.txt
     tools/release.bat         publish a build to GitHub Releases
     tools/check_js.py         will the .js files run at all? (no Node here)
+    tools/paper_airplane/     the Paper Airplane storybook is GENERATED: run
+                              build.py, never hand-edit that part of index.html
     worker/cxpaper-license.js the Cloudflare Worker that hands out keys
     worker/deploy_worker.py   put that Worker on Cloudflare
     worker/mint_batch.py      sign a batch of keys and stock the Worker

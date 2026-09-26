@@ -1,0 +1,37 @@
+<g class="cps-truck">
+    <rect x="-10" y="-10" width="1020" height="600" fill="#EDE4D2"/>
+    <!-- windshield -->
+    <path d="M42 10 L958 14 L972 198 C700 210 300 210 26 198 Z" fill="#CFE0F8"/>
+    <path d="M26 170 Q92 150 152 170 Q222 148 292 170 Q362 150 432 170 Q502 148 572 170 Q642 150 712 170 Q782 148 852 170 Q922 152 972 168 L972 198 C700 210 300 210 26 198 Z" fill="#4B6006"/>
+    <path d="M26 186 L972 182 L972 198 C700 210 300 210 26 198 Z" fill="#CFBC99"/>
+    <!-- pillars -->
+    <path d="M-10 -10 L44 -10 L28 204 L-10 206 Z" fill="#242020"/>
+    <path d="M1010 -10 L956 -10 L972 204 L1010 206 Z" fill="#242020"/>
+    <!-- dash -->
+    <path d="M-10 190 C300 208 700 208 1010 190 L1010 272 C700 288 300 288 -10 272 Z" fill="#2A2320"/>
+    <path d="M-10 266 C300 282 700 282 1010 266 L1010 402 L-10 400 Z" fill="#242020"/>
+    <!-- seat / console -->
+    <path d="M-10 394 C300 404 700 404 1010 394 L1010 590 L-10 590 Z" fill="#E4DAC6"/>
+    <path d="M-10 462 C300 472 700 470 1010 460 L1010 470 C700 480 300 482 -10 472 Z" fill="#D6C9AE"/>
+    <!-- steering wheel -->
+    <circle cx="140" cy="486" r="104" fill="none" stroke="#161311" stroke-width="21"/>
+    <circle cx="140" cy="486" r="27" fill="#161311"/>
+    <path d="M40 480 h200 v14 h-200z" fill="#161311"/>
+    <path d="M133 486 h14 v96 h-14z" fill="#161311"/>
+    <!-- vents -->
+    <path d="M642 314 h150 v13 h-150z M642 336 h150 v13 h-150z" fill="#161311" opacity="0"/>
+    <path d="M62 316 h124 v13 h-124z M60 338 h124 v13 h-124z" fill="#161311" opacity=".5"/>
+    <!-- coffee, earning its place -->
+    <ellipse cx="326" cy="500" rx="42" ry="10" fill="#161311" opacity=".16"/>
+    <path d="M304 500 L348 499 L357 402 L295 403 Z" fill="#F2ECDF"/>
+    <path d="M300 452 L352 451 L354 425 L298 426 Z" fill="#C9A46A"/>
+    <path d="M298 406 L356 404 L357 392 L299 394 Z" fill="#E4DAC6"/>
+    <path d="M298 400 L356 398 L357 392 L299 394 Z" fill="#C8B995"/>
+  </g>
+
+  <!-- laptop back : the map lands in this screen -->
+  <g class="cps-lapmove cps-lap-back">
+    <path d="M441 66 L869 66 L873 374 L437 372 Z" fill="#161311" opacity=".18"/>
+    <rect x="436" y="61" width="428" height="308" rx="7" fill="#161311"/>
+    <rect x="455" y="80" width="390" height="270" fill="#F2ECDF"/>
+  </g>
