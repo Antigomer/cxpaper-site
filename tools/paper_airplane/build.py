@@ -148,6 +148,13 @@ for _seg in SEGS:
 
 
 def at_s(s):
+    # straight on past either end: the clip starts west of where the curve does
+    if s <= 0:
+        _, x, y, tx, ty = _S[0]
+        return (x + tx * s, y + ty * s, tx, ty)
+    if s >= _L:
+        _, x, y, tx, ty = _S[-1]
+        return (x + tx * (s - _L), y + ty * (s - _L), tx, ty)
     lo, hi = 0, len(_S) - 1
     while lo < hi:
         mid = (lo + hi) // 2
@@ -211,9 +218,80 @@ BLK_STA = sta_text(sta_ft(S_X - 19))
 S_FLY0, S_FLY1 = s_at_x(-40), s_at_x(1060)
 FLY_T0, FLY_T1 = 12.6, 22.6
 
+# ============================================================ the camera
+# The video is one scene seen by a camera moving down the line, not pictures
+# swapped at the pause. Chris, 2026-09-26: the marked things "just show up out
+# of nowhere" - "we should see them coming in the distance and pause when the
+# video is close". A point on the ground d map-px ahead is drawn at
+# y = HOR + KG/d, so a thing scales about the vanishing point by (its distance
+# when drawn) / (its distance now). KG comes from the two silt fences as the
+# crossing frame draws them, which puts the bag, the stream and the blanket
+# within a few px of where they were already drawn.
+VP = (368.0, 86.0)
+HOR = VP[1]
+BOT = 433.0
+NEAR_Y, FAR_Y = 300.5, 212.5      # the silt fences, paused at the crossing
+BAG_Y = 293.0                     # the filter bag, paused on it
+KG = (S_FAR - S_NEAR) / (1.0 / (FAR_Y - HOR) - 1.0 / (NEAR_Y - HOR))
+CAM_A = S_BAG - KG / (BAG_Y - HOR)
+CAM_B = S_NEAR - KG / (NEAR_Y - HOR)
+
+# Stakes every 100 ft go by on a loop of SLOTS pairs. Nine loops to the film,
+# so the loop and the timeline agree at every pause and the stakes stand still
+# where they were rather than jumping.
+SLOTS = 8
+SPACING = 100.0 / FT_PER_PX
+P_LOOP = DUR / (SLOTS * 9)
+V = SPACING / P_LOOP               # the drone: map px per second of film
+
+T = dict(
+    stage_in=0.6, stage_out=86.9,
+    rel=4.1, apex=5.9,
+    tilt0=10.2, tilt1=11.4, tilt2=12.6,
+    map_out=23.4,
+    truck=23.6, lap=24.2, click_open=26.8, player_small=27.2, zoom0=27.8, zoom1=29.4,
+    play1=29.6, pauseA=33.6,
+    pick_bag=35.2, click_bag=37.0,
+    pick_fence=44.0,
+    n1=45.0, n2=46.0, n3=47.0, n4=48.0, n_done=48.4,
+    f1=49.4, f2=50.2, f3=51.0, f_done=51.4,
+    pick_blk=52.6,
+    b1=53.6, b2=54.3, b3=55.0, b4=55.7, b_close=56.4,
+    save=57.9,
+    player_out=60.0,
+    ov_in=60.6, ov_out=70.6,
+    ge_in=71.6, marks=73.6, gclick=77.0,
+)
+# resume after a whole number of stake steps, and fly on to the crossing at the
+# same speed it came up to the bag
+T["play2"] = T["pauseA"] + 5 * P_LOOP
+T["pauseB"] = T["play2"] + (CAM_B - CAM_A) / V
+CAM_P1 = CAM_A - V * (T["pauseA"] - T["play1"])
+S_CLIP0 = CAM_P1                   # 00:00 is where the player first shows it
+OV_T0, OV_T1 = T["ov_in"], T["ov_out"] + 0.8
+
+
+def cam_player(t):
+    a, b, c, d = T["play1"], T["pauseA"], T["play2"], T["pauseB"]
+    if t <= a:
+        return CAM_P1
+    if t <= b:
+        return CAM_P1 + (CAM_A - CAM_P1) * (t - a) / (b - a)
+    if t <= c:
+        return CAM_A
+    if t <= d:
+        return CAM_A + (CAM_B - CAM_A) * (t - c) / (d - c)
+    return CAM_B
+
+
+def cam_overlay(t):
+    """The clip with the overlay, from 00:00, at the speed the player flew it
+    - it does not pause, and it is still flying when it fades."""
+    return S_CLIP0 + V * (min(max(t, OV_T0), OV_T1) - OV_T0)
+
 
 def clip_time(s):
-    return CLIP_S * (s - S_FLY0) / (S_FLY1 - S_FLY0)
+    return CLIP_S * (s - S_CLIP0) / (S_FLY1 - S_CLIP0)
 
 
 def mmss(sec):
@@ -221,8 +299,12 @@ def mmss(sec):
     return "%02d:%02d" % (sec // 60, sec % 60)
 
 
-T_A = clip_time(S_BAG - 30)     # he pauses as the bag comes into view
-T_B = clip_time(S_NEAR - 40)    # and again approaching the crossing
+T_A = clip_time(CAM_A)     # he pauses as the bag comes up close
+T_B = clip_time(CAM_B)     # and again at the crossing
+
+# the line carries on straight west of the drawn curve, because the clip does
+S_WEST = min(S_FLY0, S_CLIP0) - 200
+CL_PATH = "M%s 380 L-60 380 C200 380 420 330 560 305 C700 280 860 250 1060 240" % F(at_s(S_WEST)[0])
 
 
 def rot_rect(s, along0, along1, a0, a1):
@@ -231,7 +313,7 @@ def rot_rect(s, along0, along1, a0, a1):
 
 def ground():
     g = []
-    g.append('<rect x="-150" y="-20" width="1300" height="620" fill="#7F9A24"/>')
+    g.append('<rect x="-600" y="-20" width="1750" height="620" fill="#7F9A24"/>')
     g.append('<path d="M612 -20 L990 -10 L976 150 L664 160 L630 70 Z" fill="#93AD42"/>')
     g.append('<path d="M-150 70 L120 60 L150 250 L-150 262 Z" fill="#8CA637"/>')
     g.append('<path d="M780 380 L1150 372 L1150 600 L800 600 Z" fill="#8FA93C"/>')
@@ -249,11 +331,11 @@ def ground():
     rows = " ".join(poly(run(c0, c1, d, 30)) for d in range(70, 250, 13))
     g.append('<path d="%s" fill="none" stroke="#4B6006" stroke-width="4" opacity=".75"/>' % rows)
     # the right-of-way
-    cl = "M-60 380 C200 380 420 330 560 305 C700 280 860 250 1060 240"
+    cl = CL_PATH
     g.append('<path d="%s" fill="none" stroke="#161311" stroke-width="116" opacity=".55"/>' % cl)
     g.append('<path d="%s" fill="none" stroke="#CFBC99" stroke-width="110"/>' % cl)
-    g.append('<path d="%s" fill="none" stroke="#B9A98D" stroke-width="18"/>' % poly(run(S_FLY0 - 30, S_FLY1 + 30, -26, 80)))
-    g.append('<path d="%s" fill="none" stroke="#2A2320" stroke-width="5"/>' % poly(run(S_FLY0 - 30, S_FLY1 + 30, 10, 80)))
+    g.append('<path d="%s" fill="none" stroke="#B9A98D" stroke-width="18"/>' % poly(run(S_WEST, S_FLY1 + 30, -26, 90)))
+    g.append('<path d="%s" fill="none" stroke="#2A2320" stroke-width="5"/>' % poly(run(S_WEST, S_FLY1 + 30, 10, 90)))
     # the stream, through it
     g.append('<path d="%s" fill="none" stroke="#5083E2" stroke-width="16"/>' % stream)
     g.append('<path d="%s" fill="none" stroke="#8FB2E8" stroke-width="5"/>' % stream)
@@ -297,9 +379,9 @@ BLANKET_MAP = rot_rect(S_X, -26, -12, -52, -22)
 def align_layer(labels=True):
     """The alignment and its stationing - a layer, not the ground, so the
     KMZ view (imagery plus what he marked) leaves it off."""
-    g = ['<path d="M-60 380 C200 380 420 330 560 305 C700 280 860 250 1060 240" fill="none" stroke="#BB0A10" stroke-width="2.2"/>']
+    g = ['<path d="%s" fill="none" stroke="#BB0A10" stroke-width="2.2"/>' % CL_PATH]
     ticks, labs = [], []
-    ft0 = int(math.ceil(sta_ft(S_FLY0) / 100.0)) * 100
+    ft0 = int(math.ceil(sta_ft(S_WEST) / 100.0)) * 100
     ft = ft0
     while True:
         s = S_BAG + (ft - 220640.0) / FT_PER_PX
@@ -321,10 +403,6 @@ ALIGN_NOLAB, _ = align_layer(labels=False)
 
 # ============================================================ the video frames
 # Drawn in the player's frame, x 28-708 y 50-433, looking ahead down the line.
-VP = (368.0, 86.0)
-BOT = 433.0
-
-
 def xL(y):
     return VP[0] - 198.0 * (y - VP[1]) / (BOT - VP[1])
 
@@ -344,74 +422,148 @@ ROWP = ('<path d="M170 433 L363 88 L373 88 L566 433 Z" fill="#CFBC99"/>'
         '<path d="M170 433 L366 88 M566 433 L370 88" fill="none" stroke="#161311" stroke-width="1.4" opacity=".6"/>')
 
 
-def stakes(ys, side, ribbon=True):
-    out = []
-    for y in ys:
-        k = (y - VP[1]) / (BOT - VP[1])
-        x = (xR(y) + 3 + 4 * k) if side > 0 else (xL(y) - 3 - 4 * k)
-        h = 4 + 26 * k
-        w = 0.8 + 2.2 * k
-        out.append('<path d="M%s %s L%s %s L%s %s L%s %s Z" fill="#DAC68A" stroke="#161311" stroke-width=".6"/>'
-                   % (F(x - w), F(y), F(x + w), F(y), F(x + w * .7), F(y - h), F(x - w * .7), F(y - h)))
-        if ribbon:
-            f = side * (4 + 8 * k)
-            out.append('<path d="M%s %s l%s %s l%s %s z" fill="#BB0A10"/>'
-                       % (F(x), F(y - h), F(f), F(2 + 3 * k), F(-f), F(2 + 3 * k)))
-    return "".join(out)
+# ---- the world the camera moves through ----
+# Everything below the treeline is drawn by distance, so the same scene is
+# the player's frames and the overlay's clip, playing or paused.
+Y_TOP, Y_BOT = 92.0, 900.0          # nothing on the ground shows above the treeline
+D_EPS = KG / (Y_BOT - HOR)          # nearer than this is under the camera
+S_MAX = 4.0
+D_FADE0, D_FADE1 = 1100.0, 760.0    # far off, things come out of the haze
 
 
-def frame_a():
-    """01:12 - a filter bag out in the standing crop, past the LOD flagging."""
-    g = [SKY]
-    crop = "M372 86 L708 86 L708 433 L566 433 Z"
-    g.append('<path d="%s" fill="#8CA637"/>' % crop)
-    rows = " ".join("M%s 433 L368 86" % F(xb) for xb in range(584, 1400, 26))
-    g.append('<g clip-path="url(#pap-cropA)"><path d="%s" fill="none" stroke="#4B6006" stroke-width="4" opacity=".8"/></g>' % rows)
-    g.append(ROWP)
-    g.append(stakes([112, 140, 178, 228, 292, 372], +1))
-    g.append(stakes([150, 250, 380], -1, ribbon=False))
-    # bell hole, pump, and the hose out past the LOD
-    g.append('<ellipse cx="452" cy="358" rx="36" ry="11" fill="#2A2320"/><ellipse cx="452" cy="358" rx="26" ry="7" fill="#5083E2"/>')
-    g.append('<rect x="480" y="330" width="22" height="14" rx="2" fill="#F0A53A" stroke="#161311" stroke-width="1.4"/>')
-    g.append('<path d="M500 336 C536 334 562 312 598 299" fill="none" stroke="#161311" stroke-width="4" stroke-linecap="round"/>')
-    g.append('<ellipse cx="620" cy="298" rx="58" ry="17" fill="#3F4A1E" opacity=".5"/>')
-    g.append('<path d="M588 284 Q620 278 652 283 Q660 292 655 302 Q620 309 590 304 Q581 294 588 284 Z" fill="#C9B48A" stroke="#8A7550" stroke-width="1.6"/>')
-    g.append('<path d="M596 292 Q622 288 648 291" fill="none" stroke="#8A7550" stroke-width="1.2"/>')
-    return "".join(g)
+def F4(v):
+    s = ("%.4f" % v).rstrip("0").rstrip(".")
+    return "0" if s in ("-0", "") else s
 
 
-NEAR_Y, FAR_Y = 300.5, 212.5
+def fade(d):
+    return max(0.0, min(1.0, (D_FADE0 - d) / (D_FADE0 - D_FADE1)))
 
 
-def frame_b():
-    """02:31 - the stream crossing: silt fence on both banks, a blanket on the
-    near bank, the mat bridge."""
-    g = [SKY]
-    g.append('<path d="M28 222 C200 216 520 222 708 214 L708 282 C520 288 200 284 28 290 Z" fill="#4B6006" opacity=".75"/>')
-    g.append(ROWP)
-    g.append('<path d="M28 244 C200 236 520 242 708 234 L708 258 C520 266 200 262 28 268 Z" fill="#5083E2"/>')
-    g.append('<path d="M60 254 C220 248 500 252 690 246" fill="none" stroke="#8FB2E8" stroke-width="2.4" stroke-dasharray="14 18"/>')
-    for y, hgt, step in ((NEAR_Y, 11, 40), (FAR_Y, 6, 24)):
+def y_at(d):
+    return Y_BOT if d <= D_EPS else min(Y_BOT, HOR + KG / d)
+
+
+def pos_at(cam, y):
+    """The place on the line that a frame drawn from `cam` shows at height y."""
+    return cam + KG / (y - HOR)
+
+
+def xRe(y):     # the right-of-way's edges as ROWP draws them
+    return 373.0 + 193.0 * (y - 88.0) / 345.0
+
+
+def xLe(y):
+    return 363.0 - 193.0 * (y - 88.0) / 345.0
+
+
+# the standing crop (from the map) and the crossing's bands (from how the
+# crossing frame draws them: the bank growth, and the water)
+CROP = (s_at_x(150), s_at_x(500))
+VEG = (pos_at(CAM_B, 292.0), pos_at(CAM_B, 214.0))
+STREAM = (pos_at(CAM_B, 263.0), pos_at(CAM_B, 239.0))
+
+# things standing at one distance, each drawn once where its paused frame had
+# it: (id, the height it is drawn at, the camera it is drawn from, how far it
+# reaches from the vanishing point in that drawing)
+CARDS = [("sh", 250.0, CAM_B, 380), ("nf", NEAR_Y, CAM_B, 250), ("ff", FAR_Y, CAM_B, 150),
+         ("bl", 280.0, CAM_B, 230), ("br", 254.0, CAM_B, 210), ("bag", BAG_Y, CAM_A, 330)]
+
+
+def card_defs():
+    d = {}
+    # 01:12 - a filter bag out in the standing crop past the LOD flagging, the
+    # bell hole it is dewatering, the pump, and the hose out to it
+    d["bag"] = ('<ellipse cx="452" cy="358" rx="36" ry="11" fill="#2A2320"/><ellipse cx="452" cy="358" rx="26" ry="7" fill="#5083E2"/>'
+                '<rect x="480" y="330" width="22" height="14" rx="2" fill="#F0A53A" stroke="#161311" stroke-width="1.4"/>'
+                '<path d="M500 336 C536 334 562 312 598 299" fill="none" stroke="#161311" stroke-width="4" stroke-linecap="round"/>'
+                '<ellipse cx="620" cy="298" rx="58" ry="17" fill="#3F4A1E" opacity=".5"/>'
+                '<path d="M588 284 Q620 278 652 283 Q660 292 655 302 Q620 309 590 304 Q581 294 588 284 Z" fill="#C9B48A" stroke="#8A7550" stroke-width="1.6"/>'
+                '<path d="M596 292 Q622 288 648 291" fill="none" stroke="#8A7550" stroke-width="1.2"/>')
+    # 02:31 - the stream crossing: silt fence on both banks, a blanket on the
+    # near bank, the mat bridge
+    d["sh"] = '<path d="M-6000 250 H6000" fill="none" stroke="#8FB2E8" stroke-width="2.4" stroke-dasharray="14 18"/>'
+    for key, y, hgt, step in (("nf", NEAR_Y, 11, 40), ("ff", FAR_Y, 6, 24)):
         a, b = xL(y), xR(y)
-        g.append('<path d="M%s %s L%s %s L%s %s L%s %s Z" fill="#242020"/>'
-                 % (F(a), F(y - hgt), F(b), F(y - hgt - 1), F(b), F(y - .5), F(a), F(y)))
         xs = [a + i * step for i in range(int((b - a) / step) + 1)] + [b]
-        g.append('<path d="%s" fill="none" stroke="#87724E" stroke-width="%s"/>'
-                 % (" ".join("M%s %s V%s" % (F(x), F(y), F(y - hgt - 3)) for x in xs), "2.2" if hgt > 8 else "1.6"))
-    g.append('<path d="M256 292 L322 292 L330 268 L266 268 Z" fill="url(#pap-mesh)" stroke="#8A7550" stroke-width="1.2"/>')
-    g.append('<path d="M332 286 L404 286 L392 222 L344 222 Z" fill="#87724E" stroke="#5B4529" stroke-width="1.4"/>')
+        d[key] = ('<path d="M%s %s L%s %s L%s %s L%s %s Z" fill="#242020"/>'
+                  % (F(a), F(y - hgt), F(b), F(y - hgt - 1), F(b), F(y - .5), F(a), F(y))
+                  + '<path d="%s" fill="none" stroke="#87724E" stroke-width="%s"/>'
+                  % (" ".join("M%s %s V%s" % (F(x), F(y), F(y - hgt - 3)) for x in xs), "2.2" if hgt > 8 else "1.6"))
+    d["bl"] = '<path d="M256 292 L322 292 L330 268 L266 268 Z" fill="url(#pap-mesh)" stroke="#8A7550" stroke-width="1.2"/>'
     planks = []
     for y in range(226, 286, 7):
         t = (286 - y) / 64.0
         planks.append("M%s %s L%s %s" % (F(332 + 12 * t), y, F(404 - 12 * t), y))
-    g.append('<path d="%s" stroke="#6B5B3E" stroke-width="1.3"/>' % " ".join(planks))
-    g.append(stakes([112, 150, 330, 400], +1, ribbon=False))
-    g.append(stakes([130, 190, 340], -1, ribbon=False))
+    d["br"] = ('<path d="M332 286 L404 286 L392 222 L344 222 Z" fill="#87724E" stroke="#5B4529" stroke-width="1.4"/>'
+               '<path d="%s" stroke="#6B5B3E" stroke-width="1.3"/>' % " ".join(planks))
+    return d
+
+
+def band_rect(cls, fill):
+    return '<rect class="%s" x="-400" y="0" width="1800" height="1" fill="%s"/>' % (cls, fill)
+
+
+ROWS_D = " ".join("M%s %s L368 86" % (F(368 + (xb - 368) * (Y_BOT - HOR) / (BOT - HOR)), F(Y_BOT))
+                  for xb in range(584, 1400, 26))
+
+
+def world(p):
+    """The ground things for the player (p) or the overlay's clip (o)."""
+    g = ['<g clip-path="url(#pap-gclip)">']
+    # the crop: its rows run with the line, so they never move; what moves is
+    # where the field begins and ends, which two covers of plain grass mark
+    g.append('<g clip-path="url(#pap-rclip)"><path d="M-400 90 H1400 V%s H-400 Z" fill="#8CA637"/>' % F(Y_BOT + 50)
+             + '<path d="%s" fill="none" stroke="#4B6006" stroke-width="4" opacity=".8"/>' % ROWS_D
+             + band_rect("pap-a-%sct" % p, "#7F9A24") + band_rect("pap-a-%scb" % p, "#7F9A24") + '</g>')
+    g.append('<g clip-path="url(#pap-oclip)" opacity=".75">%s</g>' % band_rect("pap-a-%sveg" % p, "#4B6006"))
+    g.append(band_rect("pap-a-%sstr" % p, "#5083E2"))
+    for key in ("sh", "nf", "ff", "bl", "br", "bag"):
+        g.append('<g class="pap-a-%s%s"><use href="#pap-c-%s"/></g>' % (p, key, key))
+    g.append('</g>')
     return "".join(g)
 
 
-def frame_0_static():
-    return SKY + ROWP
+# ---- the stakes: pairs every 100 ft along both edges ----
+D_NEAR = KG / ((BOT - HOR) * 1.12)          # a pair this close is out of the bottom of the frame
+D_FAR = D_NEAR + SLOTS * SPACING
+LOOP = SLOTS * P_LOOP
+
+
+def pair_def():
+    out = []
+    for side, x in ((1, xR(BOT) + 7), (-1, xL(BOT) - 7)):
+        out.append('<path d="M%s 433 L%s 433 L%s 403 L%s 403 Z" fill="#DAC68A" stroke="#161311" stroke-width=".6"/>'
+                   '<path d="M%s 403 l%s 5 l%s 5 z" fill="#BB0A10"/>'
+                   % (F(x - 3), F(x + 3), F(x + 2.1), F(x - 2.1), F(x), F(side * 12), F(-side * 12)))
+    return "".join(out)
+
+
+def pair_state(u):
+    d = D_FAR - u * (D_FAR - D_NEAR)
+    s = KG / ((BOT - HOR) * d)
+    op = max(0.0, min(1.0, (D_FAR - d) / (0.8 * SPACING)))
+    return s, op
+
+
+def pair_xf(s, op):
+    return "opacity:%s;transform:translate(%spx,%spx) scale(%s)" % (F(op), F(VP[0] * (1 - s)), F(VP[1] * (1 - s)), F4(s))
+
+
+def drift_pairs():
+    return "".join('<g class="pap-drift" style="animation-delay:%ss"><use href="#pap-pair"/></g>' % F4(-k * P_LOOP)
+                   for k in range(SLOTS))
+
+
+def static_pairs(t):
+    """The pairs exactly where the moving ones are at time t."""
+    out = []
+    for k in range(SLOTS):
+        s, op = pair_state(((t + k * P_LOOP) % LOOP) / LOOP)
+        if op > 0:
+            out.append('<use href="#pap-pair" opacity="%s" transform="translate(%s,%s) scale(%s)"/>'
+                       % (F(op), F(VP[0] * (1 - s)), F(VP[1] * (1 - s)), F4(s)))
+    return "".join(out)
 
 
 NEAR_V = [(xL(NEAR_Y) + 2, NEAR_Y), (330, NEAR_Y - .3), (410, NEAR_Y - .6), (xR(NEAR_Y) - 2, NEAR_Y - .5)]
@@ -419,31 +571,128 @@ FAR_V = [(xL(FAR_Y) + 2, FAR_Y), (368, FAR_Y - .4), (xR(FAR_Y) - 2, FAR_Y - .6)]
 BLK_V = [(256, 292), (322, 292), (330, 268), (266, 268)]
 BAG_V = (620, 293)
 
-# ============================================================ the timeline
-T = dict(
-    stage_in=0.6, stage_out=86.9,
-    rel=4.1, apex=5.9,
-    tilt0=10.2, tilt1=11.4, tilt2=12.6,
-    map_out=23.4,
-    truck=23.6, lap=24.2, click_open=26.8, player_small=27.2, zoom0=27.8, zoom1=29.4,
-    play1=29.6, pauseA=33.6,
-    pick_bag=35.2, click_bag=37.0,
-    play2=39.6, pauseB=42.8,
-    pick_fence=44.0,
-    n1=45.0, n2=46.0, n3=47.0, n4=48.0, n_done=48.4,
-    f1=49.4, f2=50.2, f3=51.0, f_done=51.4,
-    pick_blk=52.6,
-    b1=53.6, b2=54.3, b3=55.0, b4=55.7, b_close=56.4,
-    save=57.9,
-    player_out=60.0,
-    ov_in=60.6, ov_out=70.6,
-    ge_in=71.6, marks=73.6, gclick=77.0,
-)
+
+# ---- turning distance into keyframes ----
+def decimate(ts, vals, tols):
+    """Keep only the samples linear interpolation cannot do without."""
+    def fits(i, j):
+        for m in range(i + 1, j):
+            f = (ts[m] - ts[i]) / (ts[j] - ts[i])
+            for c, tol in enumerate(tols):
+                if abs(vals[i][c] + (vals[j][c] - vals[i][c]) * f - vals[m][c]) > tol:
+                    return False
+        return True
+    keep, i, n = [0], 0, len(ts)
+    while i < n - 1:
+        j = i + 1
+        while j + 1 < n and fits(i, j + 1):
+            j += 1
+        keep.append(j)
+        i = j
+    return keep
+
+
+def track(cls, cam, wins, fn, tols, css, origin=None):
+    pts = []
+    for a, b in wins:
+        n = max(2, int(math.ceil((b - a) / 0.02)))
+        ts = [a + (b - a) * i / n for i in range(n + 1)]
+        vals = [fn(cam(tt)) for tt in ts]
+        pts += [(ts[i], vals[i]) for i in decimate(ts, vals, tols)]
+    stops = []
+    for tt, v in pts:
+        if stops and tt - stops[-1][0] < 1e-6:
+            continue
+        stops.append((tt, css(v)))
+    kf(cls, stops, timing="linear", origin=origin)
+
+
+def card_fn(pos, d_ref):
+    def fn(c):
+        d = pos - c
+        if d <= d_ref / S_MAX:
+            return (S_MAX, 0.0)
+        # out in the haze nothing shows, so nothing needs to move
+        return (d_ref / min(d, D_FADE0), fade(d))
+    return fn
+
+
+def card_css(v):
+    s, op = v
+    return "opacity:%s;transform:translate(%spx,%spx) scale(%s)" % (F(op), F(VP[0] * (1 - s)), F(VP[1] * (1 - s)), F4(s))
+
+
+def band_fn(near, far):
+    def fn(c):
+        dn, dfar = near - c, far - c
+        if dfar <= D_EPS:
+            return (Y_BOT, 0.0, 0.0)
+        yf, yn = y_at(dfar), y_at(dn)
+        return (yf, yn - yf, fade(max(dn, 0.0)))
+    return fn
+
+
+def band_css(v):
+    return "opacity:%s;transform:translate(0px,%spx) scale(1,%s)" % (F(v[2]), F(v[0]), F(v[1]))
+
+
+def cover_top(c):      # plain grass from the treeline down to where the crop ends
+    yf = y_at(CROP[1] - c)
+    return (Y_TOP, max(0.0, yf - Y_TOP))
+
+
+def cover_bot(c):      # and from where it begins down past the bottom
+    y0 = max(Y_TOP, y_at(CROP[0] - c))
+    return (y0, Y_BOT + 60 - y0)
+
+
+def cover_css(v):
+    return "transform:translate(0px,%spx) scale(1,%s)" % (F(v[0]), F(v[1]))
+
+
+def world_css(p, cam, wins):
+    px = 0.5        # how far off the true path a keyframe may let anything drift
+    for key, y_ref, cam0, reach in CARDS:
+        track("pap-a-%s%s" % (p, key), cam, wins, card_fn(pos_at(cam0, y_ref), KG / (y_ref - HOR)),
+              (px / reach, 0.05), card_css)
+    track("pap-a-%sveg" % p, cam, wins, band_fn(*VEG), (px, px, 0.05), band_css)
+    track("pap-a-%sstr" % p, cam, wins, band_fn(*STREAM), (px, px, 0.05), band_css)
+    track("pap-a-%sct" % p, cam, wins, cover_top, (px, px), cover_css)
+    track("pap-a-%scb" % p, cam, wins, cover_bot, (px, px), cover_css)
+
+
+def drift_css():
+    n = 600
+    ts = [LOOP * i / n for i in range(n + 1)]
+    vals = [pair_state(i / float(n)) for i in range(n + 1)]
+    keep = decimate(ts, vals, (0.35 / 300.0, 0.03))
+    frames = "".join("%s%%{%s}" % ((("%.3f" % (ts[i] / LOOP * 100)).rstrip("0").rstrip(".") or "0"), pair_xf(*vals[i]))
+                     for i in keep)
+    CSS.append(".pap-scope .pap-drift{animation:pap-drift %ss linear infinite both;transform-box:view-box;transform-origin:0 0;}\n"
+               "@keyframes pap-drift{%s}" % (F4(LOOP), frames))
+
+
+# ---- the overlay's clip: where it is, every few tenths of a second ----
+MM_K, MM_CX, MM_CY = 1.7, 200.5, 460.0
+
+
+def heading(s):
+    _, _, tx, ty = at_s(s)
+    return (90.0 + math.degrees(math.atan2(ty, tx))) % 360.0
+
+
+H0 = heading(cam_overlay(OV_T0))
+OV_STEPS = []
+_t = OV_T0
+while _t < OV_T1 - 0.05:
+    OV_STEPS.append((_t, cam_overlay(_t + 0.2)))
+    _t += 0.4
 
 
 def build():
     CSS.clear()
     t = T
+    drift_css()
     # ---------------------------------------------------------- stage
     # ---------------------------------------------------------- beat 1: the throw
     kf("pap-a-fig", [(0.3, "opacity:0;transform:translateY(80px)"), (1.6, "opacity:1;transform:none"),
@@ -521,13 +770,16 @@ def build():
                       (t["zoom0"], "opacity:1;transform:%s" % small), (t["zoom1"], "opacity:1;transform:none"),
                       (t["player_out"], "opacity:1;transform:none"), (t["player_out"] + 1.2, "opacity:0;transform:scale(.97)")],
        base="opacity:0;")
-    kf("pap-a-f0", [(0, "opacity:1"), (t["pauseA"] - 0.2, "opacity:1"), (t["pauseA"] + 0.1, "opacity:0"),
-                    (t["play2"], "opacity:0"), (t["play2"] + 0.3, "opacity:1"),
-                    (t["pauseB"] - 0.2, "opacity:1"), (t["pauseB"] + 0.1, "opacity:0")])
-    kf("pap-a-fa", [(t["pauseA"] - 0.3, "opacity:0"), (t["pauseA"], "opacity:1"),
-                    (t["play2"], "opacity:1"), (t["play2"] + 0.3, "opacity:0")], base="opacity:0;")
-    kf("pap-a-fb", [(t["pauseB"] - 0.3, "opacity:0"), (t["pauseB"], "opacity:1")], base="opacity:0;")
     playing = [(t["play1"], t["pauseA"]), (t["play2"], t["pauseB"])]
+    # the clip: the ground comes toward the camera while it plays and holds
+    # still while it is paused; the stakes go by on their loop while it plays
+    # and stand where the loop left them while it is paused
+    world_css("p", cam_player, playing)
+    steps_on("pap-a-pdrift", playing)
+    steps_on("pap-a-psP", [(0.1, t["play1"])], base_hidden=False)
+    steps_on("pap-a-psA", [(t["pauseA"], t["play2"])])
+    steps_on("pap-a-psB", [(t["pauseB"], None)])
+    kf("pap-a-fb", [(t["pauseB"] - 0.3, "opacity:0"), (t["pauseB"], "opacity:1")], base="opacity:0;")
     steps_on("pap-a-bpause", playing)
     steps_on("pap-a-bplay", [(0.1, t["play1"]), (t["pauseA"], t["play2"]), (t["pauseB"], None)], base_hidden=False)
     # the timecode, stepping while it plays
@@ -553,7 +805,7 @@ def build():
     steps_on("pap-a-sel0", [(t["pick_fence"], t["pick_blk"])])
     steps_on("pap-a-sel2", [(t["pick_blk"], None)])
     # marks on the frame
-    vis("pap-a-ma", t["click_bag"], fade=0.15)
+    vis("pap-a-ma", t["click_bag"], t["play2"], fade=0.15, fade_out=0.1)   # drawn on one frame
     for cls, a, b in (("pap-a-n1", t["n1"], t["n2"]), ("pap-a-n2", t["n2"], t["n3"]), ("pap-a-n3", t["n3"], t["n4"]),
                       ("pap-a-g1", t["f1"], t["f2"]), ("pap-a-g2", t["f2"], t["f3"]),
                       ("pap-a-k1", t["b1"], t["b2"]), ("pap-a-k2", t["b2"], t["b3"]), ("pap-a-k3", t["b3"], t["b4"]),
@@ -573,7 +825,7 @@ def build():
     # the pointer: every waypoint is a click or a move, and it moves at an even pace
     cur = [(34.0, 500, 380, 0), (34.3, 500, 380, 1), (35.0, 800, 239, 1), (t["pick_bag"], 800, 239, 1),
            (36.4, BAG_V[0], BAG_V[1], 1), (38.6, BAG_V[0], BAG_V[1], 1), (39.2, 62, 457, 1), (t["play2"], 62, 457, 1),
-           (40.2, 62, 457, 1), (40.5, 62, 457, 0), (42.9, 300, 380, 0), (43.2, 300, 380, 1),
+           (40.2, 62, 457, 1), (40.5, 62, 457, 0), (t["pauseB"] + 0.05, 300, 380, 0), (t["pauseB"] + 0.35, 300, 380, 1),
            (43.8, 800, 107, 1), (t["pick_fence"], 800, 107, 1)]
     cur += [(tt, x, y, 1) for tt, (x, y) in zip((t["n1"], t["n2"], t["n3"], t["n4"], t["n_done"]), NEAR_V + [NEAR_V[-1]])]
     cur += [(tt, x, y, 1) for tt, (x, y) in zip((t["f1"], t["f2"], t["f3"], t["f_done"]), FAR_V + [FAR_V[-1]])]
@@ -586,14 +838,27 @@ def build():
     # ---------------------------------------------------------- beat 5: the overlay
     vis("pap-a-chip2", 60.4, t["ov_out"], fade=0.6, fade_out=0.5, move="translateY(-8px)")
     vis("pap-a-ov", t["ov_in"], t["ov_out"], fade=0.8, fade_out=0.8)
-    kf("pap-a-push", [(61.0, "transform:none"), (t["ov_out"] + 0.8, "transform:scale(1.14)")], timing="linear",
-       origin="%spx %spx" % (F(23.765 + 1.29412 * VP[0]), F(-4.706 + 1.29412 * VP[1])))
-    kf("pap-a-ring", [(61.0, "transform:rotate(%sdeg)" % F(-HEAD - 3)), (t["ov_out"], "transform:rotate(%sdeg)" % F(-HEAD + 3))],
-       timing="linear", origin="861.7px 365.9px")
-    qs = [61.0, 63.4, 65.8, 68.2]
-    for i, on in enumerate(qs):
-        steps_on("pap-a-q%d" % i, [(on if i else 0.1, qs[i + 1] if i + 1 < len(qs) else None)], base_hidden=(i > 0))
-    kf("pap-a-ovknob", [(61.0, "transform:none"), (t["ov_out"], "transform:translateX(420px)")], timing="linear")
+    # the clip plays from 00:00 at the player's speed and does not slow down:
+    # Chris, 2026-09-26, "I don't know why the overlay video file moves so slow
+    # at the end" - it had been one still frame creeping 14% larger over ten
+    # seconds while the station ticked four times
+    ov_win = [(OV_T0, OV_T1)]
+    world_css("o", cam_overlay, ov_win)
+
+    def mm(c):
+        x, y = at_s(c)[:2]
+        return (MM_CX - MM_K * x, MM_CY - MM_K * y, heading(c))
+    track("pap-a-mm", cam_overlay, ov_win, mm, (0.3, 0.3, 0.2),
+          lambda v: "transform:translate(%spx,%spx) scale(%s)" % (F(v[0]), F(v[1]), F(MM_K)))
+    track("pap-a-mcone", cam_overlay, ov_win, mm, (9, 9, 0.2),
+          lambda v: "transform:rotate(%sdeg)" % F(v[2] - H0), origin="%spx %spx" % (F(MM_CX), F(MM_CY)))
+    track("pap-a-ring", cam_overlay, ov_win, mm, (9, 9, 0.2),
+          lambda v: "transform:rotate(%sdeg)" % F(-v[2]), origin="861.7px 365.9px")
+    for i, (on, _c) in enumerate(OV_STEPS):
+        offt = OV_STEPS[i + 1][0] if i + 1 < len(OV_STEPS) else None
+        steps_on("pap-a-q%d" % i, [(on if i else 0.1, offt)], base_hidden=(i > 0))
+    track("pap-a-ovknob", cam_overlay, ov_win, lambda c: (880.0 * clip_time(c) / CLIP_S,), (0.3,),
+          lambda v: "transform:translateX(%spx)" % F(v[0]))
 
     # ---------------------------------------------------------- beat 6: the KMZ
     vis("pap-a-chip3", 71.2, fade=0.6, move="translateY(-8px)")
@@ -631,11 +896,6 @@ def build():
     return "\n".join(CSS)
 
 
-# heading of the drone where the overlay's mini-map shows it, and where it is
-S_MM = S_NEAR - 44
-_, _, _tx, _ty = at_s(S_MM)
-HEAD = (90.0 + math.degrees(math.atan2(_ty, _tx))) % 360.0
-
 # the KMZ view: ground scaled into the map pane
 GE_X0, GE_Y0, GE_W, GE_H = 290.0, 80.0, 690.0, 482.0
 _rx0, _rx1 = BAG[0] - 150, off(S_FAR, 57)[0] + 120
@@ -659,15 +919,19 @@ def svg():
     A('<title id="pap-t">Paper Airplane: fly the right-of-way, then mark what the clip shows</title>')
     A('<desc id="pap-d">An inspector in a hi-vis vest throws his camera into the air; at the top of the throw it unfolds into a drone and starts recording. '
       'The view tilts over into a map and the drone flies the whole right-of-way, past a standing crop field and over a stream crossing, drawing its flight behind it, and the clip is saved. '
-      'Later, in the truck, the clip is opened in Paper Airplane on a laptop and the player fills the picture. It plays, and pauses where a filter bag sits out in the crop past the LOD flagging: '
-      'Filter bag is picked from the class list and one click marks it. It plays on and pauses at the stream crossing: silt fence is picked and drawn along the near bank and again along the far bank, '
+      'Later, in the truck, the clip is opened in Paper Airplane on a laptop and the player fills the picture. It plays down the right-of-way, stakes going by, and a filter bag out in the crop past the LOD flagging comes up out of the distance; it pauses when the bag is close: '
+      'Filter bag is picked from the class list and one click marks it. It plays on, the bag goes by, the stream crossing comes up, and it pauses there: silt fence is picked and drawn along the near bank and again along the far bank, '
       'then an erosion control blanket on the near bank is drawn round. Each mark joins the list of marks on this clip, and the redline is saved as a KMZ. '
-      'Two things come out. The clip with the overlay burned in: a mini-map of the corridor with the camera cone, a compass, and a caption with the station and the spread, These Big Jobs - Spread I, changing as it flies. '
+      'Two things come out. The clip with the overlay burned in, playing from the start: the bag and the crossing go by, with a mini-map of the corridor sliding under the camera cone, a compass, and a caption with the station and the spread, These Big Jobs - Spread I, turning over as it flies. '
       'And the KMZ opened in Google Earth: a folder of erosion control devices with the blanket, the filter bag and the two silt fences drawn on the ground where they are; '
       'the filter bag is clicked and its balloon gives the station, the class, that it was marked by hand in the viewer, when in the clip, and the mark it came from.</desc>')
     A('<defs>')
     A('<clipPath id="pap-fclip"><rect x="28" y="50" width="680" height="383"/></clipPath>')
-    A('<clipPath id="pap-cropA"><path d="M372 86 L708 86 L708 433 L566 433 Z"/></clipPath>')
+    right = "M%s %s L1400 %s L1400 %s L%s %s Z" % (F(xRe(Y_TOP)), F(Y_TOP), F(Y_TOP), F(Y_BOT + 60), F(xRe(Y_BOT + 60)), F(Y_BOT + 60))
+    left = "M%s %s L-1000 %s L-1000 %s L%s %s Z" % (F(xLe(Y_TOP)), F(Y_TOP), F(Y_TOP), F(Y_BOT + 60), F(xLe(Y_BOT + 60)), F(Y_BOT + 60))
+    A('<clipPath id="pap-gclip"><rect x="-1000" y="%s" width="2400" height="%s"/></clipPath>' % (F(Y_TOP), F(Y_BOT)))
+    A('<clipPath id="pap-rclip"><path d="%s"/></clipPath>' % right)
+    A('<clipPath id="pap-oclip"><path d="%s"/><path d="%s"/></clipPath>' % (left, right))
     A('<clipPath id="pap-ovclip"><rect x="60" y="60" width="880" height="495"/></clipPath>')
     A('<clipPath id="pap-mmclip"><rect x="64" y="370" width="273" height="172" rx="8"/></clipPath>')
     A('<clipPath id="pap-geclip"><rect x="%s" y="%s" width="%s" height="%s"/></clipPath>' % (F(GE_X0), F(GE_Y0), F(GE_W), F(GE_H - 2)))
@@ -677,7 +941,9 @@ def svg():
       '<rect width="5" height="5" fill="#E8E03A"/><path d="M0 0 v5" stroke="#161311" stroke-width="2"/></pattern>')
     A('<g id="pap-ground">%s</g>' % ground())
     A('<g id="pap-align">%s</g>' % ALIGN_NOLAB)
-    A('<g id="pap-fB">%s</g>' % frame_b())
+    for key, body in card_defs().items():
+        A('<g id="pap-c-%s">%s</g>' % (key, body))
+    A('<g id="pap-pair">%s</g>' % pair_def())
     A('</defs>')
     A('<rect x="0" y="0" width="1000" height="580" fill="#F5F1E8"/>')
     A('<g class="pap-stage">')
@@ -778,23 +1044,18 @@ def player():
     A('<text x="28" y="30" font-family="IBM Plex Mono, monospace" font-size="13" fill="#F2ECDF">Paper Airplane &#183; DJI_0042.MP4</text>')
     A('<rect x="28" y="50" width="680" height="383" fill="#161311"/>')
     A('<g clip-path="url(#pap-fclip)">')
-    # frame 0: playing - the stakes come at you down both edges
-    A('<g class="pap-a-f0">' + frame_0_static())
-    for side, cls in ((-1, "pap-drift-l"), (1, "pap-drift-r")):
-        for k in range(4):
-            delay = -0.55 * k - (0.27 if side > 0 else 0)
-            f = side * 12
-            A('<g class="%s" style="animation-delay:%ss"><path d="M-2.6 0 L2.6 0 L1.9 -30 L-1.9 -30 Z" fill="#DAC68A" stroke="#161311" stroke-width=".7"/>'
-              '<path d="M0 -30 l%s 5 l%s 5 z" fill="#BB0A10"/></g>' % (cls, F(delay), F(f), F(-f)))
-    A('</g>')
-    # frame A and its mark
-    A('<g class="pap-a-fa">' + frame_a())
+    # the clip: one scene, the camera moving down the line
+    A(SKY + ROWP + world("p"))
+    A('<g class="pap-a-pdrift">%s</g>' % drift_pairs())
+    for cls, at in (("pap-a-psP", T["play1"]), ("pap-a-psA", T["pauseA"]), ("pap-a-psB", T["pauseB"])):
+        A('<g class="%s">%s</g>' % (cls, static_pairs(at)))
+    # the bag's mark
     A('<g class="pap-a-ma"><circle cx="%s" cy="%s" r="9" fill="#BB0A10" stroke="#F2ECDF" stroke-width="3"/>'
       '<circle cx="%s" cy="%s" r="14" fill="none" stroke="#BB0A10" stroke-width="2"/></g>' % (F(BAG_V[0]), F(BAG_V[1]), F(BAG_V[0]), F(BAG_V[1])))
-    A('</g>')
-    # frame B and its marks
-    A('<g class="pap-a-fb"><use href="#pap-fB"/>')
-    A('<path class="pap-a-kfill" d="%s" fill="#BB0A10" opacity=".28"/>' % poly(BLK_V, True))
+    # the crossing's marks
+    A('<g class="pap-a-fb">')
+    # fill-opacity, not opacity: the fade-in animates opacity and would override it
+    A('<path class="pap-a-kfill" d="%s" fill="#BB0A10" fill-opacity=".28"/>' % poly(BLK_V, True))
     for i in range(3):
         A(seg("pap-a-n%d" % (i + 1), NEAR_V[i], NEAR_V[i + 1]))
     for i in range(2):
@@ -866,34 +1127,42 @@ def overlay():
     A('<g class="pap-a-ov">')
     A('<rect x="60" y="60" width="880" height="495" fill="#161311"/>')
     A('<g clip-path="url(#pap-ovclip)">')
-    A('<g class="pap-a-push"><use href="#pap-fB" transform="translate(23.765,-4.706) scale(1.29412)"/></g>')
-    # mini-map, bottom left
-    k = 1.7
-    D = at_s(S_MM)[:2]
-    cx, cy = 200.5, 460.0
-    A('<rect x="64" y="370" width="273" height="172" rx="8" fill="#5F6B3E"/>')
-    A('<g clip-path="url(#pap-mmclip)"><g transform="translate(%s,%s) scale(%s)">' % (F(cx - k * D[0]), F(cy - k * D[1]), F(k)))
-    A('<use href="#pap-ground"/><use href="#pap-align"/>')
-    A('<path d="%s" fill="none" stroke="#E8E03A" stroke-width="1"/>' % " ".join(poly(run(S_MM - 120, S_MM + 160, d, 30)) for d in (-55, 55)))
+    # the clip itself: the same scene the player showed, never paused
+    A('<g transform="translate(23.765,-4.706) scale(1.29412)">')
+    A(SKY + ROWP + world("o") + drift_pairs())
     A('</g>')
-    hd = math.radians(HEAD - 90.0)
+    # mini-map, bottom left: the map slides under the drone as it flies
+    k, cx, cy = MM_K, MM_CX, MM_CY
+    A('<rect x="64" y="370" width="273" height="172" rx="8" fill="#5F6B3E"/>')
+    A('<g clip-path="url(#pap-mmclip)"><g class="pap-a-mm">')
+    A('<use href="#pap-ground"/><use href="#pap-align"/>')
+    c0, c1 = cam_overlay(OV_T0), cam_overlay(OV_T1)
+    A('<path d="%s" fill="none" stroke="#E8E03A" stroke-width="%s"/>' % (" ".join(poly(run(c0 - 160, c1 + 160, d, 60)) for d in (-55, 55)), F4(1 / k)))
+    labs = ['<text x="%s" y="%s" text-anchor="middle">%s</text>' % (F(c[0]), F(c[1]), txt) for c, txt in STA_LABELS]
+    A('<g font-family="IBM Plex Sans, sans-serif" font-size="%s" font-weight="700" fill="#FFFFFF" stroke="#161311" '
+      'stroke-width="%s" paint-order="stroke">%s</g>' % (F4(10 / k), F4(2 / k), "".join(labs)))
+    A('</g>')
+    hd = math.radians(H0 - 90.0)
     a1, a2 = hd - math.radians(32), hd + math.radians(32)
-    A('<path d="M%s %s L%s %s L%s %s Z" fill="#E8322A" opacity=".5"/>'
+    A('<g class="pap-a-mcone"><path d="M%s %s L%s %s L%s %s Z" fill="#E8322A" opacity=".5"/></g>'
       % (F(cx), F(cy), F(cx + 90 * math.cos(a1)), F(cy + 90 * math.sin(a1)), F(cx + 90 * math.cos(a2)), F(cy + 90 * math.sin(a2))))
     A('<circle cx="%s" cy="%s" r="4.5" fill="#E8322A" stroke="#FFFFFF" stroke-width="1.8"/>' % (F(cx), F(cy)))
-    labs = []
-    for c, txt in STA_LABELS:
-        sx, sy = cx + k * (c[0] - D[0]), cy + k * (c[1] - D[1])
-        if 70 < sx < 330 and 395 < sy < 535:
-            labs.append('<text x="%s" y="%s" text-anchor="middle">%s</text>' % (F(sx), F(sy), txt))
-    A('<g font-family="IBM Plex Sans, sans-serif" font-size="10" font-weight="700" fill="#FFFFFF" stroke="#161311" '
-      'stroke-width="2" paint-order="stroke">%s</g>' % "".join(labs))
     A('</g>')
     A('<rect x="64" y="370" width="273" height="22" rx="8" fill="#1A1A14" opacity=".55"/>')
-    near = [(sta_text(sta_ft(S_MM) + d, 10), ft) for d, ft in ((0, 6), (10, 3), (20, 5), (30, 2))]
+    # where it is at each step: station, how far off the line, position, heading
+    lat0, lon0 = 40.371884, -97.029102
+    x_ref, y_ref = at_s(S_BAG)[:2]
+    away = [6, 3, 5, 2, 4, 7, 3, 5, 2, 6, 4, 3]
+    steps = []
+    for i, (_on, c) in enumerate(OV_STEPS):
+        x, y = at_s(c)[:2]
+        steps.append((sta_text(sta_ft(c)), away[i % len(away)],
+                      lat0 - (y - y_ref) * FT_PER_PX / 364000.0,
+                      lon0 + (x - x_ref) * FT_PER_PX / (364000.0 * math.cos(math.radians(lat0))),
+                      int(round(heading(c)))))
     A('<g font-family="IBM Plex Sans, sans-serif" font-weight="700" fill="#FFFFFF">'
       '<text x="72" y="385" font-size="11">N &#8593;</text>')
-    for i, (st, ft) in enumerate(near):
+    for i, (st, ft, _la, _lo, _h) in enumerate(steps):
         A('<text class="pap-a-q%d" x="329" y="386" font-size="12" text-anchor="end">%s &#183; %d ft away</text>' % (i, st, ft))
     bar = 100.0 / FT_PER_PX * k
     A('<text x="%s" y="533" font-size="10.5">100 ft</text></g>' % F(74 + bar + 6))
@@ -909,17 +1178,18 @@ def overlay():
     A('<path d="M861.7 331 l8 35 l-8 11 l-8 -11 Z" fill="#E8322A"/><path d="M861.7 401 l8 -35 l-8 -11 l-8 11 Z" fill="#FFFFFF" opacity=".8"/>'
       '<circle cx="861.7" cy="365.9" r="4" fill="#FFFFFF"/>')
     A('<rect x="824" y="425" width="76" height="28" rx="8" fill="#101010" opacity=".6"/>'
-      '<rect x="824" y="425" width="76" height="28" rx="8" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity=".8"/>'
-      '<text x="862" y="444.5" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF">%03d&#176;M</text>'
-      % int(round(HEAD)))
+      '<rect x="824" y="425" width="76" height="28" rx="8" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity=".8"/>')
+    A('<g text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF">')
+    for i, (_st, _ft, _la, _lo, h) in enumerate(steps):
+        A('<text class="pap-a-q%d" x="862" y="444.5">%03d&#176;M</text>' % (i, h))
+    A('</g>')
     # caption, bottom right, green; the station turns over as it flies
     A('<rect x="665" y="462" width="271" height="68" rx="8" fill="#12200F" opacity=".72"/>'
       '<rect x="665" y="462" width="271" height="68" rx="8" fill="none" stroke="#8FD16A" stroke-width="1.3" opacity=".55"/>')
     A('<g font-family="IBM Plex Sans, sans-serif" font-size="12.4" fill="#8FD16A">')
-    lat0, lon0 = 40.371884, -97.029102
-    for i, (st, _ft) in enumerate(near):
+    for i, (st, _ft, la, lo, h) in enumerate(steps):
         A('<g class="pap-a-q%d"><text x="676" y="481" font-size="14.5" font-weight="700">%s</text>'
-          '<text x="676" y="511">%.6f  %.6f | %03d&#176;M</text></g>' % (i, st, lat0 + 0.000007 * i, lon0 + 0.000342 * i, int(round(HEAD))))
+          '<text x="676" y="511">%.6f  %.6f | %03d&#176;M</text></g>' % (i, st, la, lo, h))
     A('<text x="746" y="481" font-size="14.5" font-weight="700" fill="#FFFFFF">%s</text>' % SPREAD)
     A('<text x="676" y="496">STREAM_S04 DEM-EX-GA-S04</text>')
     A('<text x="676" y="525">2026-09-16</text>')
@@ -927,7 +1197,7 @@ def overlay():
     A('</g>')
     A('<rect x="60" y="60" width="880" height="495" fill="none" stroke="#161311" stroke-width="2"/>')
     A('<path d="M60 568 H940" stroke="#161311" stroke-width="4" opacity=".2"/>')
-    A('<g class="pap-a-ovknob"><circle cx="300" cy="568" r="6" fill="#F0A53A" stroke="#161311" stroke-width="1.5"/></g>')
+    A('<g class="pap-a-ovknob"><circle cx="60" cy="568" r="6" fill="#F0A53A" stroke="#161311" stroke-width="1.5"/></g>')
     A('</g>')
     return "\n".join(o)
 
@@ -1032,19 +1302,14 @@ STATIC_CSS = r"""
   transform-box:view-box; transform-origin:0 0;
 }
 
-/* rotors, props, the REC light and the video's own motion keep their own time */
+/* rotors, props and the REC light keep their own time; the stakes going by
+   (.pap-drift, generated below) keep a time that divides the film exactly */
 .pap-flutter{animation:pap-flutter .14s linear infinite;transform-box:fill-box;transform-origin:center;}
 @keyframes pap-flutter{0%%,100%%{transform:scaleX(1)}50%%{transform:scaleX(.12)}}
 .pap-prop{animation:pap-spin .28s linear infinite;transform-box:fill-box;transform-origin:center;}
 @keyframes pap-spin{to{transform:rotate(360deg)}}
 .pap-blink{animation:pap-blink 1s steps(1,end) infinite;}
 @keyframes pap-blink{0%%{opacity:1}50%%{opacity:.15}}
-.pap-drift-l,.pap-drift-r{animation-duration:2.2s;animation-iteration-count:infinite;animation-fill-mode:both;
-  animation-timing-function:cubic-bezier(.75,0,.95,.55);transform-box:view-box;transform-origin:0 0;}
-.pap-drift-l{animation-name:pap-drift-l}
-.pap-drift-r{animation-name:pap-drift-r}
-@keyframes pap-drift-l{0%%{opacity:0;transform:translate(366px,90px) scale(.1)}12%%{opacity:1}100%%{opacity:1;transform:translate(120px,520px) scale(1.6)}}
-@keyframes pap-drift-r{0%%{opacity:0;transform:translate(370px,90px) scale(.1)}12%%{opacity:1}100%%{opacity:1;transform:translate(616px,520px) scale(1.6)}}
 
 /* ---- captions under the stage ---- */
 .pap-steps{display:flex;gap:.5rem 1.6rem;flex-wrap:wrap;list-style:none;margin:.9rem 0 0;padding:0;
@@ -1096,10 +1361,13 @@ def main():
     html = raw.decode("utf-8").replace("\r\n", "\n")
     a = html.index("<!-- ================= BEGIN PAPER AIRPLANE STORYBOOK")
     b = html.index("<!-- ================= END PAPER AIRPLANE STORYBOOK")
-    new = html[:a] + section() + html[b:]
+    sec = section()
+    new = html[:a] + sec + html[b:]
     INDEX.write_bytes(new.replace("\n", eol).encode("utf-8"))
-    print("wrote", INDEX, "| film %ss | pause A %s (%s) | pause B %s | bag %s near %s far %s blanket %s | heading %d"
-          % (F(DUR), mmss(T_A), F(T_A), mmss(T_B), BAG_STA, NEAR_STA, FAR_STA, BLK_STA, round(HEAD)))
+    print("wrote", INDEX, "| film %ss | pause A %s (%s) | pause B %s | bag %s near %s far %s blanket %s"
+          % (F(DUR), mmss(T_A), F(T_A), mmss(T_B), BAG_STA, NEAR_STA, FAR_STA, BLK_STA))
+    print("camera: KG %.0f | %.1f px/s (%.0f ft/s of film) | bag first seen %.0f px off | play2 %.2f s pauseB %.2f s | section %d bytes"
+          % (KG, V, V * FT_PER_PX, CAM_A + KG / (BAG_Y - HOR) - CAM_P1, T["play2"], T["pauseB"], len(sec.encode("utf-8"))))
 
 
 if __name__ == "__main__":
