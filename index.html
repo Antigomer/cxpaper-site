@@ -117,6 +117,8 @@
               aria-selected="true" tabindex="0">Rename</button>
       <button class="tabshow-tab" role="tab" id="tb-marco" aria-controls="tp-marco"
               aria-selected="false" tabindex="-1">Marco Polocator</button>
+      <button class="tabshow-tab" role="tab" id="tb-plane" aria-controls="tp-plane"
+              aria-selected="false" tabindex="-1">Paper Airplane</button>
       <button class="tabshow-tab" role="tab" id="tb-kmz" aria-controls="tp-kmz"
               aria-selected="false" tabindex="-1">Photo KMZ</button>
       <button class="tabshow-tab" role="tab" id="tb-gis" aria-controls="tp-gis"
@@ -257,7 +259,18 @@
 }
 .cps-a-row{opacity:0;animation-name:cps-a-row;}
 @keyframes cps-a-row{0%,75%{opacity:0;transform:translateX(-16px)}79%,100%{opacity:1;transform:translateX(0)}}
-.cps-r2{animation-delay:.55s}.cps-r3{animation-delay:1.1s}.cps-r4{animation-delay:1.75s}
+.cps-r2{animation-delay:.55s}.cps-r3{animation-delay:1.1s}.cps-r4{animation-delay:2.2s}
+/* Each photo is listed under the name it came off the camera with, and then
+   takes its new one. The new name is too long to sit after an arrow on the
+   same line - "These Big Jobs - Spread I" is nearly three times "Demo West" -
+   so the old name gives way to it in place instead. Same stagger as the rows;
+   the KMZ row (r4) waits until the last photo has its name. */
+.cps-a-was{animation-name:cps-a-was;animation-timing-function:linear;}
+@keyframes cps-a-was{0%,80%{opacity:1}82.5%,100%{opacity:0}}
+.cps-a-now{opacity:0;animation-name:cps-a-now;}
+@keyframes cps-a-now{0%,80.5%{opacity:0;transform:translateX(-10px)}83.5%,100%{opacity:1;transform:translateX(0)}}
+.cps-r2 .cps-a-was,.cps-r2 .cps-a-now{animation-delay:.55s}
+.cps-r3 .cps-a-was,.cps-r3 .cps-a-now{animation-delay:1.1s}
 
 /* ---- type ---- */
 .cps-lab{font-family:var(--cps-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;}
@@ -309,7 +322,8 @@
   .cps-map{opacity:1;}
   .cps-draw{stroke-dashoffset:0;}
   .cps-a-wash{opacity:.88;}
-  .cps-a-tick,.cps-a-pin,.cps-a-lab,.cps-a-chip,.cps-a-row{opacity:1;transform:none;}
+  .cps-a-tick,.cps-a-pin,.cps-a-lab,.cps-a-chip,.cps-a-row,.cps-a-now{opacity:1;transform:none;}
+  .cps-a-was{opacity:0;}
   .cps-figure{opacity:1;transform:translate(-8px,236px) scale(.6);}
   .cps-flash,.cps-flashbig{opacity:0;}
   .cps-truck,.cps-lap-back,.cps-lap-front{display:none;}
@@ -660,15 +674,18 @@
     <text class="cps-hd" x="470" y="270">Renamed</text>
     <g class="cps-a-row cps-r1">
       <circle cx="474" cy="285" r="3.6" fill="#637F08"/>
-      <text class="cps-file" x="486" y="289"><tspan fill="#8A8078">IMG_0142.JPG</tspan><tspan fill="#8A8078">  &#8594;  </tspan><tspan fill="#161311">2208+00_Demo West_IMG_0142.JPG</tspan></text>
+      <text class="cps-file cps-a-was" x="486" y="289" fill="#8A8078">IMG_0142.JPG</text>
+      <text class="cps-file cps-a-now" x="486" y="289"><tspan fill="#161311">2208+00_These Big Jobs - Spread I_</tspan><tspan fill="#8A8078">IMG_0142.JPG</tspan></text>
     </g>
     <g class="cps-a-row cps-r2">
       <circle cx="474" cy="303" r="3.6" fill="#637F08"/>
-      <text class="cps-file" x="486" y="307"><tspan fill="#8A8078">IMG_0143.JPG</tspan><tspan fill="#8A8078">  &#8594;  </tspan><tspan fill="#161311">2208+00_Demo West_IMG_0143.JPG</tspan></text>
+      <text class="cps-file cps-a-was" x="486" y="307" fill="#8A8078">IMG_0143.JPG</text>
+      <text class="cps-file cps-a-now" x="486" y="307"><tspan fill="#161311">2208+00_These Big Jobs - Spread I_</tspan><tspan fill="#8A8078">IMG_0143.JPG</tspan></text>
     </g>
     <g class="cps-a-row cps-r3">
       <circle cx="474" cy="321" r="3.6" fill="#637F08"/>
-      <text class="cps-file" x="486" y="325"><tspan fill="#8A8078">IMG_0144.JPG</tspan><tspan fill="#8A8078">  &#8594;  </tspan><tspan fill="#161311">2209+00_Demo West_IMG_0144.JPG</tspan></text>
+      <text class="cps-file cps-a-was" x="486" y="325" fill="#8A8078">IMG_0144.JPG</text>
+      <text class="cps-file cps-a-now" x="486" y="325"><tspan fill="#161311">2209+00_These Big Jobs - Spread I_</tspan><tspan fill="#8A8078">IMG_0144.JPG</tspan></text>
     </g>
     <g class="cps-a-row cps-r4">
       <circle cx="474" cy="339" r="3.6" fill="#2757B6"/>
@@ -689,9 +706,9 @@
 </ul>
 
 <ul class="cps-mobfiles">
-  <li>2208+00_Demo West_IMG_0142.JPG</li>
-  <li>2208+00_Demo West_IMG_0143.JPG</li>
-  <li>2209+00_Demo West_IMG_0144.JPG</li>
+  <li>2208+00_These Big Jobs - Spread I_IMG_0142.JPG</li>
+  <li>2208+00_These Big Jobs - Spread I_IMG_0143.JPG</li>
+  <li>2209+00_These Big Jobs - Spread I_IMG_0144.JPG</li>
   <li>9-9-26.kmz</li>
 </ul>
 </section>
@@ -900,7 +917,7 @@
   </g>
 
   <g class="mpo-name" font-family="IBM Plex Mono, monospace" font-size="14" fill="#161311" opacity=".72">
-    <text x="110" y="48">2208+00_Demo_West_IMG_0142.JPG</text>
+    <text x="110" y="48">2208+00_These Big Jobs - Spread I_IMG_0142.JPG</text>
   </g>
 
   <!-- ====== HIS LAYOUT: mini-map, bottom left, .005-.325 x .61-.985 =====
@@ -1026,19 +1043,22 @@
           font-size="14" font-weight="700" fill="#FFFFFF">118&#176;M</text>
   </g>
 
-  <!-- ====== HIS LAYOUT: caption, bottom right, .755-.995 x .813-.945 ===== -->
+  <!-- ====== HIS LAYOUT: caption, bottom right, .755-.995 x .813-.945 =====
+       Pulled out to the left from his .755 so the project name stays on the
+       station's line: the caption's wrap width is his to drag in the
+       program, and a spread name this long is what he would drag it for. -->
   <g class="mpo-cap">
-    <rect x="699" y="430" width="187" height="59" rx="7" fill="#12200F" opacity=".72"/>
-    <rect x="699" y="430" width="187" height="59" rx="7" fill="none" stroke="#8FD16A"
+    <rect x="646" y="430" width="240" height="59" rx="7" fill="#12200F" opacity=".72"/>
+    <rect x="646" y="430" width="240" height="59" rx="7" fill="none" stroke="#8FD16A"
           stroke-width="1.2" opacity=".55"/>
     <g font-family="IBM Plex Sans, sans-serif" font-size="11" fill="#8FD16A">
       <g class="mpo-c1">
-        <text x="709" y="447" font-size="13" font-weight="700">2208+00</text>
-        <text x="768" y="447" font-size="13" font-weight="700" fill="#FFFFFF">Demo_West</text>
+        <text x="656" y="447" font-size="13" font-weight="700">2208+00</text>
+        <text x="719" y="447" font-size="13" font-weight="700" fill="#FFFFFF">These Big Jobs - Spread I</text>
       </g>
-      <g class="mpo-c2"><text x="709" y="461">WETLAND_NORTH DEM-EX-GA-W07</text></g>
-      <g class="mpo-c3"><text x="709" y="474">40.371902  -97.028415 | 118&#176;M</text></g>
-      <g class="mpo-c4"><text x="709" y="486">2026-09-16</text></g>
+      <g class="mpo-c2"><text x="656" y="461">WETLAND_NORTH DEM-EX-GA-W07</text></g>
+      <g class="mpo-c3"><text x="656" y="474">40.371902  -97.028415 | 118&#176;M</text></g>
+      <g class="mpo-c4"><text x="656" y="486">2026-09-16</text></g>
     </g>
   </g>
 
@@ -1046,12 +1066,12 @@
   <g font-family="IBM Plex Mono, monospace" font-size="13">
     <g class="mpo-f1">
       <rect x="110" y="528" width="14" height="14" fill="#637F08"/>
-      <text x="132" y="540" fill="#161311">2208+00_Demo_West_IMG_0142.JPG</text>
-      <text x="486" y="540" fill="#161311" opacity=".6">untouched</text>
+      <text x="132" y="540" fill="#161311">2208+00_These Big Jobs - Spread I_IMG_0142.JPG</text>
+      <text x="584" y="540" fill="#161311" opacity=".6">untouched</text>
     </g>
     <g class="mpo-f2">
       <rect x="110" y="552" width="14" height="14" fill="#2757B6"/>
-      <text x="132" y="564" fill="#161311">Overlays\2208+00_Demo_West_IMG_0142.JPG</text>
+      <text x="132" y="564" fill="#161311">Overlays\2208+00_These Big Jobs - Spread I_IMG_0142.JPG</text>
     </g>
   </g>
 
@@ -1065,6 +1085,564 @@
 </ol>
 </section>
 <!-- ================= END MARCO POLOCATOR STORYBOOK ================= -->
+      </div>
+
+      <div class="tabshow-panel" role="tabpanel" id="tp-plane" aria-labelledby="tb-plane" hidden>
+<!-- ================= BEGIN PAPER AIRPLANE STORYBOOK ================= -->
+<section class="pap-scope" aria-label="How Paper Airplane turns a drone clip into the flight it flew, and a paused frame into marks on the map">
+<style>
+/* ============================================================
+   Paper Airplane (the program's FlyPaper tab until 2026-09-26).
+   Chris's brief: the inspector throws the camera up in the air
+   and it becomes a drone that is taking video.
+
+   What it then shows is what the tab does, from REDLINE-PLAN.md
+   and ecd_video: the clip carries where the aircraft was, so the
+   flight comes out as a track on the map; pause, pick the class
+   first (a silt fence is a line), click along it on the frame,
+   and each click becomes a place on the ground. What leaves is
+   <clip>_flight.kml and Redline_<spread>.kmz. The clip name,
+   timecodes and stations are illustrative.
+
+   One 20s loop, cps-style: the side-on right-of-way tilts over
+   into the map. Timeline classes are pap-a-*; the rotors, the
+   props and the REC light run on clocks of their own. Every
+   stagger is in the keyframe percentages, never animation-delay.
+   ============================================================ */
+.pap-scope{
+  --pap-ink:#161311; --pap-ground:#F5F1E8; --pap-red-t:#AC040C;
+  --pap-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --pap-dur:20s;
+  margin:0; overflow:hidden;
+}
+.pap-stagewrap{position:relative;width:100%;border-radius:3px;overflow:hidden;background:var(--pap-ground);}
+.pap-svg{display:block;width:100%;height:auto;}
+
+.pap-stage{animation:pap-stage var(--pap-dur) linear infinite both;}
+@keyframes pap-stage{0%{opacity:0}2%,95%{opacity:1}99.5%,100%{opacity:0}}
+
+.pap-scope [class*="pap-a-"]{
+  animation-duration:var(--pap-dur);
+  animation-iteration-count:infinite;
+  animation-fill-mode:both;
+  animation-timing-function:cubic-bezier(.32,.72,.28,1);
+  transform-box:view-box; transform-origin:0 0;
+}
+/* the ones that must keep an even pace: a thrown arc, a flight, a pointer
+   dragging a line, lights coming on */
+.pap-scope .pap-a-toss,.pap-scope .pap-a-drone2,.pap-scope .pap-a-track,
+.pap-scope .pap-a-cur,.pap-scope .pap-a-seg,.pap-scope .pap-a-side,
+.pap-scope .pap-a-map,.pap-scope .pap-steps li{animation-timing-function:linear;}
+
+/* ---- BEAT 1: on the right-of-way. He winds up and throws it. ---- */
+.pap-a-fig{animation-name:pap-a-fig;}
+@keyframes pap-a-fig{
+  0%,1.5%{opacity:0;transform:translateY(80px)}
+  5%,26% {opacity:1;transform:none}
+  30%,100%{opacity:0;transform:translateY(10px)}
+}
+.pap-a-dip{animation-name:pap-a-dip;}
+@keyframes pap-a-dip{0%,6%{transform:none}9%{transform:translateY(6px)}11%{transform:translateY(-4px)}12%,100%{transform:none}}
+/* down at his side, a swing in across him, then up and over to let go at
+   12% with the hand straight above his shoulder, and left pointing at it */
+.pap-a-arm{animation-name:pap-a-arm;}
+@keyframes pap-a-arm{
+  0%,6%   {transform:rotate(0deg)}
+  9%      {transform:rotate(24deg)}
+  12%     {transform:rotate(-150deg)}
+  13.5%   {transform:rotate(-168deg)}
+  17%,100%{transform:rotate(-150deg)}
+}
+.pap-a-held{animation-name:pap-a-held;}
+@keyframes pap-a-held{0%,11.9%{opacity:1}12%,100%{opacity:0}}
+.pap-a-eyes{animation-name:pap-a-eyes;}
+@keyframes pap-a-eyes{0%,11%{transform:none}14%,100%{transform:translate(1.5px,-3px)}}
+
+/* the camera in the air: picked up at the hand at the moment of release -
+   same place, same turn - and tumbling up a parabola to the top of it */
+.pap-a-toss{opacity:0;animation-name:pap-a-toss;}
+@keyframes pap-a-toss{
+  0%,11.9%{opacity:0;transform:translate(360.9px,332.2px) rotate(-150deg) scale(1.05)}
+  12%   {opacity:1;transform:translate(360.9px,332.2px) rotate(-150deg) scale(1.05)}
+  14%   {opacity:1;transform:translate(418.3px,243.6px) rotate(-292.5deg) scale(1.05)}
+  16%   {opacity:1;transform:translate(475.5px,180.5px) rotate(-435deg) scale(1.05)}
+  18%   {opacity:1;transform:translate(532.8px,142.6px) rotate(-577.5deg) scale(1.05)}
+  20%   {opacity:1;transform:translate(590px,130px) rotate(-720deg) scale(1.05)}
+  23.5% {opacity:1;transform:translate(590px,122px) rotate(-720deg) scale(1.05)}
+  27%   {opacity:1;transform:translate(598px,126px) rotate(-720deg) scale(1.05)}
+  31%,100%{opacity:0;transform:translate(720px,20px) rotate(-720deg) scale(.4)}
+}
+/* ...and at the top, it is a drone */
+.pap-a-unfold{opacity:0;animation-name:pap-a-unfold;}
+@keyframes pap-a-unfold{
+  0%,20%  {opacity:0;transform:scale(.05,.4)}
+  21.5%   {opacity:1;transform:scale(1.15,1.05)}
+  23%,100%{opacity:1;transform:none}
+}
+.pap-a-pop{opacity:0;animation-name:pap-a-pop;}
+@keyframes pap-a-pop{0%,19.8%{opacity:0;transform:scale(.2)}20.6%{opacity:1;transform:scale(1)}23%,100%{opacity:0;transform:scale(2.2)}}
+.pap-a-recon{opacity:0;animation-name:pap-a-recon;}
+@keyframes pap-a-recon{0%,22.5%{opacity:0}23.5%,100%{opacity:1}}
+.pap-a-cone{opacity:0;animation-name:pap-a-cone;}
+@keyframes pap-a-cone{0%,23%{opacity:0}25%,26.5%{opacity:1}28.5%,100%{opacity:0}}
+
+/* rotors, the REC light and the props keep their own time */
+.pap-flutter{animation:pap-flutter .14s linear infinite;transform-box:fill-box;transform-origin:center;}
+@keyframes pap-flutter{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.12)}}
+.pap-prop{animation:pap-spin .28s linear infinite;transform-box:fill-box;transform-origin:center;}
+@keyframes pap-spin{to{transform:rotate(360deg)}}
+.pap-blink{animation:pap-blink 1s steps(1,end) infinite;}
+@keyframes pap-blink{0%{opacity:1}50%{opacity:.15}}
+
+/* ---- BEAT 2: the world tilts over into the map ---- */
+.pap-a-world{animation-name:pap-a-world;}
+@keyframes pap-a-world{
+  0%,27%  {transform:none}
+  30.5%   {transform:translate(0px,26px) scale(1.02,.44)}
+  34%,100%{transform:none}
+}
+.pap-a-side{animation-name:pap-a-side;}
+@keyframes pap-a-side{0%,27.5%{opacity:1}31.5%,100%{opacity:0}}
+.pap-a-map{opacity:0;animation-name:pap-a-map;}
+@keyframes pap-a-map{0%,29.5%{opacity:0}33.5%,100%{opacity:1}}
+
+/* the drone flies the line; the track is drawn behind it at the same pace -
+   the keyframes are equal steps of arc length along the very path drawn */
+.pap-a-drone2{opacity:0;animation-name:pap-a-drone2;}
+@keyframes pap-a-drone2{
+  0%,33%{opacity:0;transform:translate(63.1px,452.5px) scale(1.6)}
+  34%   {opacity:1;transform:translate(63.1px,452.5px) scale(1)}
+  35.8% {opacity:1;transform:translate(108.5px,445.6px) scale(1)}
+  37.7% {opacity:1;transform:translate(153.6px,437.2px) scale(1)}
+  39.5% {opacity:1;transform:translate(198.3px,427.4px) scale(1)}
+  41.3% {opacity:1;transform:translate(242.7px,416.6px) scale(1)}
+  43.2% {opacity:1;transform:translate(286.7px,404.8px) scale(1)}
+  45%   {opacity:1;transform:translate(330.4px,392.3px) scale(1)}
+  46.8% {opacity:1;transform:translate(373.9px,379.3px) scale(1)}
+  48.7% {opacity:1;transform:translate(417.2px,365.9px) scale(1)}
+  50.5% {opacity:1;transform:translate(460.1px,352.8px) scale(1)}
+  52.3% {opacity:1;transform:translate(503.1px,340.7px) scale(1)}
+  54.2% {opacity:1;transform:translate(546.3px,329.5px) scale(1)}
+  56%,100%{opacity:1;transform:translate(589.8px,319.2px) scale(1)}
+}
+.pap-a-track{stroke-dasharray:100;stroke-dashoffset:100;fill:none;animation-name:pap-a-track;}
+@keyframes pap-a-track{0%,34%{stroke-dashoffset:100}56%,100%{stroke-dashoffset:0}}
+
+.pap-a-hud{opacity:0;animation-name:pap-a-hud;}
+@keyframes pap-a-hud{0%,33%{opacity:0}35%,100%{opacity:1}}
+.pap-a-tc1{opacity:0;animation-name:pap-a-tc1;}@keyframes pap-a-tc1{0%,33.9%{opacity:0}34%,39.4%{opacity:1}39.5%,100%{opacity:0}}
+.pap-a-tc2{opacity:0;animation-name:pap-a-tc2;}@keyframes pap-a-tc2{0%,39.4%{opacity:0}39.5%,44.9%{opacity:1}45%,100%{opacity:0}}
+.pap-a-tc3{opacity:0;animation-name:pap-a-tc3;}@keyframes pap-a-tc3{0%,44.9%{opacity:0}45%,50.4%{opacity:1}50.5%,100%{opacity:0}}
+.pap-a-tc4{opacity:0;animation-name:pap-a-tc4;}@keyframes pap-a-tc4{0%,50.4%{opacity:0}50.5%,55.9%{opacity:1}56%,100%{opacity:0}}
+.pap-a-hudrec{animation-name:pap-a-hudrec;}@keyframes pap-a-hudrec{0%,55.9%{opacity:1}56%,100%{opacity:0}}
+.pap-a-hudpau{opacity:0;animation-name:pap-a-hudpau;}@keyframes pap-a-hudpau{0%,55.9%{opacity:0}56%,100%{opacity:1}}
+
+/* ---- BEAT 3: paused. The frame comes out of the footprint it shows. ---- */
+.pap-a-panel{opacity:0;animation-name:pap-a-panel;}
+@keyframes pap-a-panel{
+  0%,57%  {opacity:0;transform:scale(.18)}
+  61%     {opacity:1;transform:scale(1.02)}
+  62.5%,100%{opacity:1;transform:none}
+}
+/* pick the thing, then draw it */
+.pap-a-pick{opacity:0;animation-name:pap-a-pick;}
+@keyframes pap-a-pick{0%,62.8%{opacity:0}63.6%,100%{opacity:1}}
+.pap-a-cur{opacity:0;animation-name:pap-a-cur;}
+@keyframes pap-a-cur{
+  0%,60.5%{opacity:0;transform:translate(150px,250px)}
+  61.5%   {opacity:1;transform:translate(150px,250px)}
+  63%,64% {opacity:1;transform:translate(70px,312px)}
+  66%     {opacity:1;transform:translate(390.5px,259.1px)}
+  68.5%   {opacity:1;transform:translate(367.9px,214.5px)}
+  71%     {opacity:1;transform:translate(345.4px,169.8px)}
+  73.5%,75%{opacity:1;transform:translate(322.8px,125.2px)}
+  77%,100%{opacity:0;transform:translate(322.8px,125.2px)}
+}
+.pap-a-ring{opacity:0;animation-name:pap-a-ring;}
+@keyframes pap-a-ring{0%,62.8%{opacity:0;transform:scale(.2)}63.4%{opacity:.9;transform:scale(1)}65.5%,100%{opacity:0;transform:scale(1.9)}}
+/* each click puts a vertex down, and the line follows the pointer to the next */
+.pap-a-v1{opacity:0;animation-name:pap-a-v1;}@keyframes pap-a-v1{0%,66%{opacity:0}66.6%,100%{opacity:1}}
+.pap-a-v2{opacity:0;animation-name:pap-a-v2;}@keyframes pap-a-v2{0%,68.5%{opacity:0}69.1%,100%{opacity:1}}
+.pap-a-v3{opacity:0;animation-name:pap-a-v3;}@keyframes pap-a-v3{0%,71%{opacity:0}71.6%,100%{opacity:1}}
+.pap-a-v4{opacity:0;animation-name:pap-a-v4;}@keyframes pap-a-v4{0%,73.5%{opacity:0}74.1%,100%{opacity:1}}
+.pap-a-seg{stroke-dasharray:100;stroke-dashoffset:100;fill:none;}
+.pap-a-s1{animation-name:pap-a-s1;}@keyframes pap-a-s1{0%,66%{stroke-dashoffset:100}68.5%,100%{stroke-dashoffset:0}}
+.pap-a-s2{animation-name:pap-a-s2;}@keyframes pap-a-s2{0%,68.5%{stroke-dashoffset:100}71%,100%{stroke-dashoffset:0}}
+.pap-a-s3{animation-name:pap-a-s3;}@keyframes pap-a-s3{0%,71%{stroke-dashoffset:100}73.5%,100%{stroke-dashoffset:0}}
+
+/* ...and lands on the ground, on the fence it was drawn on */
+.pap-a-mapline{stroke-dasharray:100;stroke-dashoffset:100;fill:none;animation-name:pap-a-mapline;
+  animation-timing-function:cubic-bezier(.4,0,.2,1);}
+@keyframes pap-a-mapline{0%,75%{stroke-dashoffset:100}79.5%,100%{stroke-dashoffset:0}}
+.pap-a-mapv{opacity:0;animation-name:pap-a-mapv;}
+@keyframes pap-a-mapv{0%,78.5%{opacity:0}80%,100%{opacity:1}}
+.pap-a-maplab{opacity:0;animation-name:pap-a-maplab;}
+@keyframes pap-a-maplab{0%,79.5%{opacity:0;transform:translateY(6px)}82%,100%{opacity:1;transform:none}}
+
+/* ---- BEAT 4: what is on disk afterwards ---- */
+.pap-a-f1{opacity:0;animation-name:pap-a-f1;}
+@keyframes pap-a-f1{0%,84%{opacity:0;transform:translateY(14px)}88%,100%{opacity:1;transform:none}}
+.pap-a-f2{opacity:0;animation-name:pap-a-f2;}
+@keyframes pap-a-f2{0%,86.5%{opacity:0;transform:translateY(14px)}90.5%,100%{opacity:1;transform:none}}
+
+/* ---- captions under the stage ---- */
+.pap-steps{display:flex;gap:.5rem 1.6rem;flex-wrap:wrap;list-style:none;margin:.9rem 0 0;padding:0;
+  font-family:var(--pap-mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;
+  color:rgba(22,19,17,.62);}
+.pap-steps li{display:flex;align-items:baseline;gap:.45rem;opacity:.34;}
+.pap-steps b{font-weight:400;color:var(--pap-red-t);}
+.pap-a-st1{animation-name:pap-a-st1}@keyframes pap-a-st1{0%,54%{opacity:1}57%,100%{opacity:.34}}
+.pap-a-st2{animation-name:pap-a-st2}@keyframes pap-a-st2{0%,54%{opacity:.34}57%,80%{opacity:1}83%,100%{opacity:.34}}
+.pap-a-st3{animation-name:pap-a-st3}@keyframes pap-a-st3{0%,80%{opacity:.34}83%,96%{opacity:1}100%{opacity:.34}}
+@media (max-width:40rem){ .pap-steps{font-size:10px;gap:.35rem .9rem;} }
+
+/* ---- reduced motion: the finished picture. The drone paused over the
+       fence, the frame open with the line drawn on it, the same line on the
+       map, and the two files. Nobody throwing anything. ---- */
+@media (prefers-reduced-motion:reduce){
+  .pap-scope *{animation:none !important;transition:none !important;}
+  .pap-stage{opacity:1;}
+  .pap-scope .pap-a-world{transform:none;}
+  .pap-scope .pap-a-side,.pap-scope .pap-a-fig,.pap-scope .pap-a-toss,.pap-scope .pap-a-pop,
+  .pap-scope .pap-a-cur,.pap-scope .pap-a-ring,.pap-scope .pap-a-hudrec,
+  .pap-scope .pap-a-tc1,.pap-scope .pap-a-tc2,.pap-scope .pap-a-tc3,.pap-scope .pap-a-tc4{opacity:0;}
+  .pap-scope .pap-a-map,.pap-scope .pap-a-hud,.pap-scope .pap-a-hudpau,.pap-scope .pap-a-pick,
+  .pap-scope .pap-a-v1,.pap-scope .pap-a-v2,.pap-scope .pap-a-v3,.pap-scope .pap-a-v4,
+  .pap-scope .pap-a-mapv,.pap-scope .pap-a-maplab,.pap-scope .pap-a-panel,
+  .pap-scope .pap-a-f1,.pap-scope .pap-a-f2{opacity:1;transform:none;}
+  .pap-scope .pap-a-drone2{opacity:1;transform:translate(589.8px,319.2px);}
+  .pap-scope .pap-a-track,.pap-scope .pap-a-seg,.pap-scope .pap-a-mapline{stroke-dashoffset:0;}
+  .pap-scope .pap-steps li{opacity:1;}
+}
+
+/* ---- parked by site.js while scrolled off screen ---- */
+.pap-scope.is-parked *{animation-play-state:paused !important;}
+</style>
+
+<div class="pap-stagewrap">
+<svg class="pap-svg" viewBox="0 0 1000 580" preserveAspectRatio="xMidYMid meet" role="img"
+     aria-labelledby="pap-t pap-d" focusable="false">
+<title id="pap-t">The inspector throws the camera up and it flies the right-of-way as a drone</title>
+<desc id="pap-d">An inspector in a hi-vis vest on a pipeline right-of-way winds up and throws his camera into the air. At the top of the throw it unfolds into a drone and starts recording. The view tilts over into a map: the drone flies along the right-of-way and its flight is drawn on the map behind it, with the patch of ground its camera sees shown ahead of it. The video pauses over a silt fence beside a wetland, and the paused frame opens as a window. Silt fence is picked from the class list, and a pointer clicks four points along the fence in the frame, drawing a red line; the same line then appears on the map along the fence. Two files are written: the flight as a KML named after the clip, and a redline KMZ named after the spread, These Big Jobs - Spread I.</desc>
+
+<defs>
+  <clipPath id="pap-frameclip"><rect x="40" y="58" width="384" height="216"/></clipPath>
+</defs>
+
+<rect x="0" y="0" width="1000" height="580" fill="#F5F1E8"/>
+
+<g class="pap-stage">
+
+  <!-- ============ THE WORLD: side-on, then tilted over to the map ============ -->
+  <g class="pap-a-world" style="transform-origin:500px 290px">
+
+    <!-- ---------- BEAT 1 : side-on, on the right-of-way ---------- -->
+    <g class="pap-a-side">
+      <path d="M-10 -10 H1010 V246 C820 253 640 240 480 249 C320 258 150 243 -10 251 Z" fill="#B4CEF4"/>
+      <circle cx="858" cy="74" r="22" fill="#F4E4C4"/>
+      <path d="M118 78 c14-23 47-25 61-6 c23-15 53 1 53 21 c0 16-16 24-35 24 h-65 c-21 0-31-23-14-39z" fill="#F7F2E6" transform="rotate(-1.4 175 89)"/>
+      <path d="M700 196 c11-18 37-20 48-5 c18-12 42 1 42 17 c0 13-13 19-28 19 h-51 c-16 0-25-18-11-31z" fill="#F7F2E6" opacity=".85"/>
+      <!-- far treeline -->
+      <path d="M-10 254 L-10 220 Q30 178 70 220 Q112 172 155 220 Q196 182 240 220 Q282 170 325 220 Q368 184 410 220 Q452 174 495 220 Q538 180 580 220 Q622 172 665 220 Q708 184 750 220 Q792 176 835 220 Q878 182 920 220 Q962 174 1010 221 L1010 254 Z" fill="#4B6006"/>
+      <!-- near treeline -->
+      <path d="M-10 266 L-10 233 Q22 201 58 233 Q96 197 134 233 Q172 203 210 233 Q248 199 286 233 Q324 205 362 233 Q400 197 438 233 Q476 205 514 233 Q552 199 590 233 Q628 203 666 233 Q704 197 742 233 Q780 205 818 233 Q856 199 894 233 Q932 203 970 233 Q996 205 1010 231 L1010 266 Z" fill="#637F08"/>
+      <!-- grass shoulder, spoil windrow, graded corridor, open trench -->
+      <path d="M-10 258 H1010 V300 C820 293 600 307 400 299 C240 293 90 303 -10 297 Z" fill="#6E8C1A"/>
+      <path d="M-10 302 L20 288 L44 297 L70 282 L98 293 L124 280 L152 291 L182 277 L210 289 L238 275 L268 287 L296 274 L326 286 L356 273 L386 285 L416 272 L448 284 L478 271 L508 283 L538 272 L568 282 L598 270 L630 282 L660 269 L690 281 L720 270 L752 280 L782 268 L812 280 L842 269 L872 279 L904 267 L934 278 L966 268 L1010 277 L1010 344 L-10 348 Z" fill="#8F7B59"/>
+      <path d="M-10 340 C200 332 420 346 640 336 C800 329 920 340 1010 334 L1010 524 C760 530 480 518 220 526 L-10 522 Z" fill="#CFBC99"/>
+      <path d="M-10 364 C220 358 460 372 700 360 C830 353 940 362 1010 356 L1010 406 C880 412 700 402 520 410 C340 418 150 406 -10 412 Z" fill="#AF9F82"/>
+      <path d="M-10 373 C220 367 460 381 700 369 C830 362 940 371 1010 365 L1010 397 C880 403 700 393 520 401 C340 409 150 397 -10 403 Z" fill="#5B5142"/>
+      <path d="M-10 381 C220 375 460 389 700 377 C830 370 940 379 1010 373 L1010 397 C880 403 700 393 520 401 C340 409 150 397 -10 403 Z" fill="#2A2320"/>
+      <path d="M-10 299 H1010" fill="none" stroke="#161311" stroke-width="5" opacity=".10"/>
+      <path d="M-10 337 C200 329 420 343 640 333 C800 326 920 337 1010 331" fill="none" stroke="#161311" stroke-width="5" opacity=".11"/>
+      <!-- near grass, and the wetland in front of it -->
+      <path d="M-10 512 L26 505 L58 514 L92 504 L128 513 L164 503 L198 512 L236 502 L270 511 L306 501 L342 510 L378 500 L414 509 L452 499 L488 508 L524 498 L560 507 L598 498 L634 506 L670 497 L706 505 L742 496 L778 504 L814 495 L850 503 L886 494 L922 502 L958 493 L1010 500 L1010 590 L-10 590 Z" fill="#6E8C1A"/>
+      <path d="M640 590 C650 548 720 530 800 532 C880 534 960 526 1010 536 L1010 590 Z" fill="#8FB2E8"/>
+      <path d="M700 556 h40 M770 548 h46 M850 560 h40 M920 550 h46 M740 574 h40 M830 578 h44" fill="none" stroke="#2757B6" stroke-width="2.4" opacity=".5"/>
+      <path d="M652 552 l-3-18 M660 548 l1-20 M668 550 l4-16 M990 534 l-2-18 M998 532 l3-16" fill="none" stroke="#4B6006" stroke-width="2.6" stroke-linecap="round"/>
+      <!-- the silt fence along the near edge, between the work and the wetland:
+           black fabric sagging between wooden stakes -->
+      <path d="M552 468 L560 468 Q587.5 478 615 468 Q642.5 478 670 468 Q697.5 478 725 468 Q752.5 478 780 468 Q807.5 478 835 468 Q862.5 478 890 468 Q917.5 478 945 468 Q972.5 478 1000 468 L1010 468 L1010 502 L552 504 Z" fill="#242020"/>
+      <path d="M552 504 L1010 502" fill="none" stroke="#161311" stroke-width="3"/>
+      <g fill="#87724E" stroke="#161311" stroke-width="1.2">
+        <rect x="556.5" y="458" width="7" height="50"/><rect x="611.5" y="458" width="7" height="50"/>
+        <rect x="666.5" y="458" width="7" height="50"/><rect x="721.5" y="458" width="7" height="50"/>
+        <rect x="776.5" y="458" width="7" height="50"/><rect x="831.5" y="458" width="7" height="50"/>
+        <rect x="886.5" y="458" width="7" height="50"/><rect x="941.5" y="458" width="7" height="50"/>
+        <rect x="996.5" y="458" width="7" height="50"/>
+      </g>
+    </g>
+
+    <!-- ---------- BEAT 2 : the map ---------- -->
+    <g class="pap-a-map">
+      <rect x="-150" y="0" width="1300" height="580" fill="#7F9A24"/>
+      <path d="M-150 300 C100 332 300 300 520 331 C760 364 950 330 1150 357 L1150 580 L-150 580 Z" fill="#8CA637"/>
+      <path d="M628 14 L992 26 L978 148 L668 158 L640 96 Z" fill="#93AD42"/>
+      <path d="M286 466 L566 480 L552 584 L292 578 L276 520 Z" fill="#8FA93C"/>
+      <g fill="#161311" opacity=".14" transform="translate(5,7)">
+        <path d="M-40 58 C40 22 152 30 212 66 C268 100 250 174 178 192 C110 210 20 190 -22 150 C-54 118 -60 76 -40 58 Z"/>
+        <path d="M40 470 C112 446 192 466 212 508 C230 548 180 592 100 598 C28 602 -32 578 -32 530 C-32 494 0 482 40 470 Z"/>
+      </g>
+      <path d="M-40 58 C40 22 152 30 212 66 C268 100 250 174 178 192 C110 210 20 190 -22 150 C-54 118 -60 76 -40 58 Z" fill="#4B6006"/>
+      <path d="M40 470 C112 446 192 466 212 508 C230 548 180 592 100 598 C28 602 -32 578 -32 530 C-32 494 0 482 40 470 Z" fill="#4B6006"/>
+      <path d="M268 88 a9 9 0 1 0 .1 0z M320 140 a7 7 0 1 0 .1 0z M382 60 a7 7 0 1 0 .1 0z M470 96 a9 9 0 1 0 .1 0z M556 62 a7 7 0 1 0 .1 0z M760 190 a8 8 0 1 0 .1 0z M232 470 a7 7 0 1 0 .1 0z M636 492 a7 7 0 1 0 .1 0z M886 492 a8 8 0 1 0 .1 0z M960 470 a7 7 0 1 0 .1 0z" fill="#4B6006" opacity=".8"/>
+
+      <!-- the wetland the fence is there for -->
+      <path d="M612 392 C640 368 720 356 800 346 C860 338 910 330 936 344 C962 360 944 410 890 424 C820 442 700 450 640 436 C606 428 596 408 612 392 Z" fill="#8FB2E8"/>
+      <path d="M660 400 h34 M712 390 h34 M764 382 h34 M816 374 h30 M688 420 h34 M740 414 h34 M792 408 h34 M860 396 h30" fill="none" stroke="#2757B6" stroke-width="2.4" opacity=".55"/>
+      <path d="M612 392 C640 368 720 356 800 346 C860 338 910 330 936 344 C962 360 944 410 890 424 C820 442 700 450 640 436 C606 428 596 408 612 392 Z" fill="none" stroke="#2757B6" stroke-width="2.4"/>
+      <text x="880" y="410" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1.98" fill="#2757B6" text-anchor="middle">WETLAND</text>
+
+      <!-- the right-of-way: a dark casing under the cleared band gives it edges
+           that sit exactly half a band from the line -->
+      <path d="M-40 440 C120 432 260 392 420 342 S740 262 1040 226" fill="none" stroke="#161311" stroke-width="131" opacity=".7"/>
+      <path d="M-40 440 C120 432 260 392 420 342 S740 262 1040 226" fill="none" stroke="#CFBC99" stroke-width="126"/>
+      <path d="M-40 440 C120 432 260 392 420 342 S740 262 1040 226" fill="none" stroke="#B9A98D" stroke-width="30"/>
+      <path d="M-40 440 C120 432 260 392 420 342 S740 262 1040 226" fill="none" stroke="#BB0A10" stroke-width="2.4"/>
+
+      <!-- stationing -->
+      <g stroke="#161311" stroke-width="2.4">
+        <path d="M147.6 402.7 L152.7 428.1"/><path d="M386.4 338.8 L394.1 363.7"/>
+        <path d="M627.4 275.3 L632.7 300.8"/><path d="M868.3 235 L871.9 260.7"/>
+      </g>
+      <g font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing=".66" fill="#242020" text-anchor="middle">
+        <text x="144.2" y="386">2207+00</text><text x="381.4" y="322.6">2208+00</text>
+        <text x="624" y="258.7">2209+00</text><text x="865.9" y="218.2">2210+00</text>
+      </g>
+
+      <!-- the silt fence on the ground, along the south edge -->
+      <path d="M536.1 375.4 L563.5 368.5 L591.1 362 L618.7 355.8 L646.5 350 L674.4 344.5 L702.5 339.2 L730.6 334.2 L758.9 329.4 L787.2 324.9 L815.6 320.5 L844.1 316.2 L872.6 312.1 L901.2 308.2 L929.9 304.3 L958.5 300.6" fill="none" stroke="#161311" stroke-width="3"/>
+      <path d="M536.1 375.4 a2.6 2.6 0 1 0 .1 0z M558.9 369.6 a2.6 2.6 0 1 0 .1 0z M581.9 364.1 a2.6 2.6 0 1 0 .1 0z M604.9 358.9 a2.6 2.6 0 1 0 .1 0z M628 353.9 a2.6 2.6 0 1 0 .1 0z M651.2 349.1 a2.6 2.6 0 1 0 .1 0z M674.4 344.5 a2.6 2.6 0 1 0 .1 0z M697.8 340.1 a2.6 2.6 0 1 0 .1 0z M721.2 335.9 a2.6 2.6 0 1 0 .1 0z M744.7 331.8 a2.6 2.6 0 1 0 .1 0z M768.3 327.9 a2.6 2.6 0 1 0 .1 0z M791.9 324.1 a2.6 2.6 0 1 0 .1 0z M815.6 320.5 a2.6 2.6 0 1 0 .1 0z M839.3 316.9 a2.6 2.6 0 1 0 .1 0z M863.1 313.5 a2.6 2.6 0 1 0 .1 0z M886.9 310.1 a2.6 2.6 0 1 0 .1 0z M910.8 306.9 a2.6 2.6 0 1 0 .1 0z M934.6 303.7 a2.6 2.6 0 1 0 .1 0z M958.5 300.6 a2.6 2.6 0 1 0 .1 0z" fill="#87724E" stroke="#161311" stroke-width="1.2"/>
+
+      <!-- the flight, as the clip recorded it -->
+      <path class="pap-a-track" pathLength="100" stroke="#161311" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" opacity=".35"
+            d="M63.1 452.5 L76.7 450.6 L90.3 448.5 L103.9 446.3 L117.5 444 L131.1 441.5 L144.6 439 L158 436.2 L171.5 433.4 L184.9 430.5 L198.3 427.4 L211.6 424.3 L224.9 421 L238.2 417.7 L251.5 414.3 L264.7 410.8 L277.9 407.2 L291.1 403.5 L304.2 399.8 L317.3 396.1 L330.4 392.3 L343.5 388.4 L356.5 384.5 L369.6 380.6 L382.6 376.6 L395.6 372.6 L408.6 368.6 L421.5 364.6 L434.4 360.6 L447.2 356.7 L460.1 352.8 L473 349.1 L485.8 345.4 L498.8 341.8 L511.7 338.4 L524.7 335 L537.7 331.6 L550.7 328.4 L563.7 325.3 L576.8 322.2 L589.8 319.2"/>
+      <path class="pap-a-track" pathLength="100" stroke="#F7F2E6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"
+            d="M63.1 452.5 L76.7 450.6 L90.3 448.5 L103.9 446.3 L117.5 444 L131.1 441.5 L144.6 439 L158 436.2 L171.5 433.4 L184.9 430.5 L198.3 427.4 L211.6 424.3 L224.9 421 L238.2 417.7 L251.5 414.3 L264.7 410.8 L277.9 407.2 L291.1 403.5 L304.2 399.8 L317.3 396.1 L330.4 392.3 L343.5 388.4 L356.5 384.5 L369.6 380.6 L382.6 376.6 L395.6 372.6 L408.6 368.6 L421.5 364.6 L434.4 360.6 L447.2 356.7 L460.1 352.8 L473 349.1 L485.8 345.4 L498.8 341.8 L511.7 338.4 L524.7 335 L537.7 331.6 L550.7 328.4 L563.7 325.3 L576.8 322.2 L589.8 319.2"/>
+    </g>
+  </g>
+
+  <!-- ============ THE INSPECTOR ============ -->
+  <g class="pap-a-fig">
+    <g transform="translate(300,510) scale(1.05)">
+      <g class="pap-a-dip">
+        <ellipse cx="6" cy="2" rx="38" ry="9" fill="#161311" opacity=".16"/>
+        <!-- boots -->
+        <path d="M-24 -12 L-4 -12 L-4 -1 L-31 0 Z" fill="#161311"/>
+        <path d="M6 -12 L26 -12 L33 0 L6 -1 Z" fill="#161311"/>
+        <!-- trousers -->
+        <path d="M-23 -70 L23 -71 L28 -10 L5 -10 L1 -44 L-4 -10 L-26 -10 Z" fill="#242020"/>
+        <!-- left arm, at his side -->
+        <path d="M-26 -128 L-41 -124 L-35 -84 L-24 -87 Z" fill="#5083E2"/>
+        <circle cx="-33" cy="-83" r="6.5" fill="#E8C79A"/>
+        <!-- hi-vis vest -->
+        <path d="M-27 -133 L27 -134 L33 -63 L-31 -62 Z" fill="#F0A53A"/>
+        <path d="M-28 -110 L29 -111 L30 -101 L-28 -100 Z" fill="#F2ECDF" opacity=".92"/>
+        <path d="M-29 -92 L31 -93 L32 -83 L-29 -82 Z" fill="#F2ECDF" opacity=".92"/>
+        <path d="M-3 -134 L4 -134 L5 -63 L-4 -63 Z" fill="#D08A22"/>
+        <!-- head, watching it go -->
+        <circle cx="0" cy="-151" r="18" fill="#E8C79A"/>
+        <g class="pap-a-eyes">
+          <circle cx="-6" cy="-154" r="2.3" fill="#161311"/>
+          <circle cx="6" cy="-154" r="2.3" fill="#161311"/>
+        </g>
+        <path d="M-7 -144 q7 6 14 0" fill="none" stroke="#161311" stroke-width="2.2" stroke-linecap="round"/>
+        <!-- hard hat -->
+        <path d="M-23 -160 a23 21 0 0 1 46 0 Z" fill="#F0A53A"/>
+        <path d="M-32 -161 L31 -163 L32 -154 L-32 -152 Z" fill="#F0A53A"/>
+        <path d="M-3 -180 L4 -180 L4 -160 L-3 -160 Z" fill="#D08A22"/>
+        <!-- throwing arm, turning at the shoulder, with the camera in hand -->
+        <g class="pap-a-arm" style="transform-origin:33px -126px">
+          <path d="M26 -128 L41 -124 L35 -84 L24 -87 Z" fill="#5083E2"/>
+          <g class="pap-a-held" transform="translate(33,-76)">
+            <rect x="-19" y="-13" width="38" height="26" rx="4" fill="#242020"/>
+            <rect x="-12" y="-17" width="10" height="5" rx="1" fill="#242020"/>
+            <circle cx="0" cy="0" r="8.5" fill="#161311"/>
+            <circle cx="0" cy="0" r="6" fill="#5083E2"/>
+            <circle cx="-2" cy="-2" r="1.8" fill="#CFE0F8"/>
+          </g>
+          <circle cx="33" cy="-83" r="6.5" fill="#E8C79A"/>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- ============ the camera in the air, and the drone it becomes ============ -->
+  <g class="pap-a-toss">
+    <!-- what it is filming, once it is filming -->
+    <path class="pap-a-cone" d="M0 10 L-40 330 L170 330 Z" fill="#F7F2E6" fill-opacity=".28"/>
+    <g class="pap-a-unfold" style="transform-origin:0px -24px">
+      <path d="M-16 -16 L-24 -2 M16 -16 L24 -2" fill="none" stroke="#161311" stroke-width="3.2" stroke-linecap="round"/>
+      <path d="M-26 -27 L-74 -33 M26 -27 L74 -33" fill="none" stroke="#161311" stroke-width="6" stroke-linecap="round"/>
+      <rect x="-79" y="-44" width="10" height="12" rx="2" fill="#242020"/>
+      <rect x="69" y="-44" width="10" height="12" rx="2" fill="#242020"/>
+      <path d="M-30 -18 L30 -18 L26 -36 L-26 -36 Z" fill="#242020"/>
+      <path d="M-24 -36 L24 -36 L18 -42 L-18 -42 Z" fill="#3A332E"/>
+      <path d="M-28 -29 L28 -29 L27 -25 L-29 -25 Z" fill="#F0A53A"/>
+      <rect x="-3" y="-19" width="6" height="7" fill="#161311"/>
+      <ellipse cx="-74" cy="-46" rx="30" ry="3.4" fill="#161311" opacity=".2"/>
+      <ellipse cx="74" cy="-46" rx="30" ry="3.4" fill="#161311" opacity=".2"/>
+      <path class="pap-flutter" d="M-102 -46 H-46" stroke="#161311" stroke-width="2.6" stroke-linecap="round"/>
+      <path class="pap-flutter" d="M46 -46 H102" stroke="#161311" stroke-width="2.6" stroke-linecap="round" style="animation-delay:-.05s"/>
+    </g>
+    <!-- the camera: the same one he threw, now the drone's -->
+    <rect x="-19" y="-13" width="38" height="26" rx="4" fill="#242020"/>
+    <rect x="-12" y="-17" width="10" height="5" rx="1" fill="#242020"/>
+    <circle cx="0" cy="0" r="8.5" fill="#161311"/>
+    <circle cx="0" cy="0" r="6" fill="#5083E2"/>
+    <circle cx="-2" cy="-2" r="1.8" fill="#CFE0F8"/>
+    <g class="pap-a-recon">
+      <circle class="pap-blink" cx="30" cy="4" r="4.5" fill="#BB0A10"/>
+      <text x="39" y="9" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="700" fill="#AC040C">REC</text>
+    </g>
+  </g>
+  <g class="pap-a-pop" style="transform-origin:590px 130px">
+    <g transform="translate(107,-190)">
+      <path d="M483 296 l7 17 l18-6 l-11 15 l17 9 l-19 3 l3 19 l-15-12 l-12 15 l-1-19 l-19 1 l14-12 l-14-13 l19 2 l-1-19 z" fill="#F7F2E6"/>
+    </g>
+  </g>
+
+  <!-- ============ the drone, from above, flying the line ============ -->
+  <g class="pap-a-drone2">
+    <g transform="rotate(-12.7)">
+      <!-- the ground its camera sees, ahead of it -->
+      <path d="M24 -40 L140 -82 L140 82 L24 40 Z" fill="#F7F2E6" fill-opacity=".22"
+            stroke="#F7F2E6" stroke-width="2" stroke-dasharray="7 5" stroke-opacity=".9"/>
+      <ellipse cx="14" cy="22" rx="30" ry="24" fill="#161311" opacity=".12"/>
+      <path d="M-22 -22 L22 22 M-22 22 L22 -22" stroke="#161311" stroke-width="5" stroke-linecap="round"/>
+      <g transform="translate(-22,-22)"><circle r="14" fill="#F2ECDF" fill-opacity=".45" stroke="#161311" stroke-width="1.4"/><path class="pap-prop" d="M-12 0 H12" stroke="#161311" stroke-width="2.4" stroke-linecap="round"/></g>
+      <g transform="translate(22,-22)"><circle r="14" fill="#F2ECDF" fill-opacity=".45" stroke="#161311" stroke-width="1.4"/><path class="pap-prop" d="M-12 0 H12" stroke="#161311" stroke-width="2.4" stroke-linecap="round" style="animation-delay:-.07s"/></g>
+      <g transform="translate(22,22)"><circle r="14" fill="#F2ECDF" fill-opacity=".45" stroke="#161311" stroke-width="1.4"/><path class="pap-prop" d="M-12 0 H12" stroke="#161311" stroke-width="2.4" stroke-linecap="round" style="animation-delay:-.14s"/></g>
+      <g transform="translate(-22,22)"><circle r="14" fill="#F2ECDF" fill-opacity=".45" stroke="#161311" stroke-width="1.4"/><path class="pap-prop" d="M-12 0 H12" stroke="#161311" stroke-width="2.4" stroke-linecap="round" style="animation-delay:-.21s"/></g>
+      <rect x="-12" y="-10" width="24" height="20" rx="5" fill="#242020"/>
+      <rect x="-12" y="-2" width="24" height="4" fill="#F0A53A"/>
+      <circle cx="13" cy="0" r="4" fill="#5083E2" stroke="#161311" stroke-width="1.4"/>
+    </g>
+  </g>
+
+  <!-- the line, landed on the ground -->
+  <path class="pap-a-mapline" pathLength="100" stroke="#BB0A10" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"
+        d="M637.1 351.9 L667.7 345.8 L698.5 339.9 L727.4 334.8"/>
+  <g class="pap-a-mapv" fill="#F2ECDF" stroke="#BB0A10" stroke-width="2.2">
+    <circle cx="637.1" cy="351.9" r="4.6"/><circle cx="667.7" cy="345.8" r="4.6"/>
+    <circle cx="698.5" cy="339.9" r="4.6"/><circle cx="727.4" cy="334.8" r="4.6"/>
+  </g>
+  <g class="pap-a-maplab">
+    <path d="M742 347 L834 344 L835 369 L743 372 Z" fill="#161311" opacity=".18" transform="translate(3,4)"/>
+    <path d="M742 347 L834 344 L835 369 L743 372 Z" fill="#F2ECDF" stroke="#161311" stroke-width="1.6"/>
+    <text x="789" y="363" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="#161311">Silt fence</text>
+  </g>
+
+  <!-- the clip's clock, recording and then paused -->
+  <g class="pap-a-hud" font-family="IBM Plex Mono, monospace" font-size="14" fill="#F2ECDF">
+    <rect x="790" y="22" width="180" height="32" rx="16" fill="#161311" opacity=".82"/>
+    <g class="pap-a-hudrec">
+      <circle class="pap-blink" cx="810" cy="38" r="5.5" fill="#E8322A"/>
+      <text x="824" y="43">REC</text>
+      <text class="pap-a-tc1" x="860" y="43">00:00:14</text>
+      <text class="pap-a-tc2" x="860" y="43">00:00:16</text>
+      <text class="pap-a-tc3" x="860" y="43">00:00:18</text>
+      <text class="pap-a-tc4" x="860" y="43">00:00:20</text>
+    </g>
+    <g class="pap-a-hudpau">
+      <path d="M804 31 h4.5 v14 h-4.5z M812.5 31 h4.5 v14 h-4.5z"/>
+      <text x="824" y="43">PAUSED 00:00:21</text>
+    </g>
+  </g>
+
+  <!-- ============ the paused frame, and the line drawn on it ============ -->
+  <g class="pap-a-panel" style="transform-origin:660px 300px">
+    <rect x="30" y="24" width="404" height="312" fill="#161311" opacity=".18" transform="translate(4,5)"/>
+    <rect x="30" y="24" width="404" height="312" fill="#F2ECDF" stroke="#161311" stroke-width="3"/>
+    <rect x="30" y="24" width="404" height="26" fill="#161311"/>
+    <text x="44" y="42" font-family="IBM Plex Mono, monospace" font-size="13" fill="#F2ECDF">DJI_0042.MP4</text>
+    <g fill="#F2ECDF" opacity=".85">
+      <path d="M346 32 h3.5 v11 h-3.5z M352.5 32 h3.5 v11 h-3.5z"/>
+      <text x="420" y="42" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="12">00:00:21</text>
+    </g>
+
+    <!-- what the camera saw, looking ahead down the line from 50 m -->
+    <g clip-path="url(#pap-frameclip)">
+      <rect x="40" y="58" width="384" height="216" fill="#7F9A24"/>
+      <rect x="40" y="58" width="384" height="18" fill="#CFE0F8"/>
+      <path d="M40 86 L40 74 Q60 64 82 73 Q104 62 128 72 Q152 63 176 72 Q200 62 224 72 Q248 64 272 72 Q296 62 320 72 Q344 64 368 72 Q392 62 424 72 L424 86 Z" fill="#4B6006"/>
+      <path d="M40 140 L200 118 L186 274 L40 274 Z" fill="#8CA637"/>
+      <!-- the wetland beyond the fence -->
+      <path d="M309 88 L424 96 L424 274 L412 274 Z" fill="#8FB2E8"/>
+      <path d="M352 130 h22 M380 150 h26 M372 188 h24 M398 216 h20 M340 108 h18" fill="none" stroke="#2757B6" stroke-width="2" opacity=".55"/>
+      <!-- the right-of-way, running away to the horizon -->
+      <path d="M64 274 L268 86 L300 86 L366 274 Z" fill="#CFBC99"/>
+      <path d="M180 274 L279 86 L287 86 L232 274 Z" fill="#B9A98D"/>
+      <path d="M64 274 L268 86 M366 274 L300 86" fill="none" stroke="#161311" stroke-width="1.6" opacity=".7"/>
+      <path d="M252 274 L288 86" fill="none" stroke="#BB0A10" stroke-width="1.6" opacity=".8"/>
+      <!-- the silt fence, in perspective: fabric, then its stakes -->
+      <path d="M398 274 L304 88 L304 85 L398 261 Z" fill="#242020"/>
+      <path d="M392.4 262.8 V246.4 M379.2 236.8 V221.8 M366 210.8 V197.2 M353.8 186.6 V174.3 M342.5 164.3 V153.2 M332.2 143.8 V133.8 M322.8 125.2 V116.2 M314.3 108.5 V100.4 M306.8 93.6 V86.3"
+            fill="none" stroke="#87724E" stroke-width="2.2" stroke-linecap="round"/>
+      <!-- the redline, a click at a time -->
+      <path class="pap-a-seg pap-a-s1" pathLength="100" stroke="#BB0A10" stroke-width="4" stroke-linecap="round" d="M390.5 259.1 L367.9 214.5"/>
+      <path class="pap-a-seg pap-a-s2" pathLength="100" stroke="#BB0A10" stroke-width="4" stroke-linecap="round" d="M367.9 214.5 L345.4 169.8"/>
+      <path class="pap-a-seg pap-a-s3" pathLength="100" stroke="#BB0A10" stroke-width="4" stroke-linecap="round" d="M345.4 169.8 L322.8 125.2"/>
+      <g fill="#F2ECDF" stroke="#BB0A10" stroke-width="2.2">
+        <circle class="pap-a-v1" cx="390.5" cy="259.1" r="4.8"/>
+        <circle class="pap-a-v2" cx="367.9" cy="214.5" r="4.8"/>
+        <circle class="pap-a-v3" cx="345.4" cy="169.8" r="4.8"/>
+        <circle class="pap-a-v4" cx="322.8" cy="125.2" r="4.8"/>
+      </g>
+    </g>
+    <rect x="40" y="58" width="384" height="216" fill="none" stroke="#161311" stroke-width="1.5"/>
+
+    <!-- scrub bar, stopped where he paused it -->
+    <path d="M40 285 H424" stroke="#161311" stroke-width="3" opacity=".22"/>
+    <path d="M40 285 H278" stroke="#F0A53A" stroke-width="3"/>
+    <circle cx="278" cy="285" r="5.5" fill="#F0A53A" stroke="#161311" stroke-width="1.5"/>
+
+    <!-- the class list: pick the thing, then draw it -->
+    <g font-family="IBM Plex Mono, monospace" font-size="12" fill="#161311" text-anchor="middle">
+      <rect x="40" y="299" width="98" height="26" fill="#F2ECDF" stroke="#161311" stroke-width="1.6"/>
+      <rect class="pap-a-pick" x="40" y="299" width="98" height="26" fill="#F0A53A" stroke="#161311" stroke-width="1.6"/>
+      <text x="89" y="316">Silt fence</text>
+      <rect x="146" y="299" width="98" height="26" fill="#F2ECDF" stroke="#161311" stroke-width="1.6" opacity=".55"/>
+      <text x="195" y="316" opacity=".55">Filter bag</text>
+      <rect x="252" y="299" width="78" height="26" fill="#F2ECDF" stroke="#161311" stroke-width="1.6" opacity=".55"/>
+      <text x="291" y="316" opacity=".55">Blanket</text>
+    </g>
+  </g>
+
+  <!-- ============ what is on disk afterwards ============ -->
+  <g font-family="IBM Plex Mono, monospace" font-size="16" fill="#161311">
+    <g class="pap-a-f1">
+      <rect x="30" y="462" width="400" height="42" fill="#F2ECDF" stroke="#161311" stroke-width="3"/>
+      <rect x="30" y="462" width="9" height="42" fill="#637F08"/>
+      <text x="54" y="489">DJI_0042_flight.kml</text>
+    </g>
+    <g class="pap-a-f2">
+      <rect x="30" y="514" width="400" height="42" fill="#F2ECDF" stroke="#161311" stroke-width="3"/>
+      <rect x="30" y="514" width="9" height="42" fill="#2757B6"/>
+      <text x="54" y="541">Redline_These Big Jobs - Spread I.kmz</text>
+    </g>
+  </g>
+
+  <!-- the click on the class, and the pointer -->
+  <g class="pap-a-ring" style="transform-origin:72px 314px" fill="none" stroke="#2757B6" stroke-width="3">
+    <circle cx="72" cy="314" r="18"/>
+  </g>
+  <g class="pap-a-cur">
+    <path d="M0 0 L0 30 L8 23 L14 36 L20 33 L14 20 L24 19 Z"
+          fill="#F2ECDF" stroke="#161311" stroke-width="2.5" stroke-linejoin="round"/>
+  </g>
+
+</g>
+</svg>
+</div>
+
+<ol class="pap-steps">
+  <li class="pap-a-st1"><b>01</b> A drone clip, and where it flew</li>
+  <li class="pap-a-st2"><b>02</b> Pause it and draw what is there</li>
+  <li class="pap-a-st3"><b>03</b> A KMZ of what you drew</li>
+</ol>
+</section>
+<!-- ================= END PAPER AIRPLANE STORYBOOK ================= -->
       </div>
 
       <div class="tabshow-panel" role="tabpanel" id="tp-kmz" aria-labelledby="tb-kmz" hidden>
@@ -1278,20 +1856,23 @@
   </g>
 
   <!-- ============ the balloon the click opens ============ -->
+  <!-- Laid out the way kmz_balloon_html writes it: the photograph on top, then
+       one table of label / value rows under it, in the program's order. -->
   <g class="pkz-balloon" style="transform-origin:648px 296px">
     <path d="M640 268 L648 296 L656 268 Z" fill="#FFFFFF" stroke="#999999" stroke-width="1.2"/>
-    <rect x="378" y="106" width="304" height="164" rx="4" fill="#FFFFFF" stroke="#999999" stroke-width="1.2"/>
-    <rect x="390" y="116" width="128" height="72" fill="#8FA9C8" stroke="#999999" stroke-width="1.2"/>
-    <rect x="390" y="158" width="128" height="30" fill="#8A6F4C"/>
-    <path d="M390 170 h128 v8 h-128z" fill="#2A2320"/>
+    <rect x="378" y="40" width="314" height="230" rx="4" fill="#FFFFFF" stroke="#999999" stroke-width="1.2"/>
+    <path d="M641 269 h14" stroke="#FFFFFF" stroke-width="2.4"/>
+    <rect x="390" y="52" width="160" height="90" fill="#8FA9C8" stroke="#999999" stroke-width="1.2"/>
+    <rect x="390" y="104" width="160" height="38" fill="#8A6F4C"/>
+    <path d="M390 119 h160 v10 h-160z" fill="#2A2320"/>
     <g font-family="Arial, Helvetica, sans-serif" font-size="9.5">
-      <g class="pkz-r1"><text x="530" y="124" fill="#606060" font-weight="700">File</text><text x="574" y="124" fill="#202020">2208+00_Demo_West_IMG_0142.JPEG</text></g>
-      <g class="pkz-r2"><text x="530" y="140" fill="#606060" font-weight="700">Station</text><text x="574" y="140" fill="#202020">2208+00  Demo_West</text></g>
-      <g class="pkz-r3"><text x="530" y="156" fill="#606060" font-weight="700">Taken</text><text x="574" y="156" fill="#202020">2026-09-16 10:42:18</text></g>
-      <g class="pkz-r4"><text x="530" y="172" fill="#606060" font-weight="700">Position</text><text x="574" y="172" fill="#202020">40.371902, -97.028415</text></g>
-      <g class="pkz-r5"><text x="390" y="206" fill="#606060" font-weight="700">Direction</text><text x="446" y="206" fill="#202020">118&#176;M</text></g>
-      <g class="pkz-r6"><text x="390" y="224" fill="#606060" font-weight="700">Camera</text><text x="446" y="224" fill="#202020">Apple iPhone</text></g>
-      <g class="pkz-r7"><text x="390" y="242" fill="#606060" font-weight="700">Folder</text><text x="446" y="242" fill="#202020">9-16-26</text></g>
+      <g class="pkz-r1"><text x="390" y="162" fill="#606060" font-weight="700">File</text><text x="446" y="162" fill="#202020">2208+00_These Big Jobs - Spread I_IMG_0142.JPEG</text></g>
+      <g class="pkz-r2"><text x="390" y="178" fill="#606060" font-weight="700">Station</text><text x="446" y="178" fill="#202020">2208+00  These Big Jobs - Spread I</text></g>
+      <g class="pkz-r3"><text x="390" y="194" fill="#606060" font-weight="700">Taken</text><text x="446" y="194" fill="#202020">2026-09-16 10:42:18</text></g>
+      <g class="pkz-r4"><text x="390" y="210" fill="#606060" font-weight="700">Position</text><text x="446" y="210" fill="#202020">40.371902, -97.028415</text></g>
+      <g class="pkz-r5"><text x="390" y="226" fill="#606060" font-weight="700">Direction</text><text x="446" y="226" fill="#202020">118&#176;M</text></g>
+      <g class="pkz-r6"><text x="390" y="242" fill="#606060" font-weight="700">Camera</text><text x="446" y="242" fill="#202020">Apple iPhone</text></g>
+      <g class="pkz-r7"><text x="390" y="258" fill="#606060" font-weight="700">Folder</text><text x="446" y="258" fill="#202020">9-16-26</text></g>
     </g>
   </g>
 
@@ -1558,7 +2139,7 @@
     </g>
 
     <g class="gst-r1" font-family="IBM Plex Mono, monospace" font-size="13" fill="#161311" opacity=".62">
-      <text x="30" y="102">9-16-26 scatter sheet.xlsx</text>
+      <text x="30" y="102">These Big Jobs - Spread I &#183; 9-16-26 scatter sheet.xlsx</text>
     </g>
 
     <g class="gst-r1">
@@ -1700,6 +2281,14 @@
         pasted into a report and printed.</p>
       </div>
       <div>
+        <h3>Paper Airplane</h3>
+        <p>Opens a drone clip and reads the flight out of the clip itself, so
+        where the aircraft went goes to Google Earth. Pause it, pick what you
+        are marking &mdash; silt fence, filter bag, blanket &mdash; and click
+        it on the frame: each click lands on the ground where that thing is,
+        and the marks come out as a KMZ for the spread.</p>
+      </div>
+      <div>
         <h3>Google Earth KMZ</h3>
         <p>Exports the day as a KMZ, one file for each folder of photos,
         named after the folder. Every photo becomes a pin with a cone showing
@@ -1743,6 +2332,6 @@
   </div>
 </footer>
 
-<script src="assets/site.js?v=bb6d04d0"></script>
+<script src="assets/site.js?v=ec689efc"></script>
 </body>
 </html>

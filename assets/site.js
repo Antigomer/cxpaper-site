@@ -160,7 +160,7 @@ var CONFIG = {
     // Was one storybook, is now one per tab of the program. Each gets its own
     // observer entry; a panel that is hidden is not animating at all, so this
     // only ever has real work to do for the tab on show.
-    var scopes = document.querySelectorAll(".cps-scope, .gst-scope, .mpo-scope, .pkz-scope");
+    var scopes = document.querySelectorAll(".cps-scope, .gst-scope, .mpo-scope, .pap-scope, .pkz-scope");
     if (!scopes.length || !("IntersectionObserver" in window)) return;
     var io = new IntersectionObserver(function (entries) {
       for (var i = 0; i < entries.length; i++) {
@@ -182,13 +182,53 @@ var CONFIG = {
     if (!tabs.length) return;
 
     function show(tab) {
+      var shown = null;
       for (var i = 0; i < tabs.length; i++) {
         var on = tabs[i] === tab;
         tabs[i].setAttribute("aria-selected", on ? "true" : "false");
         tabs[i].tabIndex = on ? 0 : -1;
         var panel = document.getElementById(tabs[i].getAttribute("aria-controls"));
         if (panel) panel.hidden = !on;
+        if (on) shown = i;
       }
+      playThrough(shown);
+    }
+
+    // One storybook plays through once and hands on to the next tab, per
+    // Chris, so the strip reads as one film of the whole program rather than
+    // one tab on repeat. After the last tab it comes back round to the first.
+    //
+    // The cue is the storybook's own stage animation finishing its first pass,
+    // read off that animation's clock - not a 20 s timer beside it, which
+    // would keep counting while the storybook is parked off screen or the
+    // browser tab is in the background, and cut it short on return. Not the
+    // animationiteration event either: headless Chrome never sends it, and a
+    // hand-off nothing can test is one that breaks quietly.
+    //
+    // Reduced motion runs no animation, so there is no clock and the still on
+    // show stays put. The CSS still says infinite, so a browser without
+    // getAnimations simply loops each storybook as it did before.
+    var watch = null;
+    function playThrough(at) {
+      if (watch) { clearTimeout(watch); watch = null; }
+      if (at === null) return;
+      var panel = document.getElementById(tabs[at].getAttribute("aria-controls"));
+      var stage = panel ? panel.querySelector('[class$="-stage"]') : null;
+      if (!stage || !stage.getAnimations) return;
+      function look() {
+        watch = null;
+        var a = stage.getAnimations()[0];
+        if (!a || panel.hidden) return;
+        var t = a.effect.getComputedTiming();
+        if (t.currentIteration >= 1) { show(tabs[(at + 1) % tabs.length]); return; }
+        // Wake at the end of this pass, at the rate it is really playing. A
+        // parked one is not playing, so it is looked at again in a second.
+        var left = a.playState === "running" && a.playbackRate > 0
+          ? (t.duration - (t.localTime % t.duration)) / a.playbackRate
+          : 1000;
+        watch = setTimeout(look, Math.max(40, Math.min(left + 40, 5000)));
+      }
+      look();
     }
 
     // Hover switches tabs, per Chris. The small delay is not hesitation: the
@@ -216,6 +256,11 @@ var CONFIG = {
       tabs[i].addEventListener("focus", function () { cancel(); show(this); });
     }
     bar.addEventListener("mouseleave", cancel);
+
+    // The tab on show when the page opens plays through like any other.
+    for (var s = 0; s < tabs.length; s++) {
+      if (tabs[s].getAttribute("aria-selected") === "true") { playThrough(s); break; }
+    }
 
     // Left/right arrows move between tabs, which is what a tablist is expected
     // to do and what a keyboard user will try.
