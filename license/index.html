@@ -33,7 +33,9 @@
     <a class="name" href="/">Construction Paper</a>
     <nav class="site-nav">
       <a href="/">Overview</a>
-      <a href="/license/">Request a license</a>
+      <!-- Disabled 2026-09-26, same as index.html - see that file for
+           Chris's words. Was: <a href="/license/">Request a license</a> -->
+      <button class="btn" type="button" disabled>Coming soon</button>
     </nav>
   </div>
 </header>
@@ -97,8 +99,14 @@
                 aria-label="Your license key"></textarea>
       <div class="btn-row" style="margin:0.75rem 0 0">
         <button class="btn" type="button" data-request="copy">Copy the key</button>
-        <a class="btn ghost" data-release="link" aria-disabled="true"
-           href="https://github.com/antigomer/cxpaper-releases/releases">Download the program</a>
+        <!-- Download button disabled 2026-09-26, same reason as the nav
+             links - dropped data-release="link" too, so site.js's auto-fill
+             (assets/site.js?v=ec689efc, ~line 79) can't silently re-enable it once a
+             real GitHub release exists. Was:
+             <a class="btn ghost" data-release="link" aria-disabled="true"
+                href="https://github.com/antigomer/cxpaper-releases/releases">
+               Download the program</a> -->
+        <button class="btn ghost" type="button" disabled>Coming soon</button>
         <span class="form-state" data-request="copied" role="status" aria-live="polite"></span>
       </div>
       <p style="margin:1rem 0 0">
@@ -153,8 +161,13 @@
     </p>
 
     <div class="btn-row">
-      <a class="btn" data-release="link" data-release-label aria-disabled="true"
-         href="https://github.com/antigomer/cxpaper-releases/releases">Download the program</a>
+      <!-- Disabled 2026-09-26, same as above - dropped data-release/
+           data-release-label so site.js can't re-enable it. Was:
+           <a class="btn" data-release="link" data-release-label
+              aria-disabled="true"
+              href="https://github.com/antigomer/cxpaper-releases/releases">
+             Download the program</a> -->
+      <button class="btn" type="button" disabled>Coming soon</button>
     </div>
     <p>
       Take it whenever you like &mdash; the order does not matter, only that you
