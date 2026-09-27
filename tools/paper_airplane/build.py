@@ -917,7 +917,7 @@ def svg():
     A = o.append
     A('<svg class="pap-svg" viewBox="0 0 1000 580" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="pap-t pap-d" focusable="false">')
     A('<title id="pap-t">Paper Airplane: fly the right-of-way, then mark what the clip shows</title>')
-    A('<desc id="pap-d">An inspector in a hi-vis vest throws his camera into the air; at the top of the throw it unfolds into a drone and starts recording. '
+    A('<desc id="pap-d">Yule Avdat, an inspector in a hi-vis vest, throws his camera into the air; at the top of the throw it unfolds into a drone and starts recording. '
       'The view tilts over into a map and the drone flies the whole right-of-way, past a standing crop field and over a stream crossing, drawing its flight behind it, and the clip is saved. '
       'Later, in the truck, the clip is opened in Paper Airplane on a laptop and the player fills the picture. It plays down the right-of-way, stakes going by, and a filter bag out in the crop past the LOD flagging comes up out of the distance; it pauses when the bag is close: '
       'Filter bag is picked from the class list and one click marks it. It plays on, the bag goes by, the stream crossing comes up, and it pauses there: silt fence is picked and drawn along the near bank and again along the far bank, '
