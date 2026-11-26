@@ -15,7 +15,7 @@ var CONFIG = {
   // that is not GitHub. Empty until the endpoint exists, and while it is
   // empty the form says so and hands the visitor the email instead of
   // pretending to send. Fill it in and nothing else here changes.
-  licenseApi: "https://cxpaper-license.chris-73e.workers.dev/request",
+  licenseApi: "",  // switched off 2026-11-26 on Chris's word; was https://cxpaper-license.chris-73e.workers.dev/request
   supportEmail: "chris@chrisputnam.me"
 };
 

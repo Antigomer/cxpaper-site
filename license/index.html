@@ -35,7 +35,6 @@
       <a href="/">Overview</a>
       <!-- Disabled 2026-09-26, same as index.html - see that file for
            Chris's words. Was: <a href="/license/">Request a license</a> -->
-      <button class="btn" type="button" disabled>Coming soon</button>
     </nav>
   </div>
 </header>
@@ -46,9 +45,7 @@
 
     <h1>Request a license</h1>
     <p class="lede">
-      Construction Paper will not open without a license. Answer these four
-      and your key comes straight back, on this page. The file to download
-      is further down, under <a href="#the-file">The file</a>.
+      Construction Paper will not open without a license. License requests open soon.
     </p>
 
     <form class="form" id="license-request" novalidate>
@@ -83,7 +80,8 @@
       </div>
 
       <div class="btn-row">
-        <button class="btn" type="submit" data-request="submit">Send the request</button>
+        <!-- Switched off 2026-11-26 on Chris's word ("Turn it off."). Was an enabled "Send the request" button. -->
+        <button class="btn" type="submit" data-request="submit" disabled>Coming soon</button>
         <span class="form-state" data-request="state" role="status" aria-live="polite"></span>
       </div>
     </form>
@@ -101,7 +99,7 @@
         <button class="btn" type="button" data-request="copy">Copy the key</button>
         <!-- Download button disabled 2026-09-26, same reason as the nav
              links - dropped data-release="link" too, so site.js's auto-fill
-             (assets/site.js?v=ec689efc, ~line 79) can't silently re-enable it once a
+             (assets/site.js?v=392f8b2c, ~line 79) can't silently re-enable it once a
              real GitHub release exists. Was:
              <a class="btn ghost" data-release="link" aria-disabled="true"
                 href="https://github.com/antigomer/cxpaper-releases/releases">
@@ -171,8 +169,7 @@
     </div>
     <p>
       Take it whenever you like &mdash; the order does not matter, only that you
-      end up with both. It will not open until a license is pasted into it, and
-      the form at the top of this page gives you one on the spot.
+      end up with both. It will not open until a license is pasted into it.
     </p>
 
     <table class="kv" data-release-state="loading">
@@ -236,6 +233,6 @@
   </div>
 </footer>
 
-<script src="../assets/site.js?v=ec689efc"></script>
+<script src="../assets/site.js?v=392f8b2c"></script>
 </body>
 </html>

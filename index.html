@@ -103,7 +103,7 @@
            "disable the download and request for license links... replace
            them with hero buttons that don't do anything, but just say
            coming soon." Was: <a href="/license/">Request a license</a> -->
-      <button class="btn" type="button" disabled>Coming soon</button>
+      <!-- Header Coming soon button removed 2026-11-26 (Chris: Grok/Charles website review); the one under "Who it is for" stays. -->
     </nav>
   </div>
 </header>
@@ -115,13 +115,6 @@
     <p class="label">Windows · pipeline environmental inspection</p>
     <h1>Tools for inspectors. Built by inspectors.</h1>
     <p class="hero-sub">Not outsourced, made here, by someone who does the job.</p>
-    <p class="lede">
-      Name a day's photos by station. Stamp them with where they were taken.
-      Send the day to Google Earth. Lay stationing down the line, pull features
-      out into layers, and put the crews on the map from the scatter sheet. It
-      runs from its own folder on a truck laptop, and does not need the internet
-      while you work.
-    </p>
 
 
     <div class="tabshow" id="tabshow">
@@ -305,12 +298,12 @@
 /* ---- caption chips under the picture ---- */
 .cps-steps{display:flex;flex-wrap:wrap;gap:.4rem 1.25rem;margin:.9rem 0 0;padding:0;list-style:none;
   font-family:var(--cps-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cps-ink);}
-.cps-steps li{opacity:.34;animation-duration:var(--cps-dur);animation-iteration-count:infinite;
+.cps-steps li{opacity:.75;animation-duration:var(--cps-dur);animation-iteration-count:infinite;
   animation-fill-mode:both;animation-timing-function:linear;}
 .cps-steps li b{font-weight:400;color:var(--cps-red-t);margin-right:.5em;}
-.cps-s1{animation-name:cps-s1}@keyframes cps-s1{0%,24%{opacity:1}28%,100%{opacity:.34}}
-.cps-s2{animation-name:cps-s2}@keyframes cps-s2{0%,24%{opacity:.34}28%,64%{opacity:1}68%,100%{opacity:.34}}
-.cps-s3{animation-name:cps-s3}@keyframes cps-s3{0%,64%{opacity:.34}68%,96%{opacity:1}100%{opacity:.34}}
+.cps-s1{animation-name:cps-s1}@keyframes cps-s1{0%,24%{opacity:1}28%,100%{opacity:.75}}
+.cps-s2{animation-name:cps-s2}@keyframes cps-s2{0%,24%{opacity:.75}28%,64%{opacity:1}68%,100%{opacity:.75}}
+.cps-s3{animation-name:cps-s3}@keyframes cps-s3{0%,64%{opacity:.75}68%,96%{opacity:1}100%{opacity:.75}}
 
 /* ---- small screens: the on-screen filenames stop being legible, so give them as real text ---- */
 .cps-mobfiles{display:none;}
@@ -837,11 +830,11 @@
 .mpo-steps{display:flex;gap:.5rem 1.6rem;flex-wrap:wrap;list-style:none;margin:.9rem 0 0;padding:0;
   font-family:var(--mpo-mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;
   color:rgba(22,19,17,.62);}
-.mpo-steps li{display:flex;align-items:baseline;gap:.45rem;opacity:.34;}
+.mpo-steps li{display:flex;align-items:baseline;gap:.45rem;opacity:.75;}
 .mpo-steps b{font-weight:400;color:var(--mpo-red-t);}
 .mpo-scope .mpo-steps li{animation-timing-function:linear;}
-.mpo-s1{animation-name:mpo-s1}@keyframes mpo-s1{0%,30%{opacity:1}35%,100%{opacity:.34}}
-.mpo-s2{animation-name:mpo-s2}@keyframes mpo-s2{0%,30%{opacity:.34}35%,100%{opacity:1}}
+.mpo-s1{animation-name:mpo-s1}@keyframes mpo-s1{0%,30%{opacity:1}35%,100%{opacity:.75}}
+.mpo-s2{animation-name:mpo-s2}@keyframes mpo-s2{0%,30%{opacity:.75}35%,100%{opacity:1}}
 @media (max-width:40rem){ .mpo-steps{font-size:10px;gap:.35rem .9rem;} }
 
 /* ---- reduced motion: the finished photograph ---- */
@@ -1147,7 +1140,7 @@
 .pap-steps{display:flex;gap:.5rem 1.6rem;flex-wrap:wrap;list-style:none;margin:.9rem 0 0;padding:0;
   font-family:var(--pap-mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;
   color:rgba(22,19,17,.62);}
-.pap-steps li{display:flex;align-items:baseline;gap:.45rem;opacity:.34;}
+.pap-steps li{display:flex;align-items:baseline;gap:.45rem;opacity:.75;}
 .pap-steps b{font-weight:400;color:var(--pap-red-t);}
 @media (max-width:40rem){ .pap-steps{font-size:10px;gap:.35rem .9rem;} }
 
@@ -1447,15 +1440,15 @@
 .pap-scope .pap-a-gball{opacity:0;animation-name:pap-a-gball;animation-timing-function:cubic-bezier(.2,1.2,.35,1);transform-origin:444.2px 462.18px;}
 @keyframes pap-a-gball{0%,87.614%{opacity:0;transform:scale(.05)}87.727%{opacity:1;transform:scale(.05)}88.182%{opacity:1;transform:scale(1.04)}88.409%,100%{opacity:1;transform:none}}
 .pap-scope .pap-a-st1{animation-name:pap-a-st1;animation-timing-function:linear;}
-@keyframes pap-a-st1{0%{opacity:1}26.25%{opacity:1}26.818%,100%{opacity:.34}}
+@keyframes pap-a-st1{0%{opacity:1}26.25%{opacity:1}26.818%,100%{opacity:.75}}
 .pap-scope .pap-a-st2{animation-name:pap-a-st2;animation-timing-function:linear;}
-@keyframes pap-a-st2{0%,26.25%{opacity:.34}26.818%{opacity:1}32.841%{opacity:1}33.409%,100%{opacity:.34}}
+@keyframes pap-a-st2{0%,26.25%{opacity:.75}26.818%{opacity:1}32.841%{opacity:1}33.409%,100%{opacity:.75}}
 .pap-scope .pap-a-st3{animation-name:pap-a-st3;animation-timing-function:linear;}
-@keyframes pap-a-st3{0%,32.841%{opacity:.34}33.409%{opacity:1}67.614%{opacity:1}68.182%,100%{opacity:.34}}
+@keyframes pap-a-st3{0%,32.841%{opacity:.75}33.409%{opacity:1}67.614%{opacity:1}68.182%,100%{opacity:.75}}
 .pap-scope .pap-a-st4{animation-name:pap-a-st4;animation-timing-function:linear;}
-@keyframes pap-a-st4{0%,67.614%{opacity:.34}68.182%{opacity:1}80.114%{opacity:1}80.682%,100%{opacity:.34}}
+@keyframes pap-a-st4{0%,67.614%{opacity:.75}68.182%{opacity:1}80.114%{opacity:1}80.682%,100%{opacity:.75}}
 .pap-scope .pap-a-st5{animation-name:pap-a-st5;animation-timing-function:linear;}
-@keyframes pap-a-st5{0%,80.114%{opacity:.34}80.682%{opacity:1}97.841%{opacity:1}98.409%,100%{opacity:.34}}
+@keyframes pap-a-st5{0%,80.114%{opacity:.75}80.682%{opacity:1}97.841%{opacity:1}98.409%,100%{opacity:.75}}
 
 /* ---- reduced motion: the finished result - the KMZ open in Google Earth
        with every mark on the ground and the filter bag's balloon open ---- */
@@ -2094,11 +2087,11 @@
 .pkz-steps{display:flex;gap:.5rem 1.6rem;flex-wrap:wrap;list-style:none;margin:.9rem 0 0;padding:0;
   font-family:var(--pkz-mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;
   color:rgba(22,19,17,.62);}
-.pkz-steps li{display:flex;align-items:baseline;gap:.45rem;opacity:.34;}
+.pkz-steps li{display:flex;align-items:baseline;gap:.45rem;opacity:.75;}
 .pkz-steps b{font-weight:400;color:var(--pkz-red-t);}
 .pkz-scope .pkz-steps li{animation-timing-function:linear;}
-.pkz-s1{animation-name:pkz-s1}@keyframes pkz-s1{0%,22%{opacity:1}27%,100%{opacity:.34}}
-.pkz-s2{animation-name:pkz-s2}@keyframes pkz-s2{0%,22%{opacity:.34}27%,100%{opacity:1}}
+.pkz-s1{animation-name:pkz-s1}@keyframes pkz-s1{0%,22%{opacity:1}27%,100%{opacity:.75}}
+.pkz-s2{animation-name:pkz-s2}@keyframes pkz-s2{0%,22%{opacity:.75}27%,100%{opacity:1}}
 @media (max-width:40rem){ .pkz-steps{font-size:10px;gap:.35rem .9rem;} }
 
 /* ---- reduced motion: the finished map, a balloon open on one pin ---- */
@@ -2363,12 +2356,12 @@
 .gst-steps{display:flex;gap:.5rem 1.6rem;flex-wrap:wrap;list-style:none;margin:.9rem 0 0;padding:0;
   font-family:var(--gst-mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;
   color:rgba(22,19,17,.62);}
-.gst-steps li{display:flex;align-items:baseline;gap:.45rem;opacity:.34;}
+.gst-steps li{display:flex;align-items:baseline;gap:.45rem;opacity:.75;}
 .gst-steps b{font-weight:400;color:var(--gst-red-t);}
 /* linear, not the scope's easing - these are just lights coming on */
 .gst-scope .gst-steps li{animation-timing-function:linear;}
-.gst-s1{animation-name:gst-s1}@keyframes gst-s1{0%,30%{opacity:1}34%,100%{opacity:.34}}
-.gst-s2{animation-name:gst-s2}@keyframes gst-s2{0%,30%{opacity:.34}34%,100%{opacity:1}}
+.gst-s1{animation-name:gst-s1}@keyframes gst-s1{0%,30%{opacity:1}34%,100%{opacity:.75}}
+.gst-s2{animation-name:gst-s2}@keyframes gst-s2{0%,30%{opacity:.75}34%,100%{opacity:1}}
 @media (max-width:40rem){ .gst-steps{font-size:10px;gap:.35rem .9rem;} }
 
 /* ---- reduced motion: the finished picture, balloon open on the crew that is
@@ -2596,34 +2589,6 @@
 
     <div class="grid">
       <div>
-        <h3>Rename by station</h3>
-        <p>Reads the GPS out of each photo, finds the nearest station point in
-        your KMZ, and writes a name you can sort — station, project, original
-        filename. Videos too, on a machine that has ffmpeg installed.</p>
-      </div>
-      <div>
-        <h3>Marco Polocator</h3>
-        <p>Burns location, bearing, date and a caption onto the image itself, so
-        the photo still says where it was taken after it has been mailed,
-        pasted into a report and printed.</p>
-      </div>
-      <div>
-        <h3>Paper Airplane</h3>
-        <p>Opens a drone clip and reads the flight out of the clip itself, so
-        where the aircraft went goes to Google Earth. Pause it, pick what you
-        are marking &mdash; silt fence, filter bag, blanket &mdash; and click
-        it on the frame: each click lands on the ground where that thing is,
-        and the marks come out as a KMZ for the spread.</p>
-      </div>
-      <div>
-        <h3>Google Earth KMZ</h3>
-        <p>Exports the day as a KMZ, one file for each folder of photos,
-        named after the folder. Every photo becomes a pin with a cone showing
-        which way the camera was pointed &mdash; and just the pin, with no cone,
-        where the phone recorded no heading. Click one and the photo opens in
-        the balloon. Send it and the other person sees what you saw.</p>
-      </div>
-      <div>
         <h3>Stale GPS caught</h3>
         <p>A plausibility check catches coordinates that could not be right
         — usually a hot phone that stopped reacquiring GPS and stamped the photo
@@ -2634,7 +2599,7 @@
         <h3>Portable</h3>
         <p>One executable and no installer. Settings, layers, profiles and tile
         cache live beside it, so it runs from a truck laptop and leaves the rest
-        of the machine alone. The key binds to the first computer it opens on.</p>
+        of the machine alone. The key binds to the first computer it opens on. It runs from its own folder and does not need the internet while you work.</p>
       </div>
     </div>
 
@@ -2661,6 +2626,6 @@
   </div>
 </footer>
 
-<script src="assets/site.js?v=ec689efc"></script>
+<script src="assets/site.js?v=392f8b2c"></script>
 </body>
 </html>
